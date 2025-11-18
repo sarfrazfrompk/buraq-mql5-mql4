@@ -1,0 +1,413 @@
+{
+	"name": "buraq-mql5-mql4", 
+	"displayName": "Buraq MQL5 & MQL4",
+	"description": "Buraq MQL5 & MQL4 is a VS Code extension that provides comprehensive language support for MQL (MetaQuotes Language) files used in MetaTrader trading platforms. It enables developers to write, compile, and debug MQL4/MQL5 code directly within VS Code with features like syntax checking, compilation, help documentation access, and intelligent code completion. The extension bridges VS Code and MetaEditor/MetaTrader, automating compilation workflows and enhancing productivity for algorithmic trading development.",
+	"version": "1.00",
+	"publisher": "sarfrazfrompk",
+	"engines": {
+		"vscode": "^1.106.0"
+	},
+	"categories": [
+		"Programming Languages",
+		"Snippets",
+		"Other"
+	],
+	"keywords": [
+		"mql",
+		"mql4",
+		"mql5",
+		"mqh",
+		"mq4",
+		"mq5"
+	],
+	"icon": "mql-images/mql-icon.png",
+	"repository": {
+		"type": "website",
+		"url": "http://sarfrazfrompk.vercel.app/"
+	},
+	"activationEvents": [
+		"onLanguage:cpp",
+		"onCommand:buraq_mql5_mql4.compileScript",
+		"onCommand:buraq_mql5_mql4.checkFile",
+		"onCommand:buraq_mql5_mql4.compileFile",
+		"onCommand:buraq_mql5_mql4.help",
+		"onCommand:buraq_mql5_mql4.configurations",
+		"onCommand:buraq_mql5_mql4.Addicon",
+		"onCommand:buraq_mql5_mql4.Showfiles",
+		"onCommand:buraq_mql5_mql4.InsNameMQH",
+		"onCommand:buraq_mql5_mql4.InsMQH",
+		"onCommand:buraq_mql5_mql4.InsMQL",
+		"onCommand:buraq_mql5_mql4.InsNameMQL",
+		"onCommand:buraq_mql5_mql4.InsResource",
+		"onCommand:buraq_mql5_mql4.InsImport",
+		"onCommand:buraq_mql5_mql4.InsTime",
+		"onCommand:buraq_mql5_mql4.InsIcon",
+		"onCommand:buraq_mql5_mql4.commentary",
+		"onCommand:buraq_mql5_mql4.openInME"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"configuration": {
+			"title": "Buraq MQL5 & MQL4",
+			"properties": {
+				"buraq_mql5_mql4.LogFile.DeleteLog": {
+					"type": "boolean",
+					"default": true,
+					"description": "%buraq_mql5_mql4.configuration.DeleteLog.description%"
+				},
+				"buraq_mql5_mql4.Metaeditor.Metaeditor4Dir": {
+					"type": "string",
+					"default": "C:\\MT4_Install\\MetaTrader\\metaeditor.exe",
+					"description": "%buraq_mql5_mql4.configuration.Metaeditor4Dir.description%"
+				},
+				"buraq_mql5_mql4.Metaeditor.Metaeditor5Dir": {
+					"type": "string",
+					"default": "C:\\MT5_Install\\MetaTrader\\metaeditor.exe",
+					"description": "%buraq_mql5_mql4.configuration.Metaeditor5Dir.description%"
+				},
+				"buraq_mql5_mql4.Metaeditor.Include4Dir": {
+					"type": "string",
+					"default": "",
+					"description": "%buraq_mql5_mql4.configuration.Include4Dir.description%"
+				},
+				"buraq_mql5_mql4.Metaeditor.Include5Dir": {
+					"type": "string",
+					"default": "",
+					"description": "%buraq_mql5_mql4.configuration.Include5Dir.description%"
+				},
+				"buraq_mql5_mql4.LogFile.NameLog": {
+					"type": "string",
+					"default": "",
+					"description": "%buraq_mql5_mql4.configuration.LogDir.description%"
+				},
+				"buraq_mql5_mql4.ShowButton.Compile": {
+					"type": "boolean",
+					"default": true,
+					"description": "%buraq_mql5_mql4.configuration.ShowButtonCompile.description%"
+				},
+				"buraq_mql5_mql4.ShowButton.Check": {
+					"type": "boolean",
+					"default": true,
+					"description": "%buraq_mql5_mql4.configuration.ShowButtonCheck.description%"
+				},
+				"buraq_mql5_mql4.ShowButton.Script": {
+					"type": "boolean",
+					"default": true,
+					"description": "%buraq_mql5_mql4.configuration.ShowButtonScript.description%"
+				},
+				"buraq_mql5_mql4.Script.MiniME": {
+					"type": "boolean",
+					"default": true,
+					"description": "%buraq_mql5_mql4.configuration.MiniME.description%"
+				},
+				"buraq_mql5_mql4.Script.Timetomini": {
+					"type": "number",
+					"default": 500,
+					"minimum": 100,
+					"description": "%buraq_mql5_mql4.configuration.Timetomini.description%"
+				},
+				"buraq_mql5_mql4.Script.CloseME": {
+					"type": "boolean",
+					"default": true,
+					"description": "%buraq_mql5_mql4.configuration.CloseME.description%"
+				},
+				"buraq_mql5_mql4.Help.HelpON": {
+					"type": "boolean",
+					"default": true,
+					"description": "%buraq_mql5_mql4.configuration.HelpON.description%"
+				},
+				"buraq_mql5_mql4.Help.MQL4HelpLanguage": {
+					"type": "string",
+					"default": "English",
+					"enum": [
+						"English"
+					],
+					"description": "%buraq_mql5_mql4.configuration.MQL4HelpLanguage.description%"
+				},
+				"buraq_mql5_mql4.Help.MQL5HelpLanguage": {
+					"type": "string",
+					"default": "English",
+					"enum": [
+						"English"
+					],
+					"description": "%buraq_mql5_mql4.configuration.MQL5HelpLanguage.description%"
+				},
+				"buraq_mql5_mql4.Help.HelpVal": {
+					"type": "number",
+					"default": 500,
+					"minimum": 150,
+					"description": "%buraq_mql5_mql4.configuration.HelpVal.description%"
+				},
+				"buraq_mql5_mql4.context": {
+					"type": "boolean",
+					"default": false,
+					"markdownDeprecationMessage": "%buraq_mql5_mql4.configuration.context%"
+				},
+				"buraq_mql5_mql4.ShowChart.BrandingEnabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable MQL-Media branding on charts"
+				},
+				"buraq_mql5_mql4.ShowChart.BrandingPosition": {
+					"type": "string",
+					"default": "top-right",
+					"enum": [
+						"top-right",
+						"top-left",
+						"bottom-right",
+						"bottom-left"
+					],
+					"description": "Position of MQL-Media branding on charts"
+				}
+			}
+		},
+		"languages": [
+			{
+				"id": "cpp",
+				"extensions": [
+					".mq4",
+					".mq5",
+					".mqh"
+				],
+				"configuration": "./syntaxes/mql.configuration.json"
+			},
+			{
+				"id": "mql-output",
+				"mimetypes": [
+					"text/x-code-output"
+				]
+			}
+		],
+		"grammars": [
+			{
+				"language": "cpp",
+				"scopeName": "source.mql",
+				"path": "./syntaxes/mql.tmLanguage"
+			},
+			{
+				"language": "mql-output",
+				"scopeName": "mql.output",
+				"path": "./syntaxes/mql.out.tmLanguage"
+			}
+		],
+		"commands": [
+			{
+				"command": "buraq_mql5_mql4.compileScript",
+				"title": "%buraq_mql5_mql4.commands.compileScript.title%",
+				"category": "MQL",
+				"icon": {
+					"dark": "./mql-media/script-dark.svg",
+					"light": "./mql-media/script-light.svg"
+				}
+			},
+			{
+				"command": "buraq_mql5_mql4.compileFile",
+				"title": "%buraq_mql5_mql4.commands.compileFile.title%",
+				"category": "MQL",
+				"icon": {
+					"dark": "./mql-media/compile-dark.svg",
+					"light": "./mql-media/compile-light.svg"
+				}
+			},
+			{
+				"command": "buraq_mql5_mql4.checkFile",
+				"title": "%buraq_mql5_mql4.commands.checkFile.title%",
+				"category": "MQL",
+				"icon": {
+					"dark": "./mql-media/check-dark.svg",
+					"light": "./mql-media/check-light.svg"
+				}
+			},
+			{
+				"command": "buraq_mql5_mql4.help",
+				"title": "%buraq_mql5_mql4.commands.help.title%",
+				"category": "MQL"
+			},
+			{
+				"command": "buraq_mql5_mql4.configurations",
+				"title": "%buraq_mql5_mql4.commands.configurations.title%",
+				"category": "MQL"
+			},
+			{
+				"command": "buraq_mql5_mql4.Addicon",
+				"title": "%buraq_mql5_mql4.commands.Addicon.title%",
+				"category": "MQL"
+			},
+			{
+				"command": "buraq_mql5_mql4.Showfiles",
+				"title": "%buraq_mql5_mql4.commands.Showfiles.title%"
+			},
+			{
+				"command": "buraq_mql5_mql4.InsNameMQL",
+				"title": "%buraq_mql5_mql4.commands.InsNameMQL.title%"
+			},
+			{
+				"command": "buraq_mql5_mql4.InsMQL",
+				"title": "%buraq_mql5_mql4.commands.InsNameMQL.title%"
+			},
+			{
+				"command": "buraq_mql5_mql4.InsNameMQH",
+				"title": "%buraq_mql5_mql4.commands.InsNameMQH.title%"
+			},
+			{
+				"command": "buraq_mql5_mql4.InsMQH",
+				"title": "%buraq_mql5_mql4.commands.InsNameMQH.title%"
+			},
+			{
+				"command": "buraq_mql5_mql4.InsResource",
+				"title": "%buraq_mql5_mql4.commands.InsResource.title%"
+			},
+			{
+				"command": "buraq_mql5_mql4.InsImport",
+				"title": "%buraq_mql5_mql4.commands.InsImport.title%"
+			},
+			{
+				"command": "buraq_mql5_mql4.InsTime",
+				"title": "%buraq_mql5_mql4.commands.InsTime.title%"
+			},
+			{
+				"command": "buraq_mql5_mql4.InsIcon",
+				"title": "%buraq_mql5_mql4.commands.InsIcon.title%"
+			},
+			{
+				"command": "buraq_mql5_mql4.commentary",
+				"title": "%buraq_mql5_mql4.commands.createCommentary.title%"
+			},
+			{
+				"command": "buraq_mql5_mql4.openInME",
+				"title": "%buraq_mql5_mql4.commands.openInME.title%"
+			},
+			{
+				"command": "buraq_mql5_mql4.showChartView",
+				"title": "Show Chart with MQL-Media Branding",
+				"category": "MQL"
+			}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"when": "resourceExtname == .mq4 || resourceExtname == .mq5 || resourceExtname == .mqh",
+					"submenu": "buraq_mql5_mql4.commentary.context",
+					"group": "mql"
+				}
+			],
+			"editor/title": [
+				{
+					"when": "resourceExtname == .mq4 && config.buraq_mql5_mql4.ShowButton.Script == true || resourceExtname == .mq5 && config.buraq_mql5_mql4.ShowButton.Script == true || resourceExtname == .mqh && config.buraq_mql5_mql4.ShowButton.Script == true",
+					"command": "buraq_mql5_mql4.compileScript",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceExtname == .mq4 && config.buraq_mql5_mql4.ShowButton.Compile == true || resourceExtname == .mq5 && config.buraq_mql5_mql4.ShowButton.Compile == true || resourceExtname == .mqh && config.buraq_mql5_mql4.ShowButton.Compile == true",
+					"command": "buraq_mql5_mql4.compileFile",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceExtname == .mq4 && config.buraq_mql5_mql4.ShowButton.Check == true|| resourceExtname == .mq5 && config.buraq_mql5_mql4.ShowButton.Check == true || resourceExtname == .mqh && config.buraq_mql5_mql4.ShowButton.Check == true",
+					"command": "buraq_mql5_mql4.checkFile",
+					"group": "navigation"
+				}
+			],
+			"explorer/context": [
+				{
+					"when": "config.buraq_mql5_mql4.context == true",
+					"command": "buraq_mql5_mql4.Showfiles",
+					"group": "z_commands"
+				},
+				{
+					"when": "resourceExtname == .mq4 || resourceExtname == .mq5 || resourceExtname == .mqh",
+					"command": "buraq_mql5_mql4.openInME",
+					"group": "z_commands"
+				},
+				{
+					"when": "resourceExtname == .mqh",
+					"command": "buraq_mql5_mql4.InsNameMQH",
+					"group": "z_commands"
+				},
+				{
+					"when": "resourceExtname == .mq4 || resourceExtname == .mq5",
+					"command": "buraq_mql5_mql4.InsNameMQL",
+					"group": "z_commands"
+				}
+			],
+			"buraq_mql5_mql4.commentary.context": [
+				{
+					"command": "buraq_mql5_mql4.commentary",
+					"group": "comment"
+				},
+				{
+					"command": "buraq_mql5_mql4.InsMQH",
+					"group": "insert"
+				},
+				{
+					"command": "buraq_mql5_mql4.InsResource",
+					"group": "insert"
+				},
+				{
+					"command": "buraq_mql5_mql4.InsImport",
+					"group": "insert"
+				},
+				{
+					"command": "buraq_mql5_mql4.InsTime",
+					"group": "insert"
+				},
+				{
+					"command": "buraq_mql5_mql4.InsIcon",
+					"group": "insert"
+				},
+				{
+					"when": "resourceExtname == .mqh",
+					"command": "buraq_mql5_mql4.InsMQL",
+					"group": "insert"
+				}
+			]
+		},
+		"submenus": [
+			{
+				"id": "buraq_mql5_mql4.commentary.context",
+				"label": "Buraq MQL5 & MQL4"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "buraq_mql5_mql4.compileFile",
+				"key": "ctrl+shift+x",
+				"when": "resourceExtname == .mq4 || resourceExtname == .mq5 || resourceExtname == .mqh"
+			},
+			{
+				"command": "buraq_mql5_mql4.checkFile",
+				"key": "ctrl+shift+z",
+				"when": "resourceExtname == .mq4 || resourceExtname == .mq5 || resourceExtname == .mqh"
+			},
+			{
+				"command": "buraq_mql5_mql4.compileScript",
+				"key": "ctrl+shift+c",
+				"when": "resourceExtname == .mq4 || resourceExtname == .mq5 || resourceExtname == .mqh"
+			},
+			{
+				"command": "buraq_mql5_mql4.help",
+				"key": "F1",
+				"when": "config.buraq_mql5_mql4.Help.HelpON == true && resourceExtname == .mq4 || config.buraq_mql5_mql4.Help.HelpON == true && resourceExtname == .mq5 || config.buraq_mql5_mql4.Help.HelpON == true && resourceExtname == .mqh"
+			}
+		]
+	},
+	"extensionDependencies": [
+		"ms-vscode.cpptools"
+	],
+	"scripts": {
+		"lint": "eslint .",
+		"pretest": "npm run lint",
+		"test": "node ./test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.2.0",
+		"@types/mocha": "^9.1.1",
+		"@types/node": "~14.18.63",
+		"@types/vscode": "^1.106.0",
+		"@vscode/test-electron": "^1.6.2",
+		"eslint": "^8.57.1",
+		"glob": "^7.2.3",
+		"mocha": "^9.2.2",
+		"typescript": "^4.9.5"
+	}
+}
