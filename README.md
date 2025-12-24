@@ -96,6 +96,101 @@ The extension contributes settings under `Buraq MQL5 & MQL4`.
 | `buraq_mql5_mql4.ShowChart.BrandingEnabled` | boolean | `true` | Enable MQL-Media branding on charts |
 | `buraq_mql5_mql4.ShowChart.BrandingPosition` | string | `top-right` | Position of MQL-Media branding on charts (top-right, top-left, bottom-right, bottom-left) |
 
+## Customizing Syntax Highlighting
+
+You can customize the colors of syntax highlighting for MQL files using VS Code's built-in `editor.tokenColorCustomizations` setting. This allows you to change colors for comments, keywords, functions, and any other code elements.
+
+### How to Customize Colors
+
+1. **Identify the TextMate Scope**:
+   - Open a `.mq4`, `.mq5`, or `.mqh` file
+   - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
+   - Search for and select **"Developer: Inspect Editor Tokens and Scopes"**
+   - Click on the code element you want to customize (e.g., a comment, function name, keyword)
+   - Note the **TextMate scope** shown in the popup (e.g., `comment.line.double-slash.mql`)
+
+2. **Add Custom Colors to settings.json**:
+   - Press `Ctrl+Shift+P` and select **"Preferences: Open Settings (JSON)"**
+   - Add or modify the `editor.tokenColorCustomizations` section:
+
+```json
+{
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "comment.line.double-slash.mql",
+        "settings": {
+          "foreground": "#6A9955",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "comment.block.mql",
+        "settings": {
+          "foreground": "#6A9955",
+          "fontStyle": "italic"
+        }
+      }
+    ]
+  }
+}
+```
+
+### Common MQL TextMate Scopes
+
+Here are some commonly used scopes for MQL files that you can customize:
+
+- `comment.line.double-slash.mql` — Single-line comments (`//`)
+- `comment.block.mql` — Multi-line comments (`/* */`)
+- `keyword.control.mql` — Control keywords (if, else, for, while, return, etc.)
+- `keyword.control.preprocessor.mql` — Preprocessor directives (#include, #property, etc.)
+- `storage.type.mql` — Data types (int, double, string, bool, etc.)
+- `storage.modifier.mql` — Modifiers (extern, input, static)
+- `entity.name.function.mql` — Function names
+- `string.quoted.double.mql` — String literals
+- `constant.numeric.integer.mql` — Integer numbers
+- `constant.numeric.double.mql` — Floating-point numbers
+
+### Example: Custom Color Scheme for MQL
+
+```json
+{
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "comment.line.double-slash.mql",
+        "settings": {
+          "foreground": "#00FF00",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "keyword.control.mql",
+        "settings": {
+          "foreground": "#569CD6",
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "scope": "entity.name.function.mql",
+        "settings": {
+          "foreground": "#DCDCAA"
+        }
+      },
+      {
+        "scope": "storage.type.mql",
+        "settings": {
+          "foreground": "#4EC9B0"
+        }
+      }
+    ]
+  }
+}
+```
+
+For more information on customizing syntax highlighting, see the [VS Code Theme Color Reference](https://code.visualstudio.com/api/references/theme-color).
+
+
 ## Commands
 
 - `buraq_mql5_mql4.compileScript`
@@ -108,12 +203,55 @@ The extension contributes settings under `Buraq MQL5 & MQL4`.
 
 ## Troubleshooting
 
-- MetaEditor not found: verify `Metaeditor4Dir`/`Metaeditor5Dir` paths and that MetaEditor is installed.
-- Buttons missing: ensure `ShowButton.*` settings are enabled and file extension is `.mq4`, `.mq5`, or `.mqh`.
-- Help not working: confirm `Help.HelpON` is true and select a valid help language.
-- Context menu items absent: set `buraq_mql5_mql4.context` to `true`.
-- Chart branding not visible: ensure `ShowChart.BrandingEnabled` is true and icon files exist in the extension directory.
-- Build status badge is static until CI is configured in your repository.
+### Common Issues
+
+#### MetaEditor Not Found
+- **Solution**: Verify `Metaeditor4Dir`/`Metaeditor5Dir` paths in settings and ensure MetaEditor is installed.
+- Check that the path points to the actual `metaeditor.exe` file (e.g., `C:\Program Files\MetaTrader 5\MetaEditor64.exe`)
+
+#### Buttons Missing in Editor Title Bar
+- **Solution**: Ensure `ShowButton.*` settings are enabled and file extension is `.mq4`, `.mq5`, or `.mqh`.
+- Reload VS Code window after changing settings (`Ctrl+Shift+P` → "Developer: Reload Window")
+
+#### F1 Help Not Working / 404 Errors
+- **Symptoms**: Pressing F1 shows "Failed to load help file. Server response code - 404"
+- **Solutions**:
+  1. Ensure `Help.HelpON` is set to `true` in settings
+  2. Check your internet connection (help files are downloaded on first use)
+  3. Try deleting the help cache folder and triggering F1 again:
+     - Navigate to: `[Extension Install Dir]/mql-files/help/`
+     - Delete all `.chm` files
+     - Press F1 on a keyword to re-download
+  4. If the issue persists, check the Developer Console (`Ctrl+Shift+I`) for detailed error messages
+  5. Verify firewall/antivirus isn't blocking the download
+
+#### Syntax Highlighting Colors
+- **Question**: "Can I customize the syntax highlighting colors?"
+- **Answer**: Yes! See the [Customizing Syntax Highlighting](#customizing-syntax-highlighting) section above for detailed instructions.
+- Use `Ctrl+Shift+P` → "Developer: Inspect Editor Tokens and Scopes" to identify scopes, then customize in `settings.json`
+
+#### Context Menu Items Absent
+- **Solution**: Set `buraq_mql5_mql4.context` to `true` in settings
+
+#### Chart Branding Not Visible
+- **Solution**: Ensure `ShowChart.BrandingEnabled` is true and icon files exist in the extension directory
+
+### FAQ
+
+**Q: The help file downloads are very slow. Can I download them manually?**
+
+A: Yes. Download the help files from the GitHub repository and place them in `[Extension Install Dir]/mql-files/help/`:
+- For MQL4: `mql4.chm`
+- For MQL5: `mql5.chm` (or localized versions like `mql5-russian.chm`)
+
+**Q: Why does the extension use the C++ language mode?**
+
+A: MQL syntax is similar to C++, so the extension maps `.mq4`, `.mq5`, and `.mqh` files to the `cpp` language ID for better IDE integration. This allows features like IntelliSense from the C++ tools extension.
+
+**Q: How do I disable F1 help if it conflicts with VS Code's default help?**
+
+A: Set `"buraq_mql5_mql4.Help.HelpON": false` in your settings.json.
+
 
 ## Contributing
 

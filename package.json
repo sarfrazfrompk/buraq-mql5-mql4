@@ -1,8 +1,8 @@
 {
-	"name": "buraq-mql5-mql4", 
+	"name": "buraq-mql5-mql4",
 	"displayName": "Buraq MQL5 & MQL4",
 	"description": "Buraq MQL5 & MQL4 is a VS Code extension that provides comprehensive language support for MQL (MetaQuotes Language) files used in MetaTrader trading platforms. It enables developers to write, compile, and debug MQL4/MQL5 code directly within VS Code with features like syntax checking, compilation, help documentation access, and intelligent code completion. The extension bridges VS Code and MetaEditor/MetaTrader, automating compilation workflows and enhancing productivity for algorithmic trading development.",
-	"version": "1.00",
+	"version": "0.3.0",
 	"publisher": "sarfrazfrompk",
 	"engines": {
 		"vscode": "^1.106.0"
@@ -387,7 +387,7 @@
 			{
 				"command": "buraq_mql5_mql4.help",
 				"key": "F1",
-				"when": "config.buraq_mql5_mql4.Help.HelpON == true && resourceExtname == .mq4 || config.buraq_mql5_mql4.Help.HelpON == true && resourceExtname == .mq5 || config.buraq_mql5_mql4.Help.HelpON == true && resourceExtname == .mqh"
+				"when": "config.buraq_mql5_mql4.Help.HelpON == true && (resourceExtname == .mq4 || resourceExtname == .mq5 || resourceExtname == .mqh)"
 			}
 		]
 	},

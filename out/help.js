@@ -10,21 +10,31 @@ const ext = require("./extension");
 
 
 function Help(sm) {
-    const { document, selection } = vscode.window.activeTextEditor, { start, end } = selection;
-    if (end.line !== start.line)
+    // Check if there's an active editor
+    if (!vscode.window.activeTextEditor) {
+        vscode.window.showWarningMessage('No active editor. Please open an MQL file.');
         return undefined;
-    const isSelectionSearch = end.line !== start.line || end.character !== start.character, wordAtCursorRange = isSelectionSearch ? selection : document.getWordRangeAtPosition(end, /(#\w+|\w+)/);
-    if (wordAtCursorRange === undefined)
-        return undefined;
+    }
 
-    const config = vscode.workspace.getConfiguration('buraq_mql5_mql4'), extension = pathModule.extname(document.fileName), PathKeyHH = pathModule.join(__dirname, '../' ,'mql-files', 'KeyHH.exe'), 
+    const { document, selection } = vscode.window.activeTextEditor, { start, end } = selection;
+    if (end.line !== start.line) {
+        vscode.window.showWarningMessage('Help works on single line selection. Please place cursor on a keyword.');
+        return undefined;
+    }
+    const isSelectionSearch = end.line !== start.line || end.character !== start.character, wordAtCursorRange = isSelectionSearch ? selection : document.getWordRangeAtPosition(end, /(#\w+|\w+)/);
+    if (wordAtCursorRange === undefined) {
+        vscode.window.showWarningMessage('No keyword found at cursor position. Please place cursor on an MQL keyword.');
+        return undefined;
+    }
+
+    const config = vscode.workspace.getConfiguration('buraq_mql5_mql4'), extension = pathModule.extname(document.fileName), PathKeyHH = pathModule.join(__dirname, '../', 'mql-files', 'KeyHH.exe'),
         wn = vscode.workspace.name.includes('MQL4'), helpval = config.Help.HelpVal, var_loc4 = config.Help.MQL4HelpLanguage, var_loc5 = config.Help.MQL5HelpLanguage, keyword = document.getText(wordAtCursorRange);
 
     let v, loc;
 
     if (extension === '.mq4' || (extension === '.mqh' && wn)) {
         v = 4; loc = var_loc4 === 'Default' ? (language === 'ru' ? '_russian' : '') : (var_loc4 === 'Русский' ? '_russian' : '');
-    } 
+    }
     else if (extension === '.mq5' || (extension === '.mqh' && !wn)) {
         v = 5;
         switch (var_loc5 === 'Default' ? language : var_loc5) {
@@ -41,20 +51,56 @@ function Help(sm) {
             default: loc = ''; break;
         }
     }
-    else return undefined;
+    else {
+        vscode.window.showWarningMessage('Help is only available for MQL files (.mq4, .mq5, .mqh)');
+        return undefined;
+    }
 
-    const PathHelp = pathModule.join(__dirname, '../' ,'mql-files', 'help', 'mql' + v + (loc ? loc.replace('_','-') : '') + '.chm');
+    const PathHelp = pathModule.join(__dirname, '../', 'mql-files', 'help', 'mql' + v + '-help' + (loc ? loc.replace('_', '-') : '') + '.chm');
 
-    if (!fs.existsSync(PathHelp))
-        return download(v, loc);    
+    // Check if help file exists
+    if (!fs.existsSync(PathHelp)) {
+        console.log('Help file not found:', PathHelp, '- attempting download');
+        return download(v, loc);
+    }
+
+    // Check if KeyHH.exe exists
+    if (!fs.existsSync(PathKeyHH)) {
+        vscode.window.showErrorMessage(`KeyHH.exe not found at: ${PathKeyHH}. Cannot open help file.`);
+        console.error('KeyHH.exe not found at:', PathKeyHH);
+        return undefined;
+    }
+
+    console.log('Opening help file:', PathHelp, 'with keyword:', keyword);
+
 
     childProcess.exec(`tasklist /FI "IMAGENAME eq KeyHH.exe"`, (err, stdout) => {
-        if (stdout.includes("KeyHH.exe") != true) {
-            childProcess.exec(`${PathKeyHH} -Mql ${PathHelp}`);
-            sleep(sm ? helpval : 1000).then(() => { childProcess.exec(`${PathKeyHH} -Mql -#klink '${keyword}' ${PathHelp}`); });
+        if (err) {
+            console.error('Error checking for KeyHH.exe process:', err);
+            vscode.window.showErrorMessage('Error checking for KeyHH.exe process. See console for details.');
+            return;
         }
-        else
-            childProcess.exec(`${PathKeyHH} -Mql -#klink '${keyword}' ${PathHelp}`);
+
+        if (stdout.includes("KeyHH.exe") != true) {
+            // KeyHH not running, open help file directly to the keyword
+            console.log('Starting KeyHH.exe with help file and searching for keyword:', keyword);
+            childProcess.exec(`"${PathKeyHH}" -Mql -#klink "${keyword}" "${PathHelp}"`, (err) => {
+                if (err) {
+                    console.error('Error opening help file with keyword:', err);
+                    vscode.window.showErrorMessage(`Failed to open help file: ${err.message}`);
+                }
+            });
+        }
+        else {
+            // KeyHH already running, just search
+            console.log('KeyHH.exe already running, searching for keyword:', keyword);
+            childProcess.exec(`"${PathKeyHH}" -Mql -#klink "${keyword}" "${PathHelp}"`, (err) => {
+                if (err) {
+                    console.error('Error searching keyword in existing process:', err);
+                    vscode.window.showErrorMessage(`Failed to search keyword: ${err.message}`);
+                }
+            });
+        }
     });
 }
 
@@ -66,17 +112,20 @@ function download(n, locname) {
         },
         () => {
             return new Promise((resolve) => {
-                if (!fs.existsSync(pathModule.join(__dirname, '../' , 'mql-files', 'help')))
-                    fs.mkdirSync(pathModule.join(__dirname, '../' , 'mql-files', 'help'));
-                const req = https.get('https://raw.githubusercontent.com/sarfrazfrompk/Buraq-MQL5-MQL4/master/mql-files/help/mql' + n + (locname ? locname.replace('_','-') : '') + '.chm',
+                if (!fs.existsSync(pathModule.join(__dirname, '../', 'mql-files', 'help')))
+                    fs.mkdirSync(pathModule.join(__dirname, '../', 'mql-files', 'help'));
+                const helpFileName = 'mql' + n + '-help' + (locname ? locname.replace('_', '-') : '') + '.chm';
+                const downloadUrl = 'https://raw.githubusercontent.com/sarfrazfrompk/buraq-mql5-mql4/main/mql-files/help/' + helpFileName;
+                const req = https.get(downloadUrl,
                     (response) => {
                         if (response.statusCode === 200) {
                             const file = fs.createWriteStream(
-                                pathModule.join(__dirname, '../' , 'mql-files', 'help', 'mql' + n + (locname ? locname.replace('_','-') : '') + '.chm')
+                                pathModule.join(__dirname, '../', 'mql-files', 'help', helpFileName)
                             );
                             response.pipe(file);
 
-                            file.on('error', () => {
+                            file.on('error', (err) => {
+                                console.error('Help file save error:', err);
                                 return resolve(), vscode.window.showErrorMessage(ext.lg['help_er_save']);
                             });
 
@@ -84,13 +133,15 @@ function download(n, locname) {
                                 return file.close(), resolve(), Help(false);
                             });
                         } else {
-                            return resolve(), vscode.window.showErrorMessage(`${ext.lg['help_er_statusCode']} ${response.statusCode}`);
+                            console.error('Help file download failed. URL:', downloadUrl, 'Status:', response.statusCode);
+                            return resolve(), vscode.window.showErrorMessage(`${ext.lg['help_er_statusCode']} ${response.statusCode}. URL: ${downloadUrl}`);
                         }
                     }
                 );
 
-                req.on('error', () => {
-                    return resolve(), vscode.window.showErrorMessage(ext.lg['help_er_noconnect']);
+                req.on('error', (err) => {
+                    console.error('Help file download error:', err, 'URL:', downloadUrl);
+                    return resolve(), vscode.window.showErrorMessage(`${ext.lg['help_er_noconnect']} URL: ${downloadUrl}`);
                 });
             });
         }
