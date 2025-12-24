@@ -115,19 +115,19 @@ You can customize the colors of syntax highlighting for MQL files using VS Code'
 
 ```json
 {
-  "editor.tokenColorCustomizations": {
+    "editor.tokenColorCustomizations": {
     "textMateRules": [
       {
         "scope": "comment.line.double-slash.mql",
         "settings": {
-          "foreground": "#6A9955",
+          "foreground": "#51ff00",
           "fontStyle": "italic"
         }
       },
       {
         "scope": "comment.block.mql",
         "settings": {
-          "foreground": "#6A9955",
+          "foreground": "#51ff00",
           "fontStyle": "italic"
         }
       }
