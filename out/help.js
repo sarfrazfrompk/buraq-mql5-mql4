@@ -27,7 +27,7 @@ function Help(sm) {
         return undefined;
     }
 
-    const config = vscode.workspace.getConfiguration('buraq_mql5_mql4'), extension = pathModule.extname(document.fileName), PathKeyHH = pathModule.join(__dirname, '../', 'mql-files', 'KeyHH.exe'),
+    const config = vscode.workspace.getConfiguration('buraq_mql5_mql4'), extension = pathModule.extname(document.fileName), PathKeyHH = pathModule.join(__dirname, '../', 'mql-files', 'BuraqKeys.exe'),
         wn = vscode.workspace.name.includes('MQL4'), helpval = config.Help.HelpVal, var_loc4 = config.Help.MQL4HelpLanguage, var_loc5 = config.Help.MQL5HelpLanguage, keyword = document.getText(wordAtCursorRange);
 
     let v, loc;
@@ -64,26 +64,26 @@ function Help(sm) {
         return download(v, loc);
     }
 
-    // Check if KeyHH.exe exists
+    // Check if BuraqKeys.exe exists
     if (!fs.existsSync(PathKeyHH)) {
-        vscode.window.showErrorMessage(`KeyHH.exe not found at: ${PathKeyHH}. Cannot open help file.`);
-        console.error('KeyHH.exe not found at:', PathKeyHH);
+        vscode.window.showErrorMessage(`BuraqKeys.exe not found at: ${PathKeyHH}. Cannot open help file.`);
+        console.error('BuraqKeys.exe not found at:', PathKeyHH);
         return undefined;
     }
 
     console.log('Opening help file:', PathHelp, 'with keyword:', keyword);
 
 
-    childProcess.exec(`tasklist /FI "IMAGENAME eq KeyHH.exe"`, (err, stdout) => {
+    childProcess.exec(`tasklist /FI "IMAGENAME eq BuraqKeys.exe"`, (err, stdout) => {
         if (err) {
-            console.error('Error checking for KeyHH.exe process:', err);
-            vscode.window.showErrorMessage('Error checking for KeyHH.exe process. See console for details.');
+            console.error('Error checking for BuraqKeys.exe process:', err);
+            vscode.window.showErrorMessage('Error checking for BuraqKeys.exe process. See console for details.');
             return;
         }
 
-        if (stdout.includes("KeyHH.exe") != true) {
-            // KeyHH not running, open help file directly to the keyword
-            console.log('Starting KeyHH.exe with help file and searching for keyword:', keyword);
+        if (stdout.includes("BuraqKeys.exe") != true) {
+            // BuraqKeys not running, open help file directly to the keyword
+            console.log('Starting BuraqKeys.exe with help file and searching for keyword:', keyword);
             childProcess.exec(`"${PathKeyHH}" -Mql -#klink "${keyword}" "${PathHelp}"`, (err) => {
                 if (err) {
                     console.error('Error opening help file with keyword:', err);

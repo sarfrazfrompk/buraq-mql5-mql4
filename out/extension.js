@@ -34,11 +34,11 @@ function getVisibleLength(text) {
 function padText(text, width, align = 'left') {
     const visibleLen = getVisibleLength(text);
     const padding = width - visibleLen;
-    
+
     if (padding <= 0) return text;
-    
+
     const spaces = ' '.repeat(padding);
-    
+
     switch (align) {
         case 'right':
             return spaces + text;
@@ -98,11 +98,11 @@ function initializeBuraqTerminal() {
     if (!buraqTerminal) {
         writeEmitter = new vscode.EventEmitter();
         const closeEmitter = new vscode.EventEmitter();
-        
+
         const pty = {
             onDidWrite: writeEmitter.event,
             onDidClose: closeEmitter.event,
-            open: () => {},
+            open: () => { },
             close: () => {
                 closeEmitter.fire();
                 if (writeEmitter) {
@@ -115,12 +115,12 @@ function initializeBuraqTerminal() {
                 buraqTerminal = null;
                 writeEmitter = null;
             },
-            handleInput: () => {}
+            handleInput: () => { }
         };
-        
+
         buraqTerminal = vscode.window.createTerminal({ name: 'Buraq Terminal', pty });
     }
-    
+
     try {
         buraqTerminal.show(true);
     } catch (e) {
@@ -132,14 +132,14 @@ function initializeBuraqTerminal() {
                 // Ignore disposal errors
             }
         }
-        
+
         writeEmitter = new vscode.EventEmitter();
         const closeEmitter = new vscode.EventEmitter();
-        
+
         const pty = {
             onDidWrite: writeEmitter.event,
             onDidClose: closeEmitter.event,
-            open: () => {},
+            open: () => { },
             close: () => {
                 closeEmitter.fire();
                 if (writeEmitter) {
@@ -152,9 +152,9 @@ function initializeBuraqTerminal() {
                 buraqTerminal = null;
                 writeEmitter = null;
             },
-            handleInput: () => {}
+            handleInput: () => { }
         };
-        
+
         buraqTerminal = vscode.window.createTerminal({ name: 'Buraq Terminal', pty });
         buraqTerminal.show(true);
     }
@@ -170,10 +170,10 @@ catch (error) {
 
 function Compile(rt) {
     initializeBuraqTerminal();
-    
+
     // CRITICAL: Clear terminal FIRST and wait for it to complete
     clearTerminalCompletely();
-    
+
     FixFormatting();
     vscode.commands.executeCommand('workbench.action.files.saveAll');
     const NameFileMQL = rt != 0 ? FindParentFile() : '',
@@ -181,7 +181,7 @@ function Compile(rt) {
         config = vscode.workspace.getConfiguration('buraq_mql5_mql4'),
         fileName = pathModule.basename(path),
         extension = pathModule.extname(path),
-        PathScript = pathModule.join(__dirname, '../', 'mql-files', 'MQL Tools_Compiler.exe'),
+        PathScript = pathModule.join(__dirname, '../', 'mql-files', 'BuraqCompiler.exe'),
         logDir = config.LogFile.NameLog, Timemini = config.Script.Timetomini,
         mme = config.Script.MiniME, cme = config.Script.CloseME,
         wn = vscode.workspace.name.includes('MQL4'), startT = new Date(),
@@ -285,8 +285,8 @@ function Compile(rt) {
                         }
 
                         config.LogFile.DeleteLog && fs.unlink(logFile, (err) => {
-                                err && vscode.window.showErrorMessage(lg['err_remove_log']);
-                            });
+                            err && vscode.window.showErrorMessage(lg['err_remove_log']);
+                        });
 
                         switch (rt) {
                             case 0: log = replaceLog(data, false); writeToTerminal(log.text); writeSeparator(); resolve(); break;
@@ -301,7 +301,7 @@ function Compile(rt) {
                             command = `"${PathScript}" "${MetaDir}" "${path}" ${mme ? 1 : 0} ${Timemini} ${cme ? 1 : 0} ${TimeClose} ${Nm}`;
 
                             try {
-                                childProcess.execSync(command);
+                                childProcess.exec(command);
                             }
                             catch (error) {
                                 writeFormattedLine(STATUS.ERROR, lg['err_start_script'], '');
@@ -332,7 +332,7 @@ function replaceLog(str, isFullCompile) {
     let warningCount = 0;
 
     const lines = str.replace(/\u{FEFF}/gu, '').split('\n');
-    
+
     lines.forEach(item => {
         const trimmed = item.trim();
         if (!trimmed) return;
@@ -342,7 +342,7 @@ function replaceLog(str, isFullCompile) {
             const action = isFullCompile ? 'compiling' : 'checking';
             const mm = item.match(new RegExp(`(?<=${action}.).+'`, 'gi'));
             const pm = item.match(/[a-z]:\\.+(?= :)/gi);
-            
+
             if (mm && pm) {
                 const name = mm[0].replace(/'/g, '');
                 const link = url.pathToFileURL(pm[0]).href;
@@ -354,7 +354,7 @@ function replaceLog(str, isFullCompile) {
         else if (trimmed.includes(': information: including')) {
             const mm = item.match(/(?<=information: including ).+'/gi);
             const pm = item.match(/[a-z]:\\.+(?= :)/gi);
-            
+
             if (mm && pm) {
                 const name_icl = mm[0].replace(/'/g, '');
                 const link_icl = url.pathToFileURL(pm[0]).href;
@@ -370,7 +370,7 @@ function replaceLog(str, isFullCompile) {
         else if (trimmed.includes('information: info')) {
             const mm = item.match(/(?<=information: ).+/gi);
             const pm = item.match(/[a-z]:\\.+(?= :)/gi);
-            
+
             if (mm) {
                 const name_info = mm[0];
                 const link_info = pm ? url.pathToFileURL(pm[0]).href : '';
@@ -382,12 +382,12 @@ function replaceLog(str, isFullCompile) {
         else if (trimmed.includes('Result:') || trimmed.includes(': information: result')) {
             const ecMatch = item.match(/(\d+)\s+error/i);
             const wcMatch = item.match(/(\d+)\s+warning/i);
-            
+
             errorCount = ecMatch ? parseInt(ecMatch[1]) : 0;
             warningCount = wcMatch ? parseInt(wcMatch[1]) : 0;
-            
+
             outputLines.push(''); // Empty line before result
-            
+
             if (errorCount > 0) {
                 hasErrors = true;
                 outputLines.push(colorizeError(padText(STATUS.ERROR, 12) + `Compilation failed: ${errorCount} error(s), ${warningCount} warning(s)`));
@@ -403,36 +403,36 @@ function replaceLog(str, isFullCompile) {
             const link_res = item.replace(re, '$1').replace(/[\r\n]+/g, '');
             let name_res = item.replace(re, '$2').replace(/[\r\n]+/g, '').trim();
             const errorNumMatch = name_res.match(/(?<=error |warning )\d+/);
-            
+
             // Detect error messages
             const isError = name_res.toLowerCase().includes('error') ||
-                          name_res.includes('undeclared identifier') ||
-                          name_res.includes('invalid include') ||
-                          name_res.includes('not defined') ||
-                          name_res.includes('semicolon expected') ||
-                          name_res.includes('unexpected token');
-                    
+                name_res.includes('undeclared identifier') ||
+                name_res.includes('invalid include') ||
+                name_res.includes('not defined') ||
+                name_res.includes('semicolon expected') ||
+                name_res.includes('unexpected token');
+
             if (errorNumMatch) {
                 name_res = name_res.replace(errorNumMatch[0], '').trim();
             }
-            
+
             if (link_res.match(/[a-z]:\.+/gi) && name_res) {
                 const posm = link_res.match(/\((?:\d+,\d+)\)$/gm);
                 const key = posm ? name_res + ' ' + posm[0] : name_res;
                 const href = url.pathToFileURL(link_res).href.replace(/\((?=(\d+,\d+).$)/gm, '#').replace(/\)$/gm, '');
                 Object.assign(obj_hover, { [key]: { ['link']: href, ['number']: String(errorNumMatch ? errorNumMatch[0] : '') } });
-                
+
                 const location = posm ? posm[0] : '';
                 const statusIndicator = isError ? STATUS.ERROR : STATUS.WARNING;
                 const colorFunc = isError ? colorizeError : colorizeWarning;
-                
+
                 outputLines.push(colorFunc(padText(statusIndicator, 12) + name_res + (location ? ' ' + location : '')));
             } else if (name_res) {
                 Object.assign(obj_hover, { [name_res]: { ['link']: '', ['number']: errorNumMatch ? errorNumMatch[0] : '' } });
-                
+
                 const statusIndicator = isError ? STATUS.ERROR : STATUS.INFO;
                 const colorFunc = isError ? colorizeError : colorizeInfo;
-                
+
                 outputLines.push(colorFunc(padText(statusIndicator, 12) + name_res));
             }
         }
@@ -454,11 +454,11 @@ function FindParentFile() {
         let NameFileMQL, match, regEx = new RegExp('(\\/\\/###<).+(mq[4|5]>)', 'ig');
 
         while (match = regEx.exec(document.lineAt(0).text))
-            NameFileMQL = match[0];        
+            NameFileMQL = match[0];
 
         if (NameFileMQL != undefined)
             NameFileMQL = pathModule.join(workspacepath, String(NameFileMQL.match(/(?<=<).+(?=>)/)));
-        
+
         return NameFileMQL;
     } else {
         return undefined;
@@ -498,7 +498,7 @@ function writeFormattedLine(status, message, detail = '') {
                 default:
                     colorFunc = colorizeInfo;
             }
-            
+
             const line = colorFunc(padText(status, 12) + message + (detail ? ': ' + detail : ''));
             writeEmitter.fire(line + '\r\n');
         } catch (e) {
@@ -552,7 +552,7 @@ function clearTerminalCompletely() {
                 }
             }
             writeEmitter = null;
-            
+
             // Reinitialize
             initializeBuraqTerminal();
             if (writeEmitter) {
@@ -599,7 +599,7 @@ function FixFormatting() {
             ]
         };
 
-    Array.from(document.getText().matchAll(new RegExp(CollectRegEx(data.reg), 'g'))).map(match => {        
+    Array.from(document.getText().matchAll(new RegExp(CollectRegEx(data.reg), 'g'))).map(match => {
         for (const i in data.reg) {
             if (match[0].match(new RegExp(data.reg[i], 'g'))) {
                 let range = new vscode.Range(document.positionAt(match.index), document.positionAt(match.index + match[0].length))
@@ -618,9 +618,30 @@ function CollectRegEx(dt, string = "") {
     return string.slice(0, -1);
 }
 
+function showChangelog(context) {
+    const pkg = require('../package.json');
+    const currentVersion = pkg.version;
+    const lastVersion = context.globalState.get('buraq_mql5_mql4_version');
+
+    if (currentVersion !== lastVersion) {
+        context.globalState.update('buraq_mql5_mql4_version', currentVersion);
+
+        try {
+            const changelogPath = pathModule.join(__dirname, '../CHANGELOG.md');
+            if (fs.existsSync(changelogPath)) {
+                const uri = vscode.Uri.file(changelogPath);
+                vscode.commands.executeCommand('markdown.showPreview', uri);
+            }
+        } catch (e) {
+            console.error('Failed to show changelog:', e);
+        }
+    }
+}
+
 function activate(context) {
     initializeBuraqTerminal();
-    
+    showChangelog(context);
+
     const chartView = new ChartView(context);
 
     context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.checkFile', () => Compile(0)));
@@ -642,7 +663,7 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.commentary', () => CreateComment()));
     context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.showChartView', () => chartView.show()));
     context.subscriptions.push(vscode.languages.registerHoverProvider('mql-output', Hover_log()));
-    context.subscriptions.push(vscode.languages.rhC9tALXUhHxqXvDGi1whgsTt7yXAGGiwb('mql-output', DefinitionProvider()));
+    context.subscriptions.push(vscode.languages.registerDefinitionProvider('mql-output', DefinitionProvider()));
     context.subscriptions.push(vscode.languages.registerHoverProvider({ pattern: '**/*.{mq4,mq5,mqh}' }, Hover_MQL()));
     context.subscriptions.push(vscode.languages.registerColorProvider({ pattern: '**/*.{mq4,mq5,mqh}' }, ColorProvider()));
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ pattern: '**/*.{mq4,mq5,mqh}' }, ItemProvider()));
@@ -692,11 +713,11 @@ function resolveMetaEditorPath(v, p) {
                 const st = fs.statSync(input);
                 if (st.isFile()) candidates.push(input);
                 else if (st.isDirectory()) {
-                    ['metaeditor.exe','metaeditor64.exe','MetaEditor.exe','MetaEditor64.exe'].forEach(n => candidates.push(pathModule.join(input, n)));
+                    ['metaeditor.exe', 'metaeditor64.exe', 'MetaEditor.exe', 'MetaEditor64.exe'].forEach(n => candidates.push(pathModule.join(input, n)));
                 }
             } else {
                 const d = pathModule.dirname(input);
-                ['metaeditor.exe','metaeditor64.exe','MetaEditor.exe','MetaEditor64.exe'].forEach(n => candidates.push(pathModule.join(d, n)));
+                ['metaeditor.exe', 'metaeditor64.exe', 'MetaEditor.exe', 'MetaEditor64.exe'].forEach(n => candidates.push(pathModule.join(d, n)));
             }
         }
         const fallbacks = v === 5 ? [
