@@ -88,11 +88,12 @@ const { Help } = require("./help");
 const { ShowFiles, InsertNameFileMQH, InsertMQH, InsertNameFileMQL, InsertMQL, InsertResource, InsertImport, InsertTime, InsertIcon, OpenFileInMetaEditor, CreateComment } = require("./contextMenu");
 const { IconsInstallation } = require("./addIcon");
 const { Hover_log, DefinitionProvider, Hover_MQL, ItemProvider, HelpProvider, ColorProvider } = require("./provider");
-const { Cpp_prop, CreateProperties } = require("./createProperties");
+const { CreateProperties } = require("./createProperties");
 const ChartView = require("./chartView");
 const outputChannel = null; // Using Pseudoterminal instead
 let buraqTerminal = null;
 let writeEmitter = null;
+let diagnosticCollection = null; // For Problems panel integration
 
 function initializeBuraqTerminal() {
     if (!buraqTerminal) {
@@ -247,7 +248,6 @@ function Compile(rt) {
                             return resolve();
                         } else {
                             includefile = ` /include:"${incDir}"`;
-                            Cpp_prop(incDir);
                         }
                     } else {
                         includefile = '';
@@ -289,9 +289,9 @@ function Compile(rt) {
                         });
 
                         switch (rt) {
-                            case 0: log = replaceLog(data, false); writeToTerminal(log.text); writeSeparator(); resolve(); break;
-                            case 1: log = replaceLog(data, true); writeToTerminal(log.text); writeSeparator(); resolve(); break;
-                            case 2: log = cme ? replaceLog(data, true) : replaceLog(data, false); break;
+                            case 0: log = replaceLog(data, false); applyDiagnostics(log.diagnostics); writeToTerminal(log.text); writeSeparator(); resolve(); break;
+                            case 1: log = replaceLog(data, true); applyDiagnostics(log.diagnostics); writeToTerminal(log.text); writeSeparator(); resolve(); break;
+                            case 2: log = cme ? replaceLog(data, true) : replaceLog(data, false); applyDiagnostics(log.diagnostics); break;
                         }
 
                         const end = new Date;
@@ -324,18 +324,116 @@ function Compile(rt) {
     );
 }
 
+// Helper function to apply diagnostics to Problems panel
+function applyDiagnostics(diagnosticsMap) {
+    console.log('[Buraq MQL] applyDiagnostics called, diagnosticCollection exists:', !!diagnosticCollection);
+    if (diagnosticCollection) {
+        diagnosticCollection.clear();
+        if (diagnosticsMap && diagnosticsMap.size > 0) {
+            console.log('[Buraq MQL] Found', diagnosticsMap.size, 'files with diagnostics');
+            diagnosticsMap.forEach((diagnostics, filePath) => {
+                console.log('[Buraq MQL] Setting', diagnostics.length, 'diagnostics for:', filePath);
+                const uri = vscode.Uri.file(filePath);
+                diagnosticCollection.set(uri, diagnostics);
+            });
+        } else {
+            console.log('[Buraq MQL] No diagnostics to apply');
+        }
+    } else {
+        console.log('[Buraq MQL] ERROR: diagnosticCollection is null!');
+    }
+}
+
+// Debounce timer for background checks
+let backgroundCheckTimer = null;
+
+// Run background syntax check on file save (silent, no terminal output)
+function runBackgroundCheck(document) {
+    console.log('[Buraq MQL] runBackgroundCheck called for:', document.fileName);
+    // Debounce: clear previous timer and set new one
+    if (backgroundCheckTimer) {
+        clearTimeout(backgroundCheckTimer);
+    }
+
+    backgroundCheckTimer = setTimeout(() => {
+        const filePath = document.fileName;
+        const extension = pathModule.extname(filePath).toLowerCase();
+        const config = vscode.workspace.getConfiguration('buraq_mql5_mql4');
+        const wn = vscode.workspace.name ? vscode.workspace.name.includes('MQL4') : false;
+
+        console.log('[Buraq MQL] File extension:', extension);
+
+        let MetaDir;
+        if (extension === '.mq4' || (extension === '.mqh' && wn)) {
+            MetaDir = resolveMetaEditorPath(4, config.Metaeditor.Metaeditor4Dir);
+        } else if (extension === '.mq5' || (extension === '.mqh' && !wn)) {
+            MetaDir = resolveMetaEditorPath(5, config.Metaeditor.Metaeditor5Dir);
+        } else {
+            console.log('[Buraq MQL] Not an MQL file, skipping');
+            return;
+        }
+
+        console.log('[Buraq MQL] MetaEditor path:', MetaDir);
+
+        if (!MetaDir || !fs.existsSync(MetaDir)) {
+            console.log('[Buraq MQL] MetaEditor not found at:', MetaDir);
+            return;
+        }
+
+        const logDir = config.LogFile && config.LogFile.NameLog ? config.LogFile.NameLog : pathModule.dirname(filePath);
+        const fileName = pathModule.basename(filePath);
+        const logFile = pathModule.join(logDir, fileName.replace(/\.(mq4|mq5|mqh)$/i, '.log'));
+
+        // Build MetaEditor command for syntax check (silent mode)
+        const command = `"${MetaDir}" /s /compile:"${filePath}" /log:"${logFile}"`;
+        console.log('[Buraq MQL] Running command:', command);
+
+        childProcess.exec(command, { windowsHide: true }, (error, stdout, stderr) => {
+            console.log('[Buraq MQL] Compilation finished, error:', error ? error.message : 'none');
+            // Read log file after compilation
+            setTimeout(() => {
+                console.log('[Buraq MQL] Checking for log file:', logFile);
+                if (fs.existsSync(logFile)) {
+                    console.log('[Buraq MQL] Log file exists, reading...');
+                    fs.readFile(logFile, 'utf16le', (err, data) => {
+                        if (!err && data) {
+                            console.log('[Buraq MQL] Log data length:', data.length);
+                            const log = replaceLog(data, false);
+                            console.log('[Buraq MQL] Diagnostics count:', log.diagnostics ? log.diagnostics.size : 0);
+                            applyDiagnostics(log.diagnostics);
+                        } else {
+                            console.log('[Buraq MQL] Error reading log file:', err);
+                        }
+                        // Optionally delete log file
+                        if (config.LogFile && config.LogFile.DeleteLog) {
+                            fs.unlink(logFile, () => { });
+                        }
+                    });
+                } else {
+                    console.log('[Buraq MQL] Log file not found');
+                }
+            }, 500); // Wait for log file to be written
+        });
+    }, 300); // 300ms debounce delay
+}
+
+
 function replaceLog(str, isFullCompile) {
     let outputLines = [];
     let obj_hover = {};
     let hasErrors = false;
     let errorCount = 0;
     let warningCount = 0;
+    let diagnosticsMap = new Map(); // Map<filePath, Diagnostic[]>
 
     const lines = str.replace(/\u{FEFF}/gu, '').split('\n');
 
     lines.forEach(item => {
         const trimmed = item.trim();
         if (!trimmed) return;
+
+        // Debug: Log ALL lines to understand log format
+        console.log('[Buraq MQL] LOG LINE:', trimmed.substring(0, 150));
 
         // Handle compilation/checking info
         if (trimmed.includes(': information: compiling') || trimmed.includes(': information: checking')) {
@@ -398,42 +496,63 @@ function replaceLog(str, isFullCompile) {
             }
         }
         // Handle errors and warnings
+        // MetaEditor format: FilePath(line,col) : error NNN: message
         else {
-            const re = /([a-zA-Z]:\.+(?= :)|^\(\d+,\d+\))(?:.: )(.+)/;
-            const link_res = item.replace(re, '$1').replace(/[\r\n]+/g, '');
-            let name_res = item.replace(re, '$2').replace(/[\r\n]+/g, '').trim();
-            const errorNumMatch = name_res.match(/(?<=error |warning )\d+/);
+            // Regex to match: D:\path\file.mq5(7,1) : error 149: message
+            const errorRegex = /^(.+)\((\d+),(\d+)\)\s*:\s*(error|warning)\s+(\d+):\s*(.+)$/i;
+            const match = trimmed.match(errorRegex);
 
-            // Detect error messages
-            const isError = name_res.toLowerCase().includes('error') ||
-                name_res.includes('undeclared identifier') ||
-                name_res.includes('invalid include') ||
-                name_res.includes('not defined') ||
-                name_res.includes('semicolon expected') ||
-                name_res.includes('unexpected token');
+            if (match) {
+                const filePath = match[1].trim();
+                const lineNum = parseInt(match[2]);
+                const colNum = parseInt(match[3]);
+                const errType = match[4].toLowerCase(); // 'error' or 'warning'
+                const errCode = match[5];
+                const errMessage = match[6].trim();
 
-            if (errorNumMatch) {
-                name_res = name_res.replace(errorNumMatch[0], '').trim();
-            }
+                const isError = errType === 'error';
+                const posStr = `(${lineNum},${colNum})`;
+                const fullMessage = `${errType} ${errCode}: ${errMessage}`;
 
-            if (link_res.match(/[a-z]:\.+/gi) && name_res) {
-                const posm = link_res.match(/\((?:\d+,\d+)\)$/gm);
-                const key = posm ? name_res + ' ' + posm[0] : name_res;
-                const href = url.pathToFileURL(link_res).href.replace(/\((?=(\d+,\d+).$)/gm, '#').replace(/\)$/gm, '');
-                Object.assign(obj_hover, { [key]: { ['link']: href, ['number']: String(errorNumMatch ? errorNumMatch[0] : '') } });
+                console.log('[Buraq MQL] Matched error:', filePath, 'line:', lineNum, 'col:', colNum, 'msg:', errMessage);
 
-                const location = posm ? posm[0] : '';
+                // Add to hover info
+                const key = fullMessage + ' ' + posStr;
+                const href = url.pathToFileURL(filePath).href + '#' + lineNum + ',' + colNum;
+                Object.assign(obj_hover, { [key]: { ['link']: href, ['number']: errCode } });
+
+                // Add to terminal output
                 const statusIndicator = isError ? STATUS.ERROR : STATUS.WARNING;
                 const colorFunc = isError ? colorizeError : colorizeWarning;
+                outputLines.push(colorFunc(padText(statusIndicator, 12) + fullMessage + ' ' + posStr));
 
-                outputLines.push(colorFunc(padText(statusIndicator, 12) + name_res + (location ? ' ' + location : '')));
-            } else if (name_res) {
-                Object.assign(obj_hover, { [name_res]: { ['link']: '', ['number']: errorNumMatch ? errorNumMatch[0] : '' } });
+                // Build diagnostic for Problems panel
+                if (filePath && fs.existsSync(filePath)) {
+                    const line = Math.max(0, lineNum - 1);
+                    const col = Math.max(0, colNum - 1);
+                    const range = new vscode.Range(line, col, line, col + 100); // Extend range to highlight more
+                    const severity = isError ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning;
+                    const diagnostic = new vscode.Diagnostic(range, errMessage, severity);
+                    diagnostic.source = 'Buraq Compiler';
+                    diagnostic.code = errCode;
 
-                const statusIndicator = isError ? STATUS.ERROR : STATUS.INFO;
-                const colorFunc = isError ? colorizeError : colorizeInfo;
-
-                outputLines.push(colorFunc(padText(statusIndicator, 12) + name_res));
+                    if (!diagnosticsMap.has(filePath)) {
+                        diagnosticsMap.set(filePath, []);
+                    }
+                    diagnosticsMap.get(filePath).push(diagnostic);
+                    console.log('[Buraq MQL] Added diagnostic:', errMessage, 'at line', line, 'col', col);
+                } else {
+                    console.log('[Buraq MQL] File not found:', filePath);
+                }
+            } else {
+                // Fallback for other message formats
+                const name_res = trimmed;
+                if (name_res && !name_res.includes(': information:')) {
+                    const isError = name_res.toLowerCase().includes('error');
+                    const statusIndicator = isError ? STATUS.ERROR : STATUS.INFO;
+                    const colorFunc = isError ? colorizeError : colorizeInfo;
+                    outputLines.push(colorFunc(padText(statusIndicator, 12) + name_res));
+                }
             }
         }
     });
@@ -441,7 +560,8 @@ function replaceLog(str, isFullCompile) {
     exports.obj_hover = obj_hover;
     return {
         text: outputLines.join('\r\n'),
-        error: hasErrors
+        error: hasErrors,
+        diagnostics: diagnosticsMap
     };
 }
 
@@ -639,8 +759,13 @@ function showChangelog(context) {
 }
 
 function activate(context) {
+    CreateProperties();
     initializeBuraqTerminal();
     showChangelog(context);
+
+    // Initialize diagnostic collection for Problems panel
+    diagnosticCollection = vscode.languages.createDiagnosticCollection('mql');
+    context.subscriptions.push(diagnosticCollection);
 
     const chartView = new ChartView(context);
 
@@ -662,12 +787,21 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.openInME', (uri) => OpenFileInMetaEditor(uri)));
     context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.commentary', () => CreateComment()));
     context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.showChartView', () => chartView.show()));
+    const mqlLanguages = ['mql4', 'mql5', 'mqlh'];
     context.subscriptions.push(vscode.languages.registerHoverProvider('mql-output', Hover_log()));
     context.subscriptions.push(vscode.languages.registerDefinitionProvider('mql-output', DefinitionProvider()));
-    context.subscriptions.push(vscode.languages.registerHoverProvider({ pattern: '**/*.{mq4,mq5,mqh}' }, Hover_MQL()));
-    context.subscriptions.push(vscode.languages.registerColorProvider({ pattern: '**/*.{mq4,mq5,mqh}' }, ColorProvider()));
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ pattern: '**/*.{mq4,mq5,mqh}' }, ItemProvider()));
-    sleep(1000).then(() => { context.subscriptions.push(vscode.languages.registerSignatureHelpProvider({ pattern: '**/*.{mq4,mq5,mqh}' }, HelpProvider(), '(', ',')); });
+    context.subscriptions.push(vscode.languages.registerHoverProvider(mqlLanguages, Hover_MQL()));
+    context.subscriptions.push(vscode.languages.registerColorProvider(mqlLanguages, ColorProvider()));
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider(mqlLanguages, ItemProvider()));
+    sleep(1000).then(() => { context.subscriptions.push(vscode.languages.registerSignatureHelpProvider(mqlLanguages, HelpProvider(), '(', ',')); });
+
+    // Auto-check on file save - register handler for automatic diagnostics
+    context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(doc => {
+        const ext = pathModule.extname(doc.fileName).toLowerCase();
+        if (['.mq4', '.mq5', '.mqh'].includes(ext)) {
+            runBackgroundCheck(doc);
+        }
+    }));
 }
 
 function deactivate() {

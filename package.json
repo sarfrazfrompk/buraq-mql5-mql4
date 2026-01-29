@@ -26,7 +26,9 @@
 		"url": "http://sarfrazfrompk.vercel.app/"
 	},
 	"activationEvents": [
-		"onLanguage:cpp",
+		"onLanguage:mql4",
+		"onLanguage:mql5",
+		"onLanguage:mqlh",
 		"onCommand:buraq_mql5_mql4.compileScript",
 		"onCommand:buraq_mql5_mql4.checkFile",
 		"onCommand:buraq_mql5_mql4.compileFile",
@@ -163,10 +165,34 @@
 		},
 		"languages": [
 			{
-				"id": "cpp",
+				"id": "mql4",
+				"aliases": [
+					"MQL4",
+					"mql4"
+				],
 				"extensions": [
-					".mq4",
-					".mq5",
+					".mq4"
+				],
+				"configuration": "./syntaxes/mql.configuration.json"
+			},
+			{
+				"id": "mql5",
+				"aliases": [
+					"MQL5",
+					"mql5"
+				],
+				"extensions": [
+					".mq5"
+				],
+				"configuration": "./syntaxes/mql.configuration.json"
+			},
+			{
+				"id": "mqlh",
+				"aliases": [
+					"MQH",
+					"mqlh"
+				],
+				"extensions": [
 					".mqh"
 				],
 				"configuration": "./syntaxes/mql.configuration.json"
@@ -178,9 +204,33 @@
 				]
 			}
 		],
+		"snippets": [
+			{
+				"language": "mql4",
+				"path": "./snippets/mql.json"
+			},
+			{
+				"language": "mql5",
+				"path": "./snippets/mql.json"
+			},
+			{
+				"language": "mqlh",
+				"path": "./snippets/mql.json"
+			}
+		],
 		"grammars": [
 			{
-				"language": "cpp",
+				"language": "mql4",
+				"scopeName": "source.mql",
+				"path": "./syntaxes/mql.tmLanguage"
+			},
+			{
+				"language": "mql5",
+				"scopeName": "source.mql",
+				"path": "./syntaxes/mql.tmLanguage"
+			},
+			{
+				"language": "mqlh",
 				"scopeName": "source.mql",
 				"path": "./syntaxes/mql.tmLanguage"
 			},
@@ -391,9 +441,7 @@
 			}
 		]
 	},
-	"extensionDependencies": [
-		"ms-vscode.cpptools"
-	],
+	"extensionDependencies": [],
 	"scripts": {
 		"lint": "eslint .",
 		"pretest": "npm run lint",

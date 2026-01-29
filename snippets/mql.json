@@ -1,0 +1,2602 @@
+{
+	"OnInit": {
+		"prefix": "OnInit",
+		"body": [
+			"int OnInit()",
+			"{",
+			"\t${0}",
+			"\treturn(INIT_SUCCEEDED);",
+			"}"
+		],
+		"description": "The OnInit() function is the Init event handler."
+	},
+	"OnDeinit": {
+		"prefix": "OnDeinit",
+		"body": [
+			"void OnDeinit(const int reason)",
+			"{",
+			"\t${0}",
+			"}"
+		],
+		"description": "The OnDeinit() function is the Deinit event handler."
+	},
+	"OnTick": {
+		"prefix": "OnTick",
+		"body": [
+			"void OnTick()",
+			"{",
+			"\t${0}",
+			"}"
+		],
+		"description": "The OnTick() function is the NewTick event handler."
+	},
+	"OnCalculate": {
+		"prefix": "OnCalculate",
+		"body": [
+			"int OnCalculate(const int rates_total,",
+			"                const int prev_calculated,",
+			"                const datetime &time[],",
+			"                const double &open[],",
+			"                const double &high[],",
+			"                const double &low[],",
+			"                const double &close[],",
+			"                const long &tick_volume[],",
+			"                const long &volume[],",
+			"                const int &spread[])",
+			"{",
+			"\t${0}",
+			"\treturn(rates_total);",
+			"}"
+		],
+		"description": "The OnCalculate() function is called only in custom indicators."
+	},
+	"OnTimer": {
+		"prefix": "OnTimer",
+		"body": [
+			"void OnTimer()",
+			"{",
+			"\t${0}",
+			"}"
+		],
+		"description": "The OnTimer() function is called when a Timer event occurs."
+	},
+	"OnChartEvent": {
+		"prefix": "OnChartEvent",
+		"body": [
+			"void OnChartEvent(const int id,",
+			"                  const long &lparam,",
+			"                  const double &dparam,",
+			"                  const string &sparam)",
+			"{",
+			"\t${0}",
+			"}"
+		],
+		"description": "OnChartEvent() is the handler of a group of ChartEvent events."
+	},
+	"property": {
+		"prefix": "#property",
+		"body": [
+			"#property ${1|copyright,link,version,description,stacksize,library,crypt,strict,indicator_separate_window,indicator_chart_window,indicator_buffers,indicator_plots,indicator_color1,indicator_type1,indicator_width1,indicator_label1,indicator_minimum,indicator_maximum|}$0"
+		],
+		"description": "Specific parameters of the program."
+	},
+	"input": {
+		"prefix": "input",
+		"body": [
+			"input ${1:int} ${2:name} = ${3:value};$0"
+		],
+		"description": "The 'input' specifier is used for defining external parameters."
+	},
+	"extern": {
+		"prefix": "extern",
+		"body": [
+			"extern ${1:int} ${2:name} = ${3:value};$0"
+		],
+		"description": "The 'extern' specifier is used for defining external parameters in MQL4."
+	},
+	"AccountInfoDouble": {
+		"prefix": "AccountInfoDouble",
+		"body": "AccountInfoDouble(${1:property_id})$0",
+		"description": "(double) Returns the value of the appropriate account property."
+	},
+	"AccountInfoInteger": {
+		"prefix": "AccountInfoInteger",
+		"body": "AccountInfoInteger(${1:property_id})$0",
+		"description": "(long) Returns the value of the appropriate account property."
+	},
+	"AccountInfoString": {
+		"prefix": "AccountInfoString",
+		"body": "AccountInfoString(${1:property_id})$0",
+		"description": "(string) Returns the value of the appropriate account property."
+	},
+	"acos": {
+		"prefix": "acos",
+		"body": "acos(${1:val})$0",
+		"description": "(double) The function returns the arccosine of x within the range 0 to π in radians."
+	},
+	"Alert": {
+		"prefix": "Alert",
+		"body": "Alert(${1:values})$0",
+		"description": "(void) Displays a message in a separate window."
+	},
+	"ArrayBsearch": {
+		"prefix": "ArrayBsearch",
+		"body": "ArrayBsearch(${1:array}, ${2:value})$0",
+		"description": "(int) Searches for a specified value in a multidimensional numeric array sorted ascending. Search is performed through the elements of the first dimension."
+	},
+	"ArrayCompare": {
+		"prefix": "ArrayCompare",
+		"body": "ArrayCompare(${1:array1}, ${2:array2}, ${3:start1}, ${4:start2}, ${5:count})$0",
+		"description": "(int) The function returns the result of comparing two arrays of the same type. It can be used to compare arrays of simple types or custom structures without complex objects, that is the custom structures that do not contain strings, dynamic arrays, classes and other structures with complex objects."
+	},
+	"ArrayCopy": {
+		"prefix": "ArrayCopy",
+		"body": "ArrayCopy(${1:dst_array}, ${2:src_array}, ${3:dst_start}, ${4:src_start}, ${5:count})$0",
+		"description": "(int) It copies an array into another one."
+	},
+	"ArrayFill": {
+		"prefix": "ArrayFill",
+		"body": "ArrayFill(${1:array}, ${2:start}, ${3:count}, ${4:value})$0",
+		"description": "(void) The function fills an array with the specified value."
+	},
+	"ArrayFree": {
+		"prefix": "ArrayFree",
+		"body": "ArrayFree(${1:array})$0",
+		"description": "(void) It frees up a buffer of any dynamic array and sets the size of the zero dimension to 0."
+	},
+	"ArrayGetAsSeries": {
+		"prefix": "ArrayGetAsSeries",
+		"body": "ArrayGetAsSeries(${1:array})$0",
+		"description": "(bool) It checks direction of an array index."
+	},
+	"ArrayInitialize": {
+		"prefix": "ArrayInitialize",
+		"body": "ArrayInitialize(${1:array}, ${2:value})$0",
+		"description": "(int) The function initializes a numeric array by a preset value."
+	},
+	"ArrayIsDynamic": {
+		"prefix": "ArrayIsDynamic",
+		"body": "ArrayIsDynamic(${1:array})$0",
+		"description": "(bool) The function checks whether an array is dynamic."
+	},
+	"ArrayIsSeries": {
+		"prefix": "ArrayIsSeries",
+		"body": "ArrayIsSeries(${1:array})$0",
+		"description": "(bool) The function checks whether an array is a timeseries."
+	},
+	"ArrayMaximum": {
+		"prefix": "ArrayMaximum",
+		"body": "ArrayMaximum(${1:array}, ${2:start}, ${3:count})$0",
+		"description": "(int) Searches for the largest element in the first dimension of a multidimensional numeric array."
+	},
+	"ArrayMinimum": {
+		"prefix": "ArrayMinimum",
+		"body": "ArrayMinimum(${1:array}, ${2:start}, ${3:count})$0",
+		"description": "(int) Searches for the lowest element in the first dimension of a multidimensional numeric array."
+	},
+	"ArrayRange": {
+		"prefix": "ArrayRange",
+		"body": "ArrayRange(${1:array}, ${2:rank_index})$0",
+		"description": "(int) The function returns the number of elements in a selected array dimension."
+	},
+	"ArrayResize": {
+		"prefix": "ArrayResize",
+		"body": "ArrayResize(${1:array}, ${2:new_size}, ${3:reserve_size})$0",
+		"description": "(int) The function sets a new size for the first dimension"
+	},
+	"ArraySetAsSeries": {
+		"prefix": "ArraySetAsSeries",
+		"body": "ArraySetAsSeries(${1:array}, ${2:flag})$0",
+		"description": "(bool) The function sets the AS_SERIES flag to a selected object of a dynamic array, and elements will be indexed like in timeseries."
+	},
+	"ArraySize": {
+		"prefix": "ArraySize",
+		"body": "ArraySize(${1:array})$0",
+		"description": "(int) The function returns the number of elements of a selected array."
+	},
+	"ArraySort": {
+		"prefix": "ArraySort",
+		"body": "ArraySort(${1:array})$0",
+		"description": "(bool) Sorts the values in the first dimension of a multidimensional numeric array in the ascending order."
+	},
+	"ArrayPrint": {
+		"prefix": "ArrayPrint",
+		"body": "ArrayPrint(${1:array}, ${2:digits}, ${3:separator}, ${4:start}, ${5:count}, ${6:flags})$0",
+		"description": "(void) Prints an array of a simple type or a simple structure into journal."
+	},
+	"ArrayInsert": {
+		"prefix": "ArrayInsert",
+		"body": "ArrayInsert(${1:dst_array}, ${2:src_array}, ${3:dst_start}, ${4:src_start}, ${5:count})$0",
+		"description": "(bool) Inserts the specified number of elements from a source array to a receiving one starting from a specified index."
+	},
+	"ArrayRemove": {
+		"prefix": "ArrayRemove",
+		"body": "ArrayRemove(${1:array}, ${2:start}, ${3:count})$0",
+		"description": "(bool) Removes the specified number of elements from the array starting with a specified index."
+	},
+	"ArrayReverse": {
+		"prefix": "ArrayReverse",
+		"body": "ArrayReverse(${1:array}, ${2:start}, ${3:count})$0",
+		"description": "(bool) Reverses the specified number of elements in the array starting with a specified index."
+	},
+	"ArraySwap": {
+		"prefix": "ArraySwap",
+		"body": "ArraySwap(${1:array1}, ${2:array2})$0",
+		"description": "(bool) Swaps the contents of two dynamic arrays of the same type. For multidimensional arrays, the number of elements in all dimensions except the first one should match."
+	},
+	"asin": {
+		"prefix": "asin",
+		"body": "asin(${1:val})$0",
+		"description": "(double) The function returns the arc sine of x within the range of -π/2 to π/2 radians."
+	},
+	"atan": {
+		"prefix": "atan",
+		"body": "atan(${1:value})$0",
+		"description": "(double) The function returns the arc tangent of x. If x is equal to 0, the function returns 0."
+	},
+	"Bars": {
+		"prefix": "Bars",
+		"body": "Bars(${1:symbol_name}, ${2:timeframe}, ${3:start_time}, ${4:stop_time})$0",
+		"description": "(int) Returns the number of bars count in the history for a specified symbol and period. There are 2 variants of functions calls."
+	},
+	"BarsCalculated": {
+		"prefix": "BarsCalculated",
+		"body": "BarsCalculated(${1:indicator_handle})$0",
+		"description": "(int) Returns the number of calculated data for the specified indicator."
+	},
+	"CalendarCountryById": {
+		"prefix": "CalendarCountryById",
+		"body": "CalendarCountryById(${1:country_id}, ${2:country})$0",
+		"description": "(bool) Get a country description by its ID."
+	},
+	"CalendarEventById": {
+		"prefix": "CalendarEventById",
+		"body": "CalendarEventById(${1:event_id}, ${2:event})$0",
+		"description": "(bool) Get an event description by its ID."
+	},
+	"CalendarValueById": {
+		"prefix": "CalendarValueById",
+		"body": "CalendarValueById(${1:value_id}, ${2:value})$0",
+		"description": "(bool) Get an event value description by its ID."
+	},
+	"CalendarCountries": {
+		"prefix": "CalendarCountries",
+		"body": "CalendarCountries(${1:countries})$0",
+		"description": "(int) Get the array of country names available in the Calendar."
+	},
+	"CalendarEventByCountry": {
+		"prefix": "CalendarEventByCountry",
+		"body": "CalendarEventByCountry(${1:country_code}, ${2:events})$0",
+		"description": "(int) Get the array of descriptions of all events available in the Calendar by a specified country code."
+	},
+	"CalendarEventByCurrency": {
+		"prefix": "CalendarEventByCurrency",
+		"body": "CalendarEventByCurrency(${1:currency}, ${2:events})$0",
+		"description": "(int) Get the array of descriptions of all events available in the Calendar by a specified currency."
+	},
+	"CalendarValueHistoryByEvent": {
+		"prefix": "CalendarValueHistoryByEvent",
+		"body": "CalendarValueHistoryByEvent(${1:event_id}, ${2:values}, ${3:datetime_from}, ${4:datetime_to})$0",
+		"description": "(bool) Get the array of values for all events in a specified time range by an event ID."
+	},
+	"CalendarValueHistory": {
+		"prefix": "CalendarValueHistory",
+		"body": "CalendarValueHistory(${1:values}, ${2:datetime_from}, ${3:datetime_to}, ${4:country_code}, ${5:currency})$0",
+		"description": "(bool) Get the array of values for all events in a specified time range with the ability to sort by country and/or currency."
+	},
+	"CalendarValueLastByEvent": {
+		"prefix": "CalendarValueLastByEvent",
+		"body": "CalendarValueLastByEvent(${1:event_id}, ${2:change_id}, ${3:values})$0",
+		"description": "(int) Get the array of event values by its ID since the Calendar database status with a specified change_id."
+	},
+	"CalendarValueLast": {
+		"prefix": "CalendarValueLast",
+		"body": "CalendarValueLast(${1:change_id}, ${2:values}, ${3:country_code}, ${4:currency})$0",
+		"description": "(int) Get the array of values for all events with the ability to sort by country and/or currency since the calendar database status with a specified change_id."
+	},
+	"ceil": {
+		"prefix": "ceil",
+		"body": "ceil(${1:val})$0",
+		"description": "(double) The function returns integer numeric value closest from above."
+	},
+	"CharArrayToString": {
+		"prefix": "CharArrayToString",
+		"body": "CharArrayToString(${1:array}, ${2:start}, ${3:count}, ${4:codepage})$0",
+		"description": "(string) It copies and converts part of array of uchar type into a returned string."
+	},
+	"ChartApplyTemplate": {
+		"prefix": "ChartApplyTemplate",
+		"body": "ChartApplyTemplate(${1:chart_id}, ${2:filename})$0",
+		"description": "(bool) Applies a specific template from a specified file to the chart. The command is added to chart messages queue and will be executed after processing of all previous commands."
+	},
+	"ChartClose": {
+		"prefix": "ChartClose",
+		"body": "ChartClose(${1:chart_id})$0",
+		"description": "(bool) Closes the specified chart."
+	},
+	"ChartFirst": {
+		"prefix": "ChartFirst",
+		"body": "ChartFirst()$0",
+		"description": "(long) Returns the ID of the first chart of the client terminal."
+	},
+	"ChartGetDouble": {
+		"prefix": "ChartGetDouble",
+		"body": "ChartGetDouble(${1:chart_id}, ${2:prop_id}, ${3:sub_window}, ${4:double_var})$0",
+		"description": "(bool) Returns the value of a corresponding property of the specified chart. Chart property must be of double type. There are 2 variants of the function calls."
+	},
+	"ChartGetInteger": {
+		"prefix": "ChartGetInteger",
+		"body": "ChartGetInteger(${1:chart_id}, ${2:prop_id}, ${3:sub_window}, ${4:long_var})$0",
+		"description": "(bool) Returns the value of a corresponding property of the specified chart. Chart property must be of datetime, int or bool type. There are 2 variants of the function calls."
+	},
+	"ChartGetString": {
+		"prefix": "ChartGetString",
+		"body": "ChartGetString(${1:chart_id}, ${2:prop_id}, ${3:string_var})$0",
+		"description": "(bool) Returns the value of a corresponding property of the specified chart. Chart property must be of string type. There are 2 variants of the function call."
+	},
+	"ChartID": {
+		"prefix": "ChartID",
+		"body": "ChartID()$0",
+		"description": "(long) Returns the ID of the current chart."
+	},
+	"ChartIndicatorAdd": {
+		"prefix": "ChartIndicatorAdd",
+		"body": "ChartIndicatorAdd(${1:chart_id}, ${2:sub_window}, ${3:indicator_handle})$0",
+		"description": "(bool) Adds an indicator with the specified handle into a specified chart window. Indicator and chart should be generated on the same symbol and time frame."
+	},
+	"ChartIndicatorDelete": {
+		"prefix": "ChartIndicatorDelete",
+		"body": "ChartIndicatorDelete(${1:chart_id}, ${2:sub_window}, ${3:indicator_shortname})$0",
+		"description": "(bool) Removes an indicator with a specified name from the specified chart window."
+	},
+	"ChartIndicatorGet": {
+		"prefix": "ChartIndicatorGet",
+		"body": "ChartIndicatorGet(${1:chart_id}, ${2:sub_window}, ${3:indicator_shortname})$0",
+		"description": "(int) Returns the handle of the indicator with the specified short name in the specified chart window."
+	},
+	"ChartIndicatorName": {
+		"prefix": "ChartIndicatorName",
+		"body": "ChartIndicatorName(${1:chart_id}, ${2:sub_window}, ${3:index})$0",
+		"description": "(string) Returns the short name of the indicator by the number in the indicators list on the specified chart window."
+	},
+	"ChartIndicatorsTotal": {
+		"prefix": "ChartIndicatorsTotal",
+		"body": "ChartIndicatorsTotal(${1:chart_id}, ${2:sub_window})$0",
+		"description": "(int) Returns the number of all indicators applied to the specified chart window."
+	},
+	"ChartNavigate": {
+		"prefix": "ChartNavigate",
+		"body": "ChartNavigate(${1:chart_id}, ${2:position}, ${3:shift})$0",
+		"description": "(bool) Performs shift of the specified chart by the specified number of bars relative to the specified position in the chart."
+	},
+	"ChartNext": {
+		"prefix": "ChartNext",
+		"body": "ChartNext(${1:chart_id})$0",
+		"description": "(long) Returns the chart ID of the chart next to the specified one."
+	},
+	"ChartOpen": {
+		"prefix": "ChartOpen",
+		"body": "ChartOpen(${1:symbol}, ${2:period})$0",
+		"description": "(long) Opens a new chart with the specified symbol and period."
+	},
+	"CharToString": {
+		"prefix": "CharToString",
+		"body": "CharToString(${1:char_code})$0",
+		"description": "(string) Converting a symbol code into a one-character string"
+	},
+	"ChartPeriod": {
+		"prefix": "ChartPeriod",
+		"body": "ChartPeriod(${1:chart_id})$0",
+		"description": "(ENUM_TIMEFRAMES) Returns the timeframe period of specified chart."
+	},
+	"ChartPriceOnDropped": {
+		"prefix": "ChartPriceOnDropped",
+		"body": "ChartPriceOnDropped()$0",
+		"description": "(double) Returns the price coordinate corresponding to the chart point the Expert Advisor or script has been dropped to."
+	},
+	"ChartRedraw": {
+		"prefix": "ChartRedraw",
+		"body": "ChartRedraw(${1:chart_id})$0",
+		"description": "(void) This function calls a forced redrawing of a specified chart."
+	},
+	"ChartSaveTemplate": {
+		"prefix": "ChartSaveTemplate",
+		"body": "ChartSaveTemplate(${1:chart_id}, ${2:filename})$0",
+		"description": "(bool) Saves current chart settings in a template with a specified name."
+	},
+	"ChartScreenShot": {
+		"prefix": "ChartScreenShot",
+		"body": "ChartScreenShot(${1:chart_id}, ${2:filename}, ${3:width}, ${4:height}, ${5:align_mode})$0",
+		"description": "(bool) The function provides a screenshot of the chart in its current state in the GIF, PNG or BMP format depending on specified extension."
+	},
+	"ChartSetDouble": {
+		"prefix": "ChartSetDouble",
+		"body": "ChartSetDouble(${1:chart_id}, ${2:prop_id}, ${3:value})$0",
+		"description": "(bool) Sets a value for a corresponding property of the specified chart. Chart property should be of a double type. The command is added to chart messages queue and will be executed after processing of all previous commands."
+	},
+	"ChartSetInteger": {
+		"prefix": "ChartSetInteger",
+		"body": "ChartSetInteger(${1:chart_id}, ${2:prop_id}, ${3:sub_window}, ${4:value})$0",
+		"description": "(bool) Sets a value for a corresponding property of the specified chart. Chart property must be datetime, int, color, bool or char. The command is added to chart messages queue and will be executed after processing of all previous commands."
+	},
+	"ChartSetString": {
+		"prefix": "ChartSetString",
+		"body": "ChartSetString(${1:chart_id}, ${2:prop_id}, ${3:str_value})$0",
+		"description": "(bool) Sets a value for a corresponding property of the specified chart. Chart property must be of the string type. The command is added to chart messages queue and will be executed after processing of all previous commands."
+	},
+	"ChartSetSymbolPeriod": {
+		"prefix": "ChartSetSymbolPeriod",
+		"body": "ChartSetSymbolPeriod(${1:chart_id}, ${2:symbol}, ${3:period})$0",
+		"description": "(bool) Changes the symbol and period of the specified chart. The function is asynchronous, i.e. it sends the command and does not wait for its execution completion. The command is added to chart messages queue and will be executed after processing of all previous commands."
+	},
+	"ChartSymbol": {
+		"prefix": "ChartSymbol",
+		"body": "ChartSymbol(${1:chart_id})$0",
+		"description": "(string) Returns the symbol name for the specified chart."
+	},
+	"ChartTimeOnDropped": {
+		"prefix": "ChartTimeOnDropped",
+		"body": "ChartTimeOnDropped()$0",
+		"description": "(datetime) Returns the time coordinate corresponding to the chart point the Expert Advisor or script has been dropped to."
+	},
+	"ChartTimePriceToXY": {
+		"prefix": "ChartTimePriceToXY",
+		"body": "ChartTimePriceToXY(${1:chart_id}, ${2:sub_window}, ${3:time}, ${4:price}, ${5:x}, ${6:y})$0",
+		"description": "(bool) Converts the coordinates of a chart from the time/price representation to the X and Y coordinates."
+	},
+	"ChartWindowFind": {
+		"prefix": "ChartWindowFind",
+		"body": "ChartWindowFind(${1:chart_id}, ${2:indicator_shortname})$0",
+		"description": "(int) The function returns the number of a subwindow where an indicator is drawn. There are 2 variants of the function."
+	},
+	"ChartWindowOnDropped": {
+		"prefix": "ChartWindowOnDropped",
+		"body": "ChartWindowOnDropped()$0",
+		"description": "(int) Returns the number (index) of the chart subwindow the Expert Advisor or script has been dropped to. 0 means the main chart window."
+	},
+	"ChartXOnDropped": {
+		"prefix": "ChartXOnDropped",
+		"body": "ChartXOnDropped()$0",
+		"description": "(int) Returns the X coordinate of the chart point the Expert Advisor or script has been dropped to."
+	},
+	"ChartXYToTimePrice": {
+		"prefix": "ChartXYToTimePrice",
+		"body": "ChartXYToTimePrice(${1:chart_id}, ${2:x}, ${3:y}, ${4:sub_window}, ${5:time}, ${6:price})$0",
+		"description": "(bool) Converts the X and Y coordinates on a chart to the time and price values."
+	},
+	"ChartYOnDropped": {
+		"prefix": "ChartYOnDropped",
+		"body": "ChartYOnDropped()$0",
+		"description": "(int) Returns the Y coordinateof the chart point the Expert Advisor or script has been dropped to."
+	},
+	"CheckPointer": {
+		"prefix": "CheckPointer",
+		"body": "CheckPointer(${1:anyobject})$0",
+		"description": "(ENUM_POINTER_TYPE) The function returns the type of the object pointer."
+	},
+	"CLBufferCreate": {
+		"prefix": "CLBufferCreate",
+		"body": "CLBufferCreate(${1:context}, ${2:size}, ${3:flags})$0",
+		"description": "(int) Creates an OpenCL buffer and returns its handle."
+	},
+	"CLBufferFree": {
+		"prefix": "CLBufferFree",
+		"body": "CLBufferFree(${1:buffer})$0",
+		"description": "(void) Deletes an OpenCL buffer."
+	},
+	"CLBufferRead": {
+		"prefix": "CLBufferRead",
+		"body": "CLBufferRead(${1:buffer}, ${2:data}, ${3:buffer_offset}, ${4:data_offset}, ${5:data_count})$0",
+		"description": "(uint) Reads an OpenCL buffer into an array and returns the number of read elements."
+	},
+	"CLBufferWrite": {
+		"prefix": "CLBufferWrite",
+		"body": "CLBufferWrite(${1:buffer}, ${2:data}, ${3:buffer_offset}, ${4:data_offset}, ${5:data_count})$0",
+		"description": "(uint) Writes into the OpenCL buffer and returns the number of written elements."
+	},
+	"CLContextCreate": {
+		"prefix": "CLContextCreate",
+		"body": "CLContextCreate(${1:device})$0",
+		"description": "(int) Creates an OpenCL context and returns its handle."
+	},
+	"CLContextFree": {
+		"prefix": "CLContextFree",
+		"body": "CLContextFree(${1:context})$0",
+		"description": "(void) Removes an OpenCL context."
+	},
+	"CLExecute": {
+		"prefix": "CLExecute",
+		"body": "CLExecute(${1:kernel}, ${2:work_dim}, ${3:global_work_offset}, ${4:global_work_size}, ${5:local_work_size})$0",
+		"description": "(bool) The function runs an OpenCL program. There are 3 versions of the function:"
+	},
+	"CLGetDeviceInfo": {
+		"prefix": "CLGetDeviceInfo",
+		"body": "CLGetDeviceInfo(${1:handle}, ${2:property_id}, ${3:data}, ${4:size})$0",
+		"description": "(bool) The function receives device property from OpenCL driver."
+	},
+	"CLGetInfoInteger": {
+		"prefix": "CLGetInfoInteger",
+		"body": "CLGetInfoInteger(${1:handle}, ${2:prop})$0",
+		"description": "(long) Returns the value of an integer property for an OpenCL object or device."
+	},
+	"CLHandleType": {
+		"prefix": "CLHandleType",
+		"body": "CLHandleType(${1:handle})$0",
+		"description": "(ENUM_OPENCL_HANDLE_TYPE) Returns the type of an OpenCL handle as a value of the ENUM_OPENCL_HANDLE_TYPE enumeration."
+	},
+	"CLKernelCreate": {
+		"prefix": "CLKernelCreate",
+		"body": "CLKernelCreate(${1:program}, ${2:kernel_name})$0",
+		"description": "(int) Creates the OpenCL program kernel and returns its handle."
+	},
+	"CLKernelFree": {
+		"prefix": "CLKernelFree",
+		"body": "CLKernelFree(${1:kernel_name})$0",
+		"description": "(void) Removes an OpenCL start function."
+	},
+	"CLProgramCreate": {
+		"prefix": "CLProgramCreate",
+		"body": "CLProgramCreate(${1:context}, ${2:source}, ${3:build_log})$0",
+		"description": "(int) Creates an OpenCL program from a source code."
+	},
+	"CLProgramFree": {
+		"prefix": "CLProgramFree",
+		"body": "CLProgramFree(${1:program})$0",
+		"description": "(void) Removes an OpenCL program."
+	},
+	"CLSetKernelArg": {
+		"prefix": "CLSetKernelArg",
+		"body": "CLSetKernelArg(${1:kernel}, ${2:arg_index}, ${3:arg_value})$0",
+		"description": "(bool) Sets a parameter for the OpenCL function."
+	},
+	"CLSetKernelArgMem": {
+		"prefix": "CLSetKernelArgMem",
+		"body": "CLSetKernelArgMem(${1:kernel}, ${2:arg_index}, ${3:cl_mem_handle})$0",
+		"description": "(bool) Sets an OpenCL buffer as a parameter of the OpenCL function."
+	},
+	"ColorToARGB": {
+		"prefix": "ColorToARGB",
+		"body": "ColorToARGB(${1:clr}, ${2:alpha})$0",
+		"description": "(uint) The function converts color type into uint type to get ARGB representation of the color. ARGB color format is used to generate a graphical resource, text display, as well as for CCanvas standard library class."
+	},
+	"ColorToString": {
+		"prefix": "ColorToString",
+		"body": "ColorToString(${1:color_value}, ${2:color_name})$0",
+		"description": "(string) It converts color value into string of \"R,G,B\" form."
+	},
+	"Comment": {
+		"prefix": "Comment",
+		"body": "Comment(${1:values})$0",
+		"description": "(void) This function outputs a comment defined by a user in the top left corner of a chart."
+	},
+	"CopyBuffer": {
+		"prefix": "CopyBuffer",
+		"body": "CopyBuffer(${1:indicator_handle}, ${2:buffer_num}, ${3:start_pos}, ${4:count}, ${5:start_time}, ${6:stop_time}, ${7:buffer})$0",
+		"description": "(int) Gets data of a specified buffer of a certain indicator in the necessary quantity."
+	},
+	"CopyClose": {
+		"prefix": "CopyClose",
+		"body": "CopyClose(${1:symbol_name}, ${2:timeframe}, ${3:start_pos}, ${4:count}, ${5:start_time}, ${6:stop_time}, ${7:close_array})$0",
+		"description": "(int) The function gets into close_array the history data of bar close prices for the selected symbol-period pair in the specified quantity. It should be noted that elements ordering is from present to past, i.e., starting position of 0 means the current bar."
+	},
+	"CopyHigh": {
+		"prefix": "CopyHigh",
+		"body": "CopyHigh(${1:symbol_name}, ${2:timeframe}, ${3:start_pos}, ${4:count}, ${5:start_time}, ${6:stop_time}, ${7:high_array})$0",
+		"description": "(int) The function gets into high_array the history data of highest bar prices for the selected symbol-period pair in the specified quantity. It should be noted that elements ordering is from present to past, i.e., starting position of 0 means the current bar."
+	},
+	"CopyLow": {
+		"prefix": "CopyLow",
+		"body": "CopyLow(${1:symbol_name}, ${2:timeframe}, ${3:start_pos}, ${4:count}, ${5:start_time}, ${6:stop_time}, ${7:low_array})$0",
+		"description": "(int) The function gets into low_array the history data of minimal bar prices for the selected symbol-period pair in the specified quantity. It should be noted that elements ordering is from present to past, i.e., starting position of 0 means the current bar."
+	},
+	"CopyOpen": {
+		"prefix": "CopyOpen",
+		"body": "CopyOpen(${1:symbol_name}, ${2:timeframe}, ${3:start_pos}, ${4:count}, ${5:start_time}, ${6:stop_time}, ${7:open_array})$0",
+		"description": "(int) The function gets into open_array the history data of bar open prices for the selected symbol-period pair in the specified quantity. It should be noted that elements ordering is from present to past, i.e., starting position of 0 means the current bar."
+	},
+	"CopyRates": {
+		"prefix": "CopyRates",
+		"body": "CopyRates(${1:symbol_name}, ${2:timeframe}, ${3:start_time}, ${4:start_pos}, ${5:count}, ${6:stop_time}, ${7:rates_array})$0",
+		"description": "(int) Gets history data of MqlRates structure of a specified symbol-period in specified quantity into the rates_array array. The elements ordering of the copied data is from present to the past, i.e., starting position of 0 means the current bar."
+	},
+	"CopyRealVolume": {
+		"prefix": "CopyRealVolume",
+		"body": "CopyRealVolume(${1:symbol_name}, ${2:timeframe}, ${3:start_pos}, ${4:count}, ${5:start_time}, ${6:stop_time}, ${7:volume_array})$0",
+		"description": "(int) The function gets into volume_array the history data of trade volumes for the selected symbol-period pair in the specified quantity. It should be noted that elements ordering is from present to past, i.e., starting position of 0 means the current bar."
+	},
+	"CopySpread": {
+		"prefix": "CopySpread",
+		"body": "CopySpread(${1:symbol_name}, ${2:timeframe}, ${3:start_pos}, ${4:count}, ${5:start_time}, ${6:stop_time}, ${7:spread_array})$0",
+		"description": "(int) The function gets into spread_array the history data of spread values for the selected symbol-period pair in the specified quantity. It should be noted that elements ordering is from present to past, i.e., starting position of 0 means the current bar."
+	},
+	"CopyTicks": {
+		"prefix": "CopyTicks",
+		"body": "CopyTicks(${1:symbol_name}, ${2:ticks_array}, ${3:flags}, ${4:from}, ${5:count})$0",
+		"description": "(int) The function receives ticks in the MqlTick format into ticks_array. In this case, ticks are indexed from the past to the present, i.e. the 0 indexed tick is the oldest one in the array. For tick analysis, check the flags field, which shows what exactly has changed in the tick."
+	},
+	"CopyTickVolume": {
+		"prefix": "CopyTickVolume",
+		"body": "CopyTickVolume(${1:symbol_name}, ${2:timeframe}, ${3:start_pos}, ${4:count}, ${5:start_time}, ${6:stop_time}, ${7:volume_array})$0",
+		"description": "(int) The function gets into volume_array the history data of tick volumes for the selected symbol-period pair in the specified quantity. It should be noted that elements ordering is from present to past, i.e., starting position of 0 means the current bar."
+	},
+	"CopyTime": {
+		"prefix": "CopyTime",
+		"body": "CopyTime(${1:symbol_name}, ${2:timeframe}, ${3:start_pos}, ${4:count}, ${5:start_time}, ${6:stop_time}, ${7:time_array})$0",
+		"description": "(int) The function gets to time_array history data of bar opening time for the specified symbol-period pair in the specified quantity. It should be noted that elements ordering is from present to past, i.e., starting position of 0 means the current bar."
+	},
+	"cos": {
+		"prefix": "cos",
+		"body": "cos(${1:value})$0",
+		"description": "(double) The function returns the cosine of an angle."
+	},
+	"CryptDecode": {
+		"prefix": "CryptDecode",
+		"body": "CryptDecode(${1:method}, ${2:data}, ${3:key}, ${4:result})$0",
+		"description": "(int) Performs the inverse transformation of the data from array, tranformed by CryptEncode()."
+	},
+	"CryptEncode": {
+		"prefix": "CryptEncode",
+		"body": "CryptEncode(${1:method}, ${2:data}, ${3:key}, ${4:result})$0",
+		"description": "(int) Transforms the data from array with the specified method."
+	},
+	"CustomSymbolCreate": {
+		"prefix": "CustomSymbolCreate",
+		"body": "CustomSymbolCreate(${1:symbol_name}, ${2:symbol_path}, ${3:symbol_origin})$0",
+		"description": "(bool) Creates a custom symbol with the specified name in the specified group."
+	},
+	"CustomSymbolDelete": {
+		"prefix": "CustomSymbolDelete",
+		"body": "CustomSymbolDelete(${1:symbol_name})$0",
+		"description": "(bool) Deletes a custom symbol with the specified name."
+	},
+	"CustomSymbolSetInteger": {
+		"prefix": "CustomSymbolSetInteger",
+		"body": "CustomSymbolSetInteger(${1:symbol_name}, ${2:property_id}, ${3:property_value})$0",
+		"description": "(bool) Sets the integer type property value for a custom symbol."
+	},
+	"CustomSymbolSetDouble": {
+		"prefix": "CustomSymbolSetDouble",
+		"body": "CustomSymbolSetDouble(${1:symbol_name}, ${2:property_id}, ${3:property_value})$0",
+		"description": "(bool) Sets the real type property value for a custom symbol."
+	},
+	"CustomSymbolSetString": {
+		"prefix": "CustomSymbolSetString",
+		"body": "CustomSymbolSetString(${1:symbol_name}, ${2:property_id}, ${3:property_value})$0",
+		"description": "(bool) Sets the string type property value for a custom symbol."
+	},
+	"CustomSymbolSetMarginRate": {
+		"prefix": "CustomSymbolSetMarginRate",
+		"body": "CustomSymbolSetMarginRate(${1:symbol_name}, ${2:order_type}, ${3:initial_margin_rate}, ${4:maintenance_margin_rate})$0",
+		"description": "(bool) Sets the margin rates depending on the order type and direction for a custom symbol."
+	},
+	"CustomSymbolSetSessionQuote": {
+		"prefix": "CustomSymbolSetSessionQuote",
+		"body": "CustomSymbolSetSessionQuote(${1:symbol_name}, ${2:day_of_week}, ${3:session_index}, ${4:from}, ${5:to})$0",
+		"description": "(bool) Sets the start and end time of the specified quotation session for the specified symbol and week day."
+	},
+	"CustomSymbolSetSessionTrade": {
+		"prefix": "CustomSymbolSetSessionTrade",
+		"body": "CustomSymbolSetSessionTrade(${1:symbol_name}, ${2:day_of_week}, ${3:session_index}, ${4:from}, ${5:to})$0",
+		"description": "(bool) Sets the start and end time of the specified trading session for the specified symbol and week day."
+	},
+	"CustomRatesDelete": {
+		"prefix": "CustomRatesDelete",
+		"body": "CustomRatesDelete(${1:symbol}, ${2:from}, ${3:to})$0",
+		"description": "(int) Deletes all bars from the price history of the custom symbol in the specified time interval."
+	},
+	"CustomRatesReplace": {
+		"prefix": "CustomRatesReplace",
+		"body": "CustomRatesReplace(${1:symbol}, ${2:from}, ${3:to}, ${4:rates}, ${5:count})$0",
+		"description": "(int) Fully replaces the price history of the custom symbol within the specified time interval with the data from the MqlRates type array."
+	},
+	"CustomRatesUpdate": {
+		"prefix": "CustomRatesUpdate",
+		"body": "CustomRatesUpdate(${1:symbol}, ${2:rates}, ${3:count})$0",
+		"description": "(int) Adds missing bars to the custom symbol history and replaces existing data with  the ones from the MqlRates type array."
+	},
+	"CustomTicksAdd": {
+		"prefix": "CustomTicksAdd",
+		"body": "CustomTicksAdd(${1:symbol}, ${2:ticks}, ${3:count})$0",
+		"description": "(int) Adds data from an array of the MqlTick type to the price history of a custom symbol. The custom symbol must be selected in the Market Watch window."
+	},
+	"CustomTicksDelete": {
+		"prefix": "CustomTicksDelete",
+		"body": "CustomTicksDelete(${1:symbol}, ${2:from_msc}, ${3:to_msc})$0",
+		"description": "(int) Deletes all ticks from the price history of the custom symbol in the specified time interval."
+	},
+	"CustomTicksReplace": {
+		"prefix": "CustomTicksReplace",
+		"body": "CustomTicksReplace(${1:symbol}, ${2:from_msc}, ${3:to_msc}, ${4:ticks}, ${5:count})$0",
+		"description": "(int) Fully replaces the price history of the custom symbol within the specified time interval with the data from the MqlTick type array."
+	},
+	"CustomBookAdd": {
+		"prefix": "CustomBookAdd",
+		"body": "CustomBookAdd(${1:symbol}, ${2:books}, ${3:count})$0",
+		"description": "(int) Passes the status of the Depth of Market for a custom symbol. The function allows broadcasting the Depth of Market as if the prices arrive from a broker's server."
+	},
+	"DatabaseOpen": {
+		"prefix": "DatabaseOpen",
+		"body": "DatabaseOpen(${1:filename}, ${2:flags})$0",
+		"description": "(int) Opens or creates a database in a specified file."
+	},
+	"DatabaseClose": {
+		"prefix": "DatabaseClose",
+		"body": "DatabaseClose(${1:database})$0",
+		"description": "(void) Closes a database."
+	},
+	"DatabaseImport": {
+		"prefix": "DatabaseImport",
+		"body": "DatabaseImport(${1:database}, ${2:table}, ${3:filename}, ${4:flags}, ${5:separator}, ${6:skip_rows}, ${7:skip_comments})$0",
+		"description": "(long) Imports data from a file into a table."
+	},
+	"DatabaseExport": {
+		"prefix": "DatabaseExport",
+		"body": "DatabaseExport(${1:database}, ${2:table_or_sql}, ${3:filename}, ${4:flags}, ${5:separator})$0",
+		"description": "(long) Exports a table or an SQL request execution result to a CSV file. The file is created in the UTF-8 encoding."
+	},
+	"DatabasePrint": {
+		"prefix": "DatabasePrint",
+		"body": "DatabasePrint(${1:database}, ${2:table_or_sql}, ${3:flags})$0",
+		"description": "(long) Prints a table or an SQL request execution result in the Experts journal."
+	},
+	"DatabaseTableExists": {
+		"prefix": "DatabaseTableExists",
+		"body": "DatabaseTableExists(${1:database}, ${2:table})$0",
+		"description": "(bool) Checks the presence of the table in a database."
+	},
+	"DatabaseExecute": {
+		"prefix": "DatabaseExecute",
+		"body": "DatabaseExecute(${1:database}, ${2:sql})$0",
+		"description": "(bool) Executes a request to a specified database."
+	},
+	"DatabasePrepare": {
+		"prefix": "DatabasePrepare",
+		"body": "DatabasePrepare(${1:database}, ${2:sql}, ${3:parameters})$0",
+		"description": "(int) Creates a handle of a request, which can then be executed using DatabaseRead()."
+	},
+	"DatabaseReset": {
+		"prefix": "DatabaseReset",
+		"body": "DatabaseReset(${1:request})$0",
+		"description": "(int) Resets a request, like after calling DatabasePrepare()."
+	},
+	"DatabaseBind": {
+		"prefix": "DatabaseBind",
+		"body": "DatabaseBind(${1:request}, ${2:index}, ${3:value})$0",
+		"description": "(bool) Sets a parameter value in a request."
+	},
+	"DatabaseBindArray": {
+		"prefix": "DatabaseBindArray",
+		"body": "DatabaseBindArray(${1:request}, ${2:index}, ${3:array})$0",
+		"description": "(bool) Sets an array as a parameter value."
+	},
+	"DatabaseRead": {
+		"prefix": "DatabaseRead",
+		"body": "DatabaseRead(${1:request})$0",
+		"description": "(bool) Moves to the next entry as a result of a request."
+	},
+	"DatabaseReadBind": {
+		"prefix": "DatabaseReadBind",
+		"body": "DatabaseReadBind(${1:request}, ${2:struct_object})$0",
+		"description": "(bool) Moves to the next record and reads data into the structure from it."
+	},
+	"DatabaseFinalize": {
+		"prefix": "DatabaseFinalize",
+		"body": "DatabaseFinalize(${1:request})$0",
+		"description": "(void) Removes a request created in DatabasePrepare()."
+	},
+	"DatabaseTransactionBegin": {
+		"prefix": "DatabaseTransactionBegin",
+		"body": "DatabaseTransactionBegin(${1:database})$0",
+		"description": "(bool) Starts transaction execution."
+	},
+	"DatabaseTransactionCommit": {
+		"prefix": "DatabaseTransactionCommit",
+		"body": "DatabaseTransactionCommit(${1:database})$0",
+		"description": "(bool) Completes transaction execution."
+	},
+	"DatabaseTransactionRollback": {
+		"prefix": "DatabaseTransactionRollback",
+		"body": "DatabaseTransactionRollback(${1:database})$0",
+		"description": "(bool) Rolls back transactions."
+	},
+	"DatabaseColumnsCount": {
+		"prefix": "DatabaseColumnsCount",
+		"body": "DatabaseColumnsCount(${1:request})$0",
+		"description": "(int) Gets the number of fields in a request."
+	},
+	"DatabaseColumnName": {
+		"prefix": "DatabaseColumnName",
+		"body": "DatabaseColumnName(${1:request}, ${2:column}, ${3:name})$0",
+		"description": "(bool) Gets a field name by index."
+	},
+	"DatabaseColumnType": {
+		"prefix": "DatabaseColumnType",
+		"body": "DatabaseColumnType(${1:request}, ${2:column})$0",
+		"description": "(ENUM_DATABASE_FIELD_TYPE) Gets a field type by index."
+	},
+	"DatabaseColumnSize": {
+		"prefix": "DatabaseColumnSize",
+		"body": "DatabaseColumnSize(${1:request}, ${2:column})$0",
+		"description": "(int) Gets a field size in bytes."
+	},
+	"DatabaseColumnText": {
+		"prefix": "DatabaseColumnText",
+		"body": "DatabaseColumnText(${1:request}, ${2:column}, ${3:value})$0",
+		"description": "(bool) Gets a field value as a string from the current record."
+	},
+	"DatabaseColumnInteger": {
+		"prefix": "DatabaseColumnInteger",
+		"body": "DatabaseColumnInteger(${1:request}, ${2:column}, ${3:value})$0",
+		"description": "(bool) Gets the int type value from the current record."
+	},
+	"DatabaseColumnLong": {
+		"prefix": "DatabaseColumnLong",
+		"body": "DatabaseColumnLong(${1:request}, ${2:column}, ${3:value})$0",
+		"description": "(bool) Gets the long type value from the current record."
+	},
+	"DatabaseColumnDouble": {
+		"prefix": "DatabaseColumnDouble",
+		"body": "DatabaseColumnDouble(${1:request}, ${2:column}, ${3:value})$0",
+		"description": "(bool) Gets the double type value from the current record."
+	},
+	"DatabaseColumnBlob": {
+		"prefix": "DatabaseColumnBlob",
+		"body": "DatabaseColumnBlob(${1:request}, ${2:column}, ${3:data})$0",
+		"description": "(bool) Gets a field value as an array from the current record."
+	},
+	"DebugBreak": {
+		"prefix": "DebugBreak",
+		"body": "DebugBreak()$0",
+		"description": "(void) It is a program breakpoint in debugging."
+	},
+	"Digits": {
+		"prefix": "Digits",
+		"body": "Digits()$0",
+		"description": "(int) Returns the number of decimal digits determining the accuracy of price of the current chart symbol."
+	},
+	"DoubleToString": {
+		"prefix": "DoubleToString",
+		"body": "DoubleToString(${1:value}, ${2:digits})$0",
+		"description": "(string) Converting numeric value into text string."
+	},
+	"DXContextCreate": {
+		"prefix": "DXContextCreate",
+		"body": "DXContextCreate(${1:width}, ${2:height})$0",
+		"description": "(int) Creates a graphic context for rendering frames of a specified size."
+	},
+	"DXContextSetSize": {
+		"prefix": "DXContextSetSize",
+		"body": "DXContextSetSize(${1:context}, ${2:width}, ${3:height})$0",
+		"description": "(bool) Changes a frame size of a graphic context created in DXContextCreate()."
+	},
+	"DXContextClearColors": {
+		"prefix": "DXContextClearColors",
+		"body": "DXContextClearColors(${1:context}, ${2:color})$0",
+		"description": "(bool) Sets a specified color to all pixels for the rendering buffer."
+	},
+	"DXContextClearDepth": {
+		"prefix": "DXContextClearDepth",
+		"body": "DXContextClearDepth(${1:context})$0",
+		"description": "(bool) Clears the depth buffer."
+	},
+	"DXContextGetColors": {
+		"prefix": "DXContextGetColors",
+		"body": "DXContextGetColors(${1:context}, ${2:image}, ${3:image_width}, ${4:image_height}, ${5:image_offset_x}, ${6:image_offset_y})$0",
+		"description": "(bool) Gets an image of a specified size and offset from a graphic context."
+	},
+	"DXContextGetDepth": {
+		"prefix": "DXContextGetDepth",
+		"body": "DXContextGetDepth(${1:context}, ${2:image})$0",
+		"description": "(bool) Gets the depth buffer of a rendered frame."
+	},
+	"DXBufferCreate": {
+		"prefix": "DXBufferCreate",
+		"body": "DXBufferCreate(${1:context}, ${2:buffer_type}, ${3:data}, ${4:start}, ${5:count})$0",
+		"description": "(int) Creates a buffer of a specified type based on a data array."
+	},
+	"DXTextureCreate": {
+		"prefix": "DXTextureCreate",
+		"body": "DXTextureCreate(${1:context}, ${2:format}, ${3:width}, ${4:height}, ${5:data}, ${6:data_x}, ${7:data_y}, ${8:data_width}, ${9:data_height})$0",
+		"description": "(int) Creates a 2D texture out of a rectangle of a specified size cut from a passed image."
+	},
+	"DXInputCreate": {
+		"prefix": "DXInputCreate",
+		"body": "DXInputCreate(${1:context}, ${2:input_size})$0",
+		"description": "(int) Creates shader inputs."
+	},
+	"DXInputSet": {
+		"prefix": "DXInputSet",
+		"body": "DXInputSet(${1:input}, ${2:data})$0",
+		"description": "(bool) Sets shader inputs."
+	},
+	"DXShaderCreate": {
+		"prefix": "DXShaderCreate",
+		"body": "DXShaderCreate(${1:context}, ${2:shader_type}, ${3:source}, ${4:entry_point}, ${5:compile_error})$0",
+		"description": "(int) Creates a shader of a specified type."
+	},
+	"DXShaderSetLayout": {
+		"prefix": "DXShaderSetLayout",
+		"body": "DXShaderSetLayout(${1:shader}, ${2:layout})$0",
+		"description": "(bool) Sets vertex layout for the vertex shader."
+	},
+	"DXShaderInputsSet": {
+		"prefix": "DXShaderInputsSet",
+		"body": "DXShaderInputsSet(${1:shader}, ${2:inputs})$0",
+		"description": "(bool) Sets shader inputs."
+	},
+	"DXShaderTexturesSet": {
+		"prefix": "DXShaderTexturesSet",
+		"body": "DXShaderTexturesSet(${1:shader}, ${2:textures})$0",
+		"description": "(bool) Sets shader textures."
+	},
+	"DXDraw": {
+		"prefix": "DXDraw",
+		"body": "DXDraw(${1:context}, ${2:start}, ${3:count})$0",
+		"description": "(bool) Renders the vertices of the vertex buffer set in DXBufferSet()."
+	},
+	"DXDrawIndexed": {
+		"prefix": "DXDrawIndexed",
+		"body": "DXDrawIndexed(${1:context}, ${2:start}, ${3:count})$0",
+		"description": "(bool) Renders graphic primitives described by the index buffer from DXBufferSet()."
+	},
+	"DXPrimiveTopologySet": {
+		"prefix": "DXPrimiveTopologySet",
+		"body": "DXPrimiveTopologySet(${1:context}, ${2:primitive_topology})$0",
+		"description": "(bool) Sets the type of primitives for rendering using DXDrawIndexed()."
+	},
+	"DXBufferSet": {
+		"prefix": "DXBufferSet",
+		"body": "DXBufferSet(${1:context}, ${2:buffer}, ${3:start}, ${4:count})$0",
+		"description": "(bool) Sets a buffer for the current rendering."
+	},
+	"DXShaderSet": {
+		"prefix": "DXShaderSet",
+		"body": "DXShaderSet(${1:context}, ${2:shader})$0",
+		"description": "(bool) Sets a shader for rendering."
+	},
+	"DXHandleType": {
+		"prefix": "DXHandleType",
+		"body": "DXHandleType(${1:handle})$0",
+		"description": "(ENUM_DX_HANDLE_TYPE) Returns a handle type."
+	},
+	"DXRelease": {
+		"prefix": "DXRelease",
+		"body": "DXRelease(${1:handle})$0",
+		"description": "(bool) Releases a handle."
+	},
+	"EnumToString": {
+		"prefix": "EnumToString",
+		"body": "EnumToString(${1:value})$0",
+		"description": "(string) Converting an enumeration value of any type to a text form."
+	},
+	"EventChartCustom": {
+		"prefix": "EventChartCustom",
+		"body": "EventChartCustom(${1:chart_id}, ${2:custom_event_id}, ${3:lparam}, ${4:dparam}, ${5:sparam})$0",
+		"description": "(bool) The function generates a custom event for the specified chart."
+	},
+	"EventKillTimer": {
+		"prefix": "EventKillTimer",
+		"body": "EventKillTimer()$0",
+		"description": "(void) Specifies the client terminal that is necessary to stop the generation of events from Timer."
+	},
+	"EventSetMillisecondTimer": {
+		"prefix": "EventSetMillisecondTimer",
+		"body": "EventSetMillisecondTimer(${1:milliseconds})$0",
+		"description": "(bool) The function indicates to the client terminal that timer events should be generated at intervals less than one second for this Expert Advisor or indicator."
+	},
+	"EventSetTimer": {
+		"prefix": "EventSetTimer",
+		"body": "EventSetTimer(${1:seconds})$0",
+		"description": "(bool) The function indicates to the client terminal, that for this indicator or Expert Advisor, events from the timer must be generated with the specified periodicity."
+	},
+	"exp": {
+		"prefix": "exp",
+		"body": "exp(${1:value})$0",
+		"description": "(double) The function returns the value of e raised to the power of d."
+	},
+	"ExpertRemove": {
+		"prefix": "ExpertRemove",
+		"body": "ExpertRemove()$0",
+		"description": "(void) The function stops an Expert Advisor and unloads it from a chart."
+	},
+	"fabs": {
+		"prefix": "fabs",
+		"body": "fabs(${1:value})$0",
+		"description": "(double) The function returns the absolute value (modulus) of the specified numeric value."
+	},
+	"FileClose": {
+		"prefix": "FileClose",
+		"body": "FileClose(${1:file_handle})$0",
+		"description": "(void) Close the file previously opened by FileOpen()."
+	},
+	"FileCopy": {
+		"prefix": "FileCopy",
+		"body": "FileCopy(${1:src_file_name}, ${2:common_flag}, ${3:dst_file_name}, ${4:mode_flags})$0",
+		"description": "(bool) The function copies the original file from a local or shared folder to another file."
+	},
+	"FileDelete": {
+		"prefix": "FileDelete",
+		"body": "FileDelete(${1:file_name}, ${2:common_flag})$0",
+		"description": "(bool) Deletes the specified file in a local folder of the client terminal."
+	},
+	"FileFindClose": {
+		"prefix": "FileFindClose",
+		"body": "FileFindClose(${1:search_handle})$0",
+		"description": "(void) The function closes the search handle."
+	},
+	"FileFindFirst": {
+		"prefix": "FileFindFirst",
+		"body": "FileFindFirst(${1:file_filter}, ${2:returned_filename}, ${3:common_flag})$0",
+		"description": "(long) The function starts the search of files or subdirectories in a directory in accordance with the specified filter."
+	},
+	"FileFindNext": {
+		"prefix": "FileFindNext",
+		"body": "FileFindNext(${1:search_handle}, ${2:returned_filename})$0",
+		"description": "(bool) The function continues the search started by FileFindFirst()."
+	},
+	"FileFlush": {
+		"prefix": "FileFlush",
+		"body": "FileFlush(${1:file_handle})$0",
+		"description": "(void) Writes to a disk all data remaining in the input/output file buffer."
+	},
+	"FileGetInteger": {
+		"prefix": "FileGetInteger",
+		"body": "FileGetInteger(${1:file_handle}, ${2:file_name}, ${3:property_id}, ${4:common_folder})$0",
+		"description": "(long) Gets an integer property of a file. There are two variants of the function."
+	},
+	"FileIsEnding": {
+		"prefix": "FileIsEnding",
+		"body": "FileIsEnding(${1:file_handle})$0",
+		"description": "(bool) Defines the end of a file in the process of reading."
+	},
+	"FileIsExist": {
+		"prefix": "FileIsExist",
+		"body": "FileIsExist(${1:file_name}, ${2:common_flag})$0",
+		"description": "(bool) Checks the existence of a file."
+	},
+	"FileIsLineEnding": {
+		"prefix": "FileIsLineEnding",
+		"body": "FileIsLineEnding(${1:file_handle})$0",
+		"description": "(bool) Defines the line end in a text file in the process of reading."
+	},
+	"FileMove": {
+		"prefix": "FileMove",
+		"body": "FileMove(${1:src_file_name}, ${2:common_flag}, ${3:dst_file_name}, ${4:mode_flags})$0",
+		"description": "(bool) Moves a file from a local or shared folder to another folder."
+	},
+	"FileOpen": {
+		"prefix": "FileOpen",
+		"body": "FileOpen(${1:file_name}, ${2:open_flags}, ${3:delimiter}, ${4:codepage})$0",
+		"description": "(int) The function opens the file with the specified name and flag."
+	},
+	"FileReadArray": {
+		"prefix": "FileReadArray",
+		"body": "FileReadArray(${1:file_handle}, ${2:array}, ${3:start}, ${4:count})$0",
+		"description": "(uint) Reads from a file of BIN type arrays of any type except string (may be an array of structures, not containing strings, and dynamic arrays)."
+	},
+	"FileReadBool": {
+		"prefix": "FileReadBool",
+		"body": "FileReadBool(${1:file_handle})$0",
+		"description": "(bool) Reads from the file of CSV type string from the current position to a delimiter (or till the end of the text line) and converts the read string to a bool type value."
+	},
+	"FileReadDatetime": {
+		"prefix": "FileReadDatetime",
+		"body": "FileReadDatetime(${1:file_handle})$0",
+		"description": "(datetime) Reads from the file of CSV type a string of one of the formats: \"YYYY.MM.DD HH:MI:SS\", \"YYYY.MM.DD\" or \"HH:MI:SS\" - and converts it into a value of datetime type."
+	},
+	"FileReadDouble": {
+		"prefix": "FileReadDouble",
+		"body": "FileReadDouble(${1:file_handle})$0",
+		"description": "(double) Reads a double-precision floating point number (double) from the current position of the binary file."
+	},
+	"FileReadFloat": {
+		"prefix": "FileReadFloat",
+		"body": "FileReadFloat(${1:file_handle})$0",
+		"description": "(float) Reads the single-precision floating point number (float) from the current position of the binary file."
+	},
+	"FileReadInteger": {
+		"prefix": "FileReadInteger",
+		"body": "FileReadInteger(${1:file_handle}, ${2:size})$0",
+		"description": "(int) The function reads int, short or char value from the current position of the file pointer depending on the length specified in bytes."
+	},
+	"FileReadLong": {
+		"prefix": "FileReadLong",
+		"body": "FileReadLong(${1:file_handle})$0",
+		"description": "(long) The function reads an integer of long type (8 bytes) from the current position of the binary file."
+	},
+	"FileReadNumber": {
+		"prefix": "FileReadNumber",
+		"body": "FileReadNumber(${1:file_handle})$0",
+		"description": "(double) The function reads from the CSV file a string from the current position till a separator (or till the end of a text string) and converts the read string to a value of double type."
+	},
+	"FileReadString": {
+		"prefix": "FileReadString",
+		"body": "FileReadString(${1:file_handle}, ${2:length})$0",
+		"description": "(string) The function reads a string from the current position of a file pointer in a file."
+	},
+	"FileReadStruct": {
+		"prefix": "FileReadStruct",
+		"body": "FileReadStruct(${1:file_handle}, ${2:struct_object}, ${3:size})$0",
+		"description": "(uint) The function reads contents into a structure passed as a parameter from a binary-file, starting with the current position of the file pointer."
+	},
+	"FileSeek": {
+		"prefix": "FileSeek",
+		"body": "FileSeek(${1:file_handle}, ${2:offset}, ${3:origin})$0",
+		"description": "(bool) The function moves the position of the file pointer by a specified number of bytes relative to the specified position."
+	},
+	"FileSize": {
+		"prefix": "FileSize",
+		"body": "FileSize(${1:file_handle})$0",
+		"description": "(ulong) The function returns the file size in bytes."
+	},
+	"FileTell": {
+		"prefix": "FileTell",
+		"body": "FileTell(${1:file_handle})$0",
+		"description": "(ulong) The file returns the current position of the file pointer of an open file."
+	},
+	"FileWrite": {
+		"prefix": "FileWrite",
+		"body": "FileWrite(${1:file_handle}, ${2:parameters})$0",
+		"description": "(uint) The function is intended for writing of data into a CSV file, delimiter being inserted automatically unless it is equal to 0. After writing into the file, the line end character \"\\r\\n\" will be added."
+	},
+	"FileWriteArray": {
+		"prefix": "FileWriteArray",
+		"body": "FileWriteArray(${1:file_handle}, ${2:array}, ${3:start}, ${4:count})$0",
+		"description": "(uint) The function writes arrays of any type except for string to a BIN file (can be an array of structures not containing strings or dynamic arrays)."
+	},
+	"FileWriteDouble": {
+		"prefix": "FileWriteDouble",
+		"body": "FileWriteDouble(${1:file_handle}, ${2:value})$0",
+		"description": "(uint) The function writes the value of a double parameter to a a bin-file, starting from the current position of the file pointer."
+	},
+	"FileWriteFloat": {
+		"prefix": "FileWriteFloat",
+		"body": "FileWriteFloat(${1:file_handle}, ${2:value})$0",
+		"description": "(uint) The function writes the value of the float parameter to a bin-file, starting from the current position of the file pointer."
+	},
+	"FileWriteInteger": {
+		"prefix": "FileWriteInteger",
+		"body": "FileWriteInteger(${1:file_handle}, ${2:value}, ${3:size})$0",
+		"description": "(uint) The function writes the value of the int parameter to a bin-file, starting from the current position of the file pointer."
+	},
+	"FileWriteLong": {
+		"prefix": "FileWriteLong",
+		"body": "FileWriteLong(${1:file_handle}, ${2:value})$0",
+		"description": "(uint) The function writes the value of the long-type parameter to a bin-file, starting from the current position of the file pointer."
+	},
+	"FileWriteString": {
+		"prefix": "FileWriteString",
+		"body": "FileWriteString(${1:file_handle}, ${2:text_string}, ${3:length})$0",
+		"description": "(uint) The function writes the value of a string-type parameter into a BIN, CSV or TXT file starting from the current position of the file pointer. When writing to a CSV or TXT file: if there is a symbol in the string '\\n' (LF) without previous character '\\r' (CR), then before '\\n' the missing '\\r' is added."
+	},
+	"FileWriteStruct": {
+		"prefix": "FileWriteStruct",
+		"body": "FileWriteStruct(${1:file_handle}, ${2:struct_object}, ${3:size})$0",
+		"description": "(uint) The function writes into a bin-file contents of a structure passed as a parameter, starting from the current position of the file pointer."
+	},
+	"floor": {
+		"prefix": "floor",
+		"body": "floor(${1:val})$0",
+		"description": "(double) The function returns integer numeric value closest from below."
+	},
+	"fmax": {
+		"prefix": "fmax",
+		"body": "fmax(${1:value1}, ${2:value2})$0",
+		"description": "(double) The function returns the maximal value of two values."
+	},
+	"fmin": {
+		"prefix": "fmin",
+		"body": "fmin(${1:value1}, ${2:value2})$0",
+		"description": "(double) The function returns the minimal value of two values."
+	},
+	"fmod": {
+		"prefix": "fmod",
+		"body": "fmod(${1:value}, ${2:value2})$0",
+		"description": "(double) The function returns the real remainder of division of two numbers."
+	},
+	"FolderClean": {
+		"prefix": "FolderClean",
+		"body": "FolderClean(${1:folder_name}, ${2:common_flag})$0",
+		"description": "(bool) The function deletes all files in a specified folder."
+	},
+	"FolderCreate": {
+		"prefix": "FolderCreate",
+		"body": "FolderCreate(${1:folder_name}, ${2:common_flag})$0",
+		"description": "(bool) Creates a directory in the Files folder (depending on the common_flag value)"
+	},
+	"FolderDelete": {
+		"prefix": "FolderDelete",
+		"body": "FolderDelete(${1:folder_name}, ${2:common_flag})$0",
+		"description": "(bool) The function removes the specified directory. If the folder is not empty, then it can't be removed."
+	},
+	"FrameAdd": {
+		"prefix": "FrameAdd",
+		"body": "FrameAdd(${1:name}, ${2:id}, ${3:value}, ${4:filename}, ${5:data})$0",
+		"description": "(bool) Adds a frame with data. There are two variants of the function."
+	},
+	"FrameFilter": {
+		"prefix": "FrameFilter",
+		"body": "FrameFilter(${1:name}, ${2:id})$0",
+		"description": "(bool) Sets the frame reading filter and moves the pointer to the beginning."
+	},
+	"FrameFirst": {
+		"prefix": "FrameFirst",
+		"body": "FrameFirst()$0",
+		"description": "(bool) Moves a pointer of frame reading to the beginning and resets a set filter."
+	},
+	"FrameInputs": {
+		"prefix": "FrameInputs",
+		"body": "FrameInputs(${1:pass}, ${2:parameters}, ${3:parameters_count})$0",
+		"description": "(bool) Receives input parameters, on which the frame with the specified pass number is formed."
+	},
+	"FrameNext": {
+		"prefix": "FrameNext",
+		"body": "FrameNext(${1:pass}, ${2:name}, ${3:id}, ${4:value}, ${5:data})$0",
+		"description": "(bool) Reads a frame and moves the pointer to the next one. There are two variants of the function."
+	},
+	"GetLastError": {
+		"prefix": "GetLastError",
+		"body": "GetLastError()$0",
+		"description": "(int) Returns the contents of the system variable _LastError."
+	},
+	"GetPointer": {
+		"prefix": "GetPointer",
+		"body": "GetPointer(${1:anyobject})$0",
+		"description": "(void) The function returns the object pointer."
+	},
+	"GetTickCount": {
+		"prefix": "GetTickCount",
+		"body": "GetTickCount()$0",
+		"description": "(uint) The GetTickCount() function returns the number of milliseconds that elapsed since the system start."
+	},
+	"GlobalVariableCheck": {
+		"prefix": "GlobalVariableCheck",
+		"body": "GlobalVariableCheck(${1:name})$0",
+		"description": "(bool) Checks the existence of a global variable with the specified name"
+	},
+	"GlobalVariableDel": {
+		"prefix": "GlobalVariableDel",
+		"body": "GlobalVariableDel(${1:name})$0",
+		"description": "(bool) Deletes a global variable from the client terminal."
+	},
+	"GlobalVariableGet": {
+		"prefix": "GlobalVariableGet",
+		"body": "GlobalVariableGet(${1:name}, ${2:double_var})$0",
+		"description": "(bool) Returns the value of an existing global variable of the client terminal. There are 2 variants of the function."
+	},
+	"GlobalVariableName": {
+		"prefix": "GlobalVariableName",
+		"body": "GlobalVariableName(${1:index})$0",
+		"description": "(string) Returns the name of a global variable by its ordinal number."
+	},
+	"GlobalVariablesDeleteAll": {
+		"prefix": "GlobalVariablesDeleteAll",
+		"body": "GlobalVariablesDeleteAll(${1:prefix_name}, ${2:limit_data})$0",
+		"description": "(int) Deletes global variables of the client terminal."
+	},
+	"GlobalVariableSet": {
+		"prefix": "GlobalVariableSet",
+		"body": "GlobalVariableSet(${1:name}, ${2:value})$0",
+		"description": "(datetime) Sets a new value for a global variable. If the variable does not exist, the system creates a new global variable."
+	},
+	"GlobalVariableSetOnCondition": {
+		"prefix": "GlobalVariableSetOnCondition",
+		"body": "GlobalVariableSetOnCondition(${1:name}, ${2:value}, ${3:check_value})$0",
+		"description": "(bool) Sets the new value of the existing global variable if the current value equals to the third parameter check_value. If there is no global variable, the function will generate an error ERR_GLOBALVARIABLE_NOT_FOUND (4501) and return false."
+	},
+	"GlobalVariablesFlush": {
+		"prefix": "GlobalVariablesFlush",
+		"body": "GlobalVariablesFlush()$0",
+		"description": "(void) Forcibly saves contents of all global variables to a disk."
+	},
+	"GlobalVariablesTotal": {
+		"prefix": "GlobalVariablesTotal",
+		"body": "GlobalVariablesTotal()$0",
+		"description": "(int) Returns the total number of global variables of the client terminal."
+	},
+	"GlobalVariableTemp": {
+		"prefix": "GlobalVariableTemp",
+		"body": "GlobalVariableTemp(${1:name})$0",
+		"description": "(bool) The function attempts to create a temporary global variable. If the variable doesn't exist, the system creates a new temporary global variable."
+	},
+	"GlobalVariableTime": {
+		"prefix": "GlobalVariableTime",
+		"body": "GlobalVariableTime(${1:name})$0",
+		"description": "(datetime) Returns the time when the global variable was last accessed."
+	},
+	"HistoryDealGetDouble": {
+		"prefix": "HistoryDealGetDouble",
+		"body": "HistoryDealGetDouble(${1:ticket_number}, ${2:property_id}, ${3:double_var})$0",
+		"description": "(bool) Returns the requested property of a deal. The deal property must be of the double type. There are 2 variants of the function."
+	},
+	"HistoryDealGetInteger": {
+		"prefix": "HistoryDealGetInteger",
+		"body": "HistoryDealGetInteger(${1:ticket_number}, ${2:property_id}, ${3:long_var})$0",
+		"description": "(bool) Returns the requested property of a deal. The deal property must be of the datetime, int type. There are 2 variants of the function."
+	},
+	"HistoryDealGetString": {
+		"prefix": "HistoryDealGetString",
+		"body": "HistoryDealGetString(${1:ticket_number}, ${2:property_id}, ${3:string_var})$0",
+		"description": "(bool) Returns the requested property of a deal. The deal property must be of the string type. There are 2 variants of the function."
+	},
+	"HistoryDealGetTicket": {
+		"prefix": "HistoryDealGetTicket",
+		"body": "HistoryDealGetTicket(${1:index})$0",
+		"description": "(ulong) The function selects a deal for further processing and returns the deal ticket in history. Prior to calling HistoryDealGetTicket(), first it is necessary to receive the history of deals and orders using the HistorySelect() or HistorySelectByPosition() function."
+	},
+	"HistoryDealSelect": {
+		"prefix": "HistoryDealSelect",
+		"body": "HistoryDealSelect(${1:ticket})$0",
+		"description": "(bool) Selects a deal in the history for further calling it through appropriate functions. It returns true if the function has been successfully completed. Returns false if the function has failed. For more details on error call GetLastError()."
+	},
+	"HistoryDealsTotal": {
+		"prefix": "HistoryDealsTotal",
+		"body": "HistoryDealsTotal()$0",
+		"description": "(int) Returns the number of deal in history. Prior to calling HistoryDealsTotal(), first it is necessary to receive the history of deals and orders using the HistorySelect() or HistorySelectByPosition() function."
+	},
+	"HistoryOrderGetDouble": {
+		"prefix": "HistoryOrderGetDouble",
+		"body": "HistoryOrderGetDouble(${1:ticket_number}, ${2:property_id}, ${3:double_var})$0",
+		"description": "(bool) Returns the requested order property. The order property must be of the double type. There are 2 variants of the function."
+	},
+	"HistoryOrderGetInteger": {
+		"prefix": "HistoryOrderGetInteger",
+		"body": "HistoryOrderGetInteger(${1:ticket_number}, ${2:property_id}, ${3:long_var})$0",
+		"description": "(bool) Returns the requested property of an order. The order property must be of datetime, int type. There are 2 variants of the function."
+	},
+	"HistoryOrderGetString": {
+		"prefix": "HistoryOrderGetString",
+		"body": "HistoryOrderGetString(${1:ticket_number}, ${2:property_id}, ${3:string_var})$0",
+		"description": "(bool) Returns the requested property of an order. The order property must be of the string type. There are 2 variants of the function."
+	},
+	"HistoryOrderGetTicket": {
+		"prefix": "HistoryOrderGetTicket",
+		"body": "HistoryOrderGetTicket(${1:index})$0",
+		"description": "(ulong) Return the ticket of a corresponding order in the history. Prior to calling HistoryOrderGetTicket(), first it is necessary to receive the history of deals and orders using the HistorySelect() or HistorySelectByPosition() function."
+	},
+	"HistoryOrderSelect": {
+		"prefix": "HistoryOrderSelect",
+		"body": "HistoryOrderSelect(${1:ticket})$0",
+		"description": "(bool) Selects an order from the history for further calling it through appropriate functions. It returns true if the function has been successfully completed. Returns false if the function has failed. For more details on error call GetLastError()."
+	},
+	"HistoryOrdersTotal": {
+		"prefix": "HistoryOrdersTotal",
+		"body": "HistoryOrdersTotal()$0",
+		"description": "(int) Returns the number of orders in the history. Prior to calling HistoryOrdersTotal(), first it is necessary to receive the history of deals and orders using the HistorySelect() or HistorySelectByPosition() function."
+	},
+	"HistorySelect": {
+		"prefix": "HistorySelect",
+		"body": "HistorySelect(${1:from_date}, ${2:to_date})$0",
+		"description": "(bool) Retrieves the history of deals and orders for the specified period of server time."
+	},
+	"HistorySelectByPosition": {
+		"prefix": "HistorySelectByPosition",
+		"body": "HistorySelectByPosition(${1:position_id})$0",
+		"description": "(bool) Retrieves the history of deals and orders having the specified position identifier."
+	},
+	"iBars": {
+		"prefix": "iBars",
+		"body": "iBars(${1:symbol}, ${2:timeframe})$0",
+		"description": "(int) Returns the number of bars of a corresponding symbol and period, available in history."
+	},
+	"iBarShift": {
+		"prefix": "iBarShift",
+		"body": "iBarShift(${1:symbol}, ${2:timeframe}, ${3:time}, ${4:exact})$0",
+		"description": "(int) Search bar by time. The function returns the index of the bar corresponding to the specified time."
+	},
+	"iClose": {
+		"prefix": "iClose",
+		"body": "iClose(${1:symbol}, ${2:timeframe}, ${3:shift})$0",
+		"description": "(double) Returns the Close price of the bar (indicated by the 'shift' parameter) on the corresponding chart."
+	},
+	"iHigh": {
+		"prefix": "iHigh",
+		"body": "iHigh(${1:symbol}, ${2:timeframe}, ${3:shift})$0",
+		"description": "(double) Returns the High price of the bar (indicated by the 'shift' parameter) on the corresponding chart."
+	},
+	"iHighest": {
+		"prefix": "iHighest",
+		"body": "iHighest(${1:symbol}, ${2:timeframe}, ${3:type}, ${4:count}, ${5:start})$0",
+		"description": "(int) Returns the index of the highest value found on the corresponding chart (shift relative to the current bar)."
+	},
+	"iLow": {
+		"prefix": "iLow",
+		"body": "iLow(${1:symbol}, ${2:timeframe}, ${3:shift})$0",
+		"description": "(double) Returns the Low price of the bar (indicated by the 'shift' parameter) on the corresponding chart."
+	},
+	"iLowest": {
+		"prefix": "iLowest",
+		"body": "iLowest(${1:symbol}, ${2:timeframe}, ${3:type}, ${4:count}, ${5:start})$0",
+		"description": "(int) Returns the index of the smallest value found on the corresponding chart (shift relative to the current bar)."
+	},
+	"iOpen": {
+		"prefix": "iOpen",
+		"body": "iOpen(${1:symbol}, ${2:timeframe}, ${3:shift})$0",
+		"description": "(double) Returns the Open price of the bar (indicated by the 'shift' parameter) on the corresponding chart."
+	},
+	"iTime": {
+		"prefix": "iTime",
+		"body": "iTime(${1:symbol}, ${2:timeframe}, ${3:shift})$0",
+		"description": "(datetime) Returns the opening time of the bar (indicated by the 'shift' parameter) on the corresponding chart."
+	},
+	"iTickVolume": {
+		"prefix": "iTickVolume",
+		"body": "iTickVolume(${1:symbol}, ${2:timeframe}, ${3:shift})$0",
+		"description": "(long) Returns the tick volume of the bar (indicated by the 'shift' parameter) on the corresponding chart."
+	},
+	"iRealVolume": {
+		"prefix": "iRealVolume",
+		"body": "iRealVolume(${1:symbol}, ${2:timeframe}, ${3:shift})$0",
+		"description": "(long) Returns the real volume of the bar (indicated by the 'shift' parameter) on the corresponding chart."
+	},
+	"iVolume": {
+		"prefix": "iVolume",
+		"body": "iVolume(${1:symbol}, ${2:timeframe}, ${3:shift})$0",
+		"description": "(long) Returns the tick volume of the bar (indicated by the 'shift' parameter) on the corresponding chart."
+	},
+	"iSpread": {
+		"prefix": "iSpread",
+		"body": "iSpread(${1:symbol}, ${2:timeframe}, ${3:shift})$0",
+		"description": "(long) Returns the spread value of the bar (indicated by the 'shift' parameter) on the corresponding chart."
+	},
+	"iAD": {
+		"prefix": "iAD",
+		"body": "iAD(${1:symbol}, ${2:period}, ${3:applied_volume})$0",
+		"description": "(int) The function returns the handle of the Accumulation/Distribution indicator. It has only one buffer."
+	},
+	"iADX": {
+		"prefix": "iADX",
+		"body": "iADX(${1:symbol}, ${2:period}, ${3:adx_period})$0",
+		"description": "(int) The function returns the handle of the Average Directional Movement Index indicator."
+	},
+	"iADXWilder": {
+		"prefix": "iADXWilder",
+		"body": "iADXWilder(${1:symbol}, ${2:period}, ${3:adx_period})$0",
+		"description": "(int) The function returns the handle of Average Directional Movement Index by Welles Wilder."
+	},
+	"iAlligator": {
+		"prefix": "iAlligator",
+		"body": "iAlligator(${1:symbol}, ${2:period}, ${3:jaw_period}, ${4:jaw_shift}, ${5:teeth_period}, ${6:teeth_shift}, ${7:lips_period}, ${8:lips_shift}, ${9:ma_method}, ${10:applied_price})$0",
+		"description": "(int) The function returns the handle of the Alligator indicator."
+	},
+	"iAMA": {
+		"prefix": "iAMA",
+		"body": "iAMA(${1:symbol}, ${2:period}, ${3:ama_period}, ${4:fast_ma_period}, ${5:slow_ma_period}, ${6:ama_shift}, ${7:applied_price})$0",
+		"description": "(int) The function returns the handle of the Adaptive Moving Average indicator. It has only one buffer."
+	},
+	"iAO": {
+		"prefix": "iAO",
+		"body": "iAO(${1:symbol}, ${2:period})$0",
+		"description": "(int) The function returns the handle of the Awesome Oscillator indicator. It has only one buffer."
+	},
+	"iATR": {
+		"prefix": "iATR",
+		"body": "iATR(${1:symbol}, ${2:period}, ${3:ma_period})$0",
+		"description": "(int) The function returns the handle of the Average True Range indicator. It has only one buffer."
+	},
+	"iBands": {
+		"prefix": "iBands",
+		"body": "iBands(${1:symbol}, ${2:period}, ${3:bands_period}, ${4:bands_shift}, ${5:deviation}, ${6:applied_price})$0",
+		"description": "(int) The function returns the handle of the Bollinger Bands® indicator."
+	},
+	"iBearsPower": {
+		"prefix": "iBearsPower",
+		"body": "iBearsPower(${1:symbol}, ${2:period}, ${3:ma_period})$0",
+		"description": "(int) The function returns the handle of the Bears Power indicator. It has only one buffer."
+	},
+	"iBullsPower": {
+		"prefix": "iBullsPower",
+		"body": "iBullsPower(${1:symbol}, ${2:period}, ${3:ma_period})$0",
+		"description": "(int) The function returns the handle of the Bulls Power indicator. It has only one buffer."
+	},
+	"iBWMFI": {
+		"prefix": "iBWMFI",
+		"body": "iBWMFI(${1:symbol}, ${2:period}, ${3:applied_volume})$0",
+		"description": "(int) The function returns the handle of the Market Facilitation Index indicator. It has only one buffer."
+	},
+	"iCCI": {
+		"prefix": "iCCI",
+		"body": "iCCI(${1:symbol}, ${2:period}, ${3:ma_period}, ${4:applied_price})$0",
+		"description": "(int) The function returns the handle of the Commodity Channel Index indicator. It has only one buffer."
+	},
+	"iChaikin": {
+		"prefix": "iChaikin",
+		"body": "iChaikin(${1:symbol}, ${2:period}, ${3:fast_ma_period}, ${4:slow_ma_period}, ${5:ma_method}, ${6:applied_volume})$0",
+		"description": "(int) The function returns the handle of the Chaikin Oscillator indicator. It has only one buffer."
+	},
+	"iCustom": {
+		"prefix": "iCustom",
+		"body": "iCustom(${1:symbol}, ${2:period}, ${3:name}, ${4:parameters})$0",
+		"description": "(int) The function returns the handle of a specified custom indicator."
+	},
+	"iDEMA": {
+		"prefix": "iDEMA",
+		"body": "iDEMA(${1:symbol}, ${2:period}, ${3:ma_period}, ${4:ma_shift}, ${5:applied_price})$0",
+		"description": "(int) The function returns the handle of the Double Exponential Moving Average indicator. It has only one buffer."
+	},
+	"iDeMarker": {
+		"prefix": "iDeMarker",
+		"body": "iDeMarker(${1:symbol}, ${2:period}, ${3:ma_period})$0",
+		"description": "(int) The function returns the handle of the DeMarker indicator. It has only one buffer."
+	},
+	"iEnvelopes": {
+		"prefix": "iEnvelopes",
+		"body": "iEnvelopes(${1:symbol}, ${2:period}, ${3:ma_period}, ${4:ma_shift}, ${5:ma_method}, ${6:applied_price}, ${7:deviation})$0",
+		"description": "(int) The function returns the handle of the Envelopes indicator."
+	},
+	"iForce": {
+		"prefix": "iForce",
+		"body": "iForce(${1:symbol}, ${2:period}, ${3:ma_period}, ${4:ma_method}, ${5:applied_volume})$0",
+		"description": "(int) The function returns the handle of the Force Index indicator. It has only one buffer."
+	},
+	"iFractals": {
+		"prefix": "iFractals",
+		"body": "iFractals(${1:symbol}, ${2:period})$0",
+		"description": "(int) The function returns the handle of the Fractals indicator."
+	},
+	"iFrAMA": {
+		"prefix": "iFrAMA",
+		"body": "iFrAMA(${1:symbol}, ${2:period}, ${3:ma_period}, ${4:ma_shift}, ${5:applied_price})$0",
+		"description": "(int) The function returns the handle of the Fractal Adaptive Moving Average indicator. It has only one buffer."
+	},
+	"iGator": {
+		"prefix": "iGator",
+		"body": "iGator(${1:symbol}, ${2:period}, ${3:jaw_period}, ${4:jaw_shift}, ${5:teeth_period}, ${6:teeth_shift}, ${7:lips_period}, ${8:lips_shift}, ${9:ma_method}, ${10:applied_price})$0",
+		"description": "(int) The function returns the handle of the Gator indicator. The Oscillator shows the difference between the blue and red lines of Alligator (upper histogram) and difference between red and green lines (lower histogram)."
+	},
+	"iIchimoku": {
+		"prefix": "iIchimoku",
+		"body": "iIchimoku(${1:symbol}, ${2:period}, ${3:tenkan_sen}, ${4:kijun_sen}, ${5:senkou_span_b})$0",
+		"description": "(int) The function returns the handle of the Ichimoku Kinko Hyo indicator."
+	},
+	"iMA": {
+		"prefix": "iMA",
+		"body": "iMA(${1:symbol}, ${2:period}, ${3:ma_period}, ${4:ma_shift}, ${5:ma_method}, ${6:applied_price})$0",
+		"description": "(int) The function returns the handle of the Moving Average indicator. It has only one buffer."
+	},
+	"iMACD": {
+		"prefix": "iMACD",
+		"body": "iMACD(${1:symbol}, ${2:period}, ${3:fast_ema_period}, ${4:slow_ema_period}, ${5:signal_period}, ${6:applied_price})$0",
+		"description": "(int) The function returns the handle of the Moving Averages Convergence/Divergence indicator. In systems where OsMA is called MACD Histogram, this indicator is shown as two lines. In the client terminal the Moving Averages Convergence/Divergence looks like a histogram."
+	},
+	"iMFI": {
+		"prefix": "iMFI",
+		"body": "iMFI(${1:symbol}, ${2:period}, ${3:ma_period}, ${4:applied_volume})$0",
+		"description": "(int) The function returns the handle of the Money Flow Index indicator."
+	},
+	"iMomentum": {
+		"prefix": "iMomentum",
+		"body": "iMomentum(${1:symbol}, ${2:period}, ${3:mom_period}, ${4:applied_price})$0",
+		"description": "(int) The function returns the handle of the Momentum indicator. It has only one buffer."
+	},
+	"IndicatorCreate": {
+		"prefix": "IndicatorCreate",
+		"body": "IndicatorCreate(${1:symbol}, ${2:period}, ${3:indicator_type}, ${4:parameters_cnt}, ${5:parameters_array})$0",
+		"description": "(int) The function returns the handle of a specified technical indicator created based on the array of parameters of MqlParam type."
+	},
+	"IndicatorParameters": {
+		"prefix": "IndicatorParameters",
+		"body": "IndicatorParameters(${1:indicator_handle}, ${2:indicator_type}, ${3:parameters})$0",
+		"description": "(int) Based on the specified handle, returns the number of input parameters of the indicator, as well as the values and types of the parameters."
+	},
+	"IndicatorRelease": {
+		"prefix": "IndicatorRelease",
+		"body": "IndicatorRelease(${1:indicator_handle})$0",
+		"description": "(bool) The function removes an indicator handle and releases the calculation block of the indicator, if it's not used by anyone else."
+	},
+	"IndicatorSetDouble": {
+		"prefix": "IndicatorSetDouble",
+		"body": "IndicatorSetDouble(${1:prop_id}, ${2:prop_modifier}, ${3:prop_value})$0",
+		"description": "(bool) The function sets the value of the corresponding indicator property. Indicator property must be of the double type. There are two variants of the function."
+	},
+	"IndicatorSetInteger": {
+		"prefix": "IndicatorSetInteger",
+		"body": "IndicatorSetInteger(${1:prop_id}, ${2:prop_modifier}, ${3:prop_value})$0",
+		"description": "(bool) The function sets the value of the corresponding indicator property. Indicator property must be of the int or color type. There are two variants of the function."
+	},
+	"IndicatorSetString": {
+		"prefix": "IndicatorSetString",
+		"body": "IndicatorSetString(${1:prop_id}, ${2:prop_modifier}, ${3:prop_value})$0",
+		"description": "(bool) The function sets the value of the corresponding indicator property. Indicator property must be of the string type. There are two variants of the function."
+	},
+	"IntegerToString": {
+		"prefix": "IntegerToString",
+		"body": "IntegerToString(${1:number}, ${2:str_len}, ${3:fill_symbol})$0",
+		"description": "(string) This function converts value of integer type into a string of a specified length and returns the obtained string."
+	},
+	"iOBV": {
+		"prefix": "iOBV",
+		"body": "iOBV(${1:symbol}, ${2:period}, ${3:applied_volume})$0",
+		"description": "(int) The function returns the handle of the On Balance Volume indicator. It has only one buffer."
+	},
+	"iOsMA": {
+		"prefix": "iOsMA",
+		"body": "iOsMA(${1:symbol}, ${2:period}, ${3:fast_ema_period}, ${4:slow_ema_period}, ${5:signal_period}, ${6:applied_price})$0",
+		"description": "(int) The function returns the handle of the Moving Average of Oscillator indicator. The OsMA oscillator shows the difference between values of MACD and its signal line. It has only one buffer."
+	},
+	"iRSI": {
+		"prefix": "iRSI",
+		"body": "iRSI(${1:symbol}, ${2:period}, ${3:ma_period}, ${4:applied_price})$0",
+		"description": "(int) The function returns the handle of the Relative Strength Index indicator. It has only one buffer."
+	},
+	"iRVI": {
+		"prefix": "iRVI",
+		"body": "iRVI(${1:symbol}, ${2:period}, ${3:ma_period})$0",
+		"description": "(int) The function returns the handle of the Relative Vigor Index indicator."
+	},
+	"iSAR": {
+		"prefix": "iSAR",
+		"body": "iSAR(${1:symbol}, ${2:period}, ${3:step}, ${4:maximum})$0",
+		"description": "(int) The function returns the handle of the Parabolic Stop and Reverse system indicator. It has only one buffer."
+	},
+	"IsStopped": {
+		"prefix": "IsStopped",
+		"body": "IsStopped()$0",
+		"description": "(bool) Checks the forced shutdown of an mql5 program."
+	},
+	"iStdDev": {
+		"prefix": "iStdDev",
+		"body": "iStdDev(${1:symbol}, ${2:period}, ${3:ma_period}, ${4:ma_shift}, ${5:ma_method}, ${6:applied_price})$0",
+		"description": "(int) The function returns the handle of the Standard Deviation indicator. It has only one buffer."
+	},
+	"iStochastic": {
+		"prefix": "iStochastic",
+		"body": "iStochastic(${1:symbol}, ${2:period}, ${3:Kperiod}, ${4:Dperiod}, ${5:slowing}, ${6:ma_method}, ${7:price_field})$0",
+		"description": "(int) The function returns the handle of the Stochastic Oscillator indicator."
+	},
+	"iTEMA": {
+		"prefix": "iTEMA",
+		"body": "iTEMA(${1:symbol}, ${2:period}, ${3:ma_period}, ${4:ma_shift}, ${5:applied_price})$0",
+		"description": "(int) The function returns the handle of the Triple Exponential Moving Average indicator. It has only one buffer."
+	},
+	"iTriX": {
+		"prefix": "iTriX",
+		"body": "iTriX(${1:symbol}, ${2:period}, ${3:ma_period}, ${4:applied_price})$0",
+		"description": "(int) The function returns the handle of the Triple Exponential Moving Averages Oscillator indicator. It has only one buffer."
+	},
+	"iVIDyA": {
+		"prefix": "iVIDyA",
+		"body": "iVIDyA(${1:symbol}, ${2:period}, ${3:cmo_period}, ${4:ema_period}, ${5:ma_shift}, ${6:applied_price})$0",
+		"description": "(int) The function returns the handle of the Variable Index Dynamic Average indicator. It has only one buffer."
+	},
+	"iVolumes": {
+		"prefix": "iVolumes",
+		"body": "iVolumes(${1:symbol}, ${2:period}, ${3:applied_volume})$0",
+		"description": "(int) The function returns the handle of the Volumes indicator.  It has an only one buffer."
+	},
+	"iWPR": {
+		"prefix": "iWPR",
+		"body": "iWPR(${1:symbol}, ${2:period}, ${3:calc_period})$0",
+		"description": "(int) The function returns the handle of the Larry Williams' Percent Range indicator. It has only one buffer."
+	},
+	"log": {
+		"prefix": "log",
+		"body": "log(${1:val})$0",
+		"description": "(double) The function returns a natural logarithm."
+	},
+	"log10": {
+		"prefix": "log10",
+		"body": "log10(${1:val})$0",
+		"description": "(double) Returns the logarithm of a number by base 10."
+	},
+	"MarketBookAdd": {
+		"prefix": "MarketBookAdd",
+		"body": "MarketBookAdd(${1:symbol})$0",
+		"description": "(bool) Provides opening of Depth of Market for a selected symbol, and subscribes for receiving notifications of the DOM changes."
+	},
+	"MarketBookGet": {
+		"prefix": "MarketBookGet",
+		"body": "MarketBookGet(${1:symbol}, ${2:book})$0",
+		"description": "(bool) Returns a structure array MqlBookInfo containing records of the Depth of Market of a specified symbol."
+	},
+	"MarketBookRelease": {
+		"prefix": "MarketBookRelease",
+		"body": "MarketBookRelease(${1:symbol})$0",
+		"description": "(bool) Provides closing of Depth of Market for a selected symbol, and cancels the subscription for receiving notifications of the DOM changes."
+	},
+	"MathAbs": {
+		"prefix": "MathAbs",
+		"body": "MathAbs(${1:value})$0",
+		"description": "(double) The function returns the absolute value (modulus) of the specified numeric value."
+	},
+	"MathArccos": {
+		"prefix": "MathArccos",
+		"body": "MathArccos(${1:val})$0",
+		"description": "(double) The function returns the arccosine of x within the range 0 to π in radians."
+	},
+	"MathArcsin": {
+		"prefix": "MathArcsin",
+		"body": "MathArcsin(${1:val})$0",
+		"description": "(double) The function returns the arc sine of x within the range of -π/2 to π/2 radians."
+	},
+	"MathArctan": {
+		"prefix": "MathArctan",
+		"body": "MathArctan(${1:value})$0",
+		"description": "(double) The function returns the arc tangent of x. If x is equal to 0, the function returns 0."
+	},
+	"MathCeil": {
+		"prefix": "MathCeil",
+		"body": "MathCeil(${1:val})$0",
+		"description": "(double) The function returns integer numeric value closest from above."
+	},
+	"MathCos": {
+		"prefix": "MathCos",
+		"body": "MathCos(${1:value})$0",
+		"description": "(double) The function returns the cosine of an angle."
+	},
+	"MathExp": {
+		"prefix": "MathExp",
+		"body": "MathExp(${1:value})$0",
+		"description": "(double) The function returns the value of e raised to the power of d."
+	},
+	"MathFloor": {
+		"prefix": "MathFloor",
+		"body": "MathFloor(${1:val})$0",
+		"description": "(double) The function returns integer numeric value closest from below."
+	},
+	"MathIsValidNumber": {
+		"prefix": "MathIsValidNumber",
+		"body": "MathIsValidNumber(${1:number})$0",
+		"description": "(bool) It checks the correctness of a real number."
+	},
+	"MathLog": {
+		"prefix": "MathLog",
+		"body": "MathLog(${1:val})$0",
+		"description": "(double) The function returns a natural logarithm."
+	},
+	"MathLog10": {
+		"prefix": "MathLog10",
+		"body": "MathLog10(${1:val})$0",
+		"description": "(double) Returns the logarithm of a number by base 10."
+	},
+	"MathMax": {
+		"prefix": "MathMax",
+		"body": "MathMax(${1:value1}, ${2:value2})$0",
+		"description": "(double) The function returns the maximal value of two values."
+	},
+	"MathMin": {
+		"prefix": "MathMin",
+		"body": "MathMin(${1:value1}, ${2:value2})$0",
+		"description": "(double) The function returns the minimal value of two values."
+	},
+	"MathMod": {
+		"prefix": "MathMod",
+		"body": "MathMod(${1:value}, ${2:value2})$0",
+		"description": "(double) The function returns the real remainder of division of two numbers."
+	},
+	"MathPow": {
+		"prefix": "MathPow",
+		"body": "MathPow(${1:base}, ${2:exponent})$0",
+		"description": "(double) The function raises a base to a specified power."
+	},
+	"MathRand": {
+		"prefix": "MathRand",
+		"body": "MathRand()$0",
+		"description": "(int) Returns a pseudorandom integer within the range of 0 to 32767."
+	},
+	"MathRound": {
+		"prefix": "MathRound",
+		"body": "MathRound(${1:value})$0",
+		"description": "(double) The function returns a value rounded off to the nearest integer of the specified numeric value."
+	},
+	"MathSin": {
+		"prefix": "MathSin",
+		"body": "MathSin(${1:value})$0",
+		"description": "(double) Returns the sine of a specified angle."
+	},
+	"MathSqrt": {
+		"prefix": "MathSqrt",
+		"body": "MathSqrt(${1:value})$0",
+		"description": "(double) Returns the square root of a number."
+	},
+	"MathSrand": {
+		"prefix": "MathSrand",
+		"body": "MathSrand(${1:seed})$0",
+		"description": "(void) Sets the starting point for generating a series of pseudorandom integers."
+	},
+	"MathTan": {
+		"prefix": "MathTan",
+		"body": "MathTan(${1:rad})$0",
+		"description": "(double) The function returns a tangent of a number."
+	},
+	"MessageBox": {
+		"prefix": "MessageBox",
+		"body": "MessageBox(${1:text}, ${2:caption}, ${3:flags})$0",
+		"description": "(int) It creates and shows a message box and manages it. A message box contains a message and header, any combination of predefined signs and command buttons."
+	},
+	"MQLInfoInteger": {
+		"prefix": "MQLInfoInteger",
+		"body": "MQLInfoInteger(${1:property_id})$0",
+		"description": "(int) Returns the value of a corresponding property of a running mql5 program."
+	},
+	"MQLInfoString": {
+		"prefix": "MQLInfoString",
+		"body": "MQLInfoString(${1:property_id})$0",
+		"description": "(string) Returns the value of a corresponding property of a running mql5 program."
+	},
+	"NormalizeDouble": {
+		"prefix": "NormalizeDouble",
+		"body": "NormalizeDouble(${1:value}, ${2:digits})$0",
+		"description": "(double) Rounding floating point number to a specified accuracy."
+	},
+	"ObjectCreate": {
+		"prefix": "ObjectCreate",
+		"body": "ObjectCreate(${1:chart_id}, ${2:name}, ${3:type}, ${4:sub_window}, ${5:time1}, ${6:price1}, ${7:time_price})$0",
+		"description": "(bool) The function creates an object with the specified name, type, and the initial coordinates in the specified chart subwindow. During creation up to 30 coordinates can be specified."
+	},
+	"ObjectDelete": {
+		"prefix": "ObjectDelete",
+		"body": "ObjectDelete(${1:chart_id}, ${2:name})$0",
+		"description": "(bool) The function removes the object with the specified name from the specified chart."
+	},
+	"ObjectFind": {
+		"prefix": "ObjectFind",
+		"body": "ObjectFind(${1:chart_id}, ${2:name})$0",
+		"description": "(int) The function searches for an object with the specified name in the chart with the specified ID."
+	},
+	"ObjectGetDouble": {
+		"prefix": "ObjectGetDouble",
+		"body": "ObjectGetDouble(${1:chart_id}, ${2:name}, ${3:prop_id}, ${4:prop_modifier}, ${5:double_var})$0",
+		"description": "(bool) The function returns the value of the corresponding object property. The object property must be of the double type. There are 2 variants of the function."
+	},
+	"ObjectGetInteger": {
+		"prefix": "ObjectGetInteger",
+		"body": "ObjectGetInteger(${1:chart_id}, ${2:name}, ${3:prop_id}, ${4:prop_modifier}, ${5:long_var})$0",
+		"description": "(bool) The function returns the value of the corresponding object property. The object property must be of the datetime, int, color, bool or char type. There are 2 variants of the function."
+	},
+	"ObjectGetString": {
+		"prefix": "ObjectGetString",
+		"body": "ObjectGetString(${1:chart_id}, ${2:name}, ${3:prop_id}, ${4:prop_modifier}, ${5:string_var})$0",
+		"description": "(bool) The function returns the value of the corresponding object property. The object property must be of the string type. There are 2 variants of the function."
+	},
+	"ObjectGetTimeByValue": {
+		"prefix": "ObjectGetTimeByValue",
+		"body": "ObjectGetTimeByValue(${1:chart_id}, ${2:name}, ${3:value}, ${4:line_id})$0",
+		"description": "(datetime) The function returns the time value for the specified price value of the specified object."
+	},
+	"ObjectGetValueByTime": {
+		"prefix": "ObjectGetValueByTime",
+		"body": "ObjectGetValueByTime(${1:chart_id}, ${2:name}, ${3:time}, ${4:line_id})$0",
+		"description": "(double) The function returns the price value for the specified time value of the specified object."
+	},
+	"ObjectMove": {
+		"prefix": "ObjectMove",
+		"body": "ObjectMove(${1:chart_id}, ${2:name}, ${3:point_index}, ${4:time}, ${5:price})$0",
+		"description": "(bool) The function changes coordinates of the specified anchor point of the object."
+	},
+	"ObjectName": {
+		"prefix": "ObjectName",
+		"body": "ObjectName(${1:chart_id}, ${2:pos}, ${3:sub_window}, ${4:type})$0",
+		"description": "(string) The function returns the name of the corresponding object in the specified chart, in the specified subwindow, of the specified type."
+	},
+	"ObjectsDeleteAll": {
+		"prefix": "ObjectsDeleteAll",
+		"body": "ObjectsDeleteAll(${1:chart_id}, ${2:prefix}, ${3:sub_window}, ${4:type})$0",
+		"description": "(int) Removes all objects from the specified chart, specified chart subwindow, of the specified type."
+	},
+	"ObjectSetDouble": {
+		"prefix": "ObjectSetDouble",
+		"body": "ObjectSetDouble(${1:chart_id}, ${2:name}, ${3:prop_id}, ${4:prop_modifier}, ${5:prop_value})$0",
+		"description": "(bool) The function sets the value of the corresponding object property. The object property must be of the double type. There are 2 variants of the function."
+	},
+	"ObjectSetInteger": {
+		"prefix": "ObjectSetInteger",
+		"body": "ObjectSetInteger(${1:chart_id}, ${2:name}, ${3:prop_id}, ${4:prop_modifier}, ${5:prop_value})$0",
+		"description": "(bool) The function sets the value of the corresponding object property. The object property must be of the datetime, int, color, bool or char type. There are 2 variants of the function."
+	},
+	"ObjectSetString": {
+		"prefix": "ObjectSetString",
+		"body": "ObjectSetString(${1:chart_id}, ${2:name}, ${3:prop_id}, ${4:prop_modifier}, ${5:prop_value})$0",
+		"description": "(bool) The function sets the value of the corresponding object property. The object property must be of the string type. There are 2 variants of the function."
+	},
+	"ObjectsTotal": {
+		"prefix": "ObjectsTotal",
+		"body": "ObjectsTotal(${1:chart_id}, ${2:sub_window}, ${3:type})$0",
+		"description": "(int) The function returns the number of objects in the specified chart, specified subwindow, of the specified type."
+	},
+	"OnStart": {
+		"prefix": "OnStart",
+		"body": "OnStart$0",
+		"description": "(int) The function is called in scripts and services when the Start event occurs. The function is intended for one-time execution of actions implemented in a program. There are two function types."
+	},
+	"OnTrade": {
+		"prefix": "OnTrade",
+		"body": "OnTrade$0",
+		"description": "(void) OnTrade() is called only for Expert Advisors. It is not used in indicators and scripts even if you add there a function with the same name and type."
+	},
+	"OnTradeTransaction": {
+		"prefix": "OnTradeTransaction",
+		"body": "OnTradeTransaction(${1:trans}, ${2:request}, ${3:result})$0",
+		"description": "(void) The function is called in EAs when the TradeTransaction event occurs. The function is meant for handling trade request execution results."
+	},
+	"OnBookEvent": {
+		"prefix": "OnBookEvent",
+		"body": "OnBookEvent(${1:symbol})$0",
+		"description": "(void) The function is called in indicators and EAs when the BookEvent event occurs. It is meant for handling Depth of Market changes."
+	},
+	"OnTester": {
+		"prefix": "OnTester",
+		"body": "OnTester$0",
+		"description": "(double) The function is called in Expert Advisors when the Tester event occurs to perform necessary actions after testing."
+	},
+	"OnTesterInit": {
+		"prefix": "OnTesterInit",
+		"body": "OnTesterInit$0",
+		"description": "(int) The function is called in EAs when the TesterInit event occurs to perform necessary actions before optimization in the strategy tester. There are two function types."
+	},
+	"OnTesterDeinit": {
+		"prefix": "OnTesterDeinit",
+		"body": "OnTesterDeinit$0",
+		"description": "(void) The function is called in EAs when the TesterDeinit event occurs after EA optimization."
+	},
+	"OnTesterPass": {
+		"prefix": "OnTesterPass",
+		"body": "OnTesterPass$0",
+		"description": "(void) The function is called in EAs when the TesterPass event occurs for handling a new data frame during EA optimization."
+	},
+	"OrderCalcMargin": {
+		"prefix": "OrderCalcMargin",
+		"body": "OrderCalcMargin(${1:action}, ${2:symbol}, ${3:volume}, ${4:price}, ${5:margin})$0",
+		"description": "(bool) The function calculates the margin required for the specified order type, on the current account, in the current market environment not taking into account current pending orders and open positions. It allows the evaluation of margin for the trade operation planned. The value is returned in the account currency."
+	},
+	"OrderCalcProfit": {
+		"prefix": "OrderCalcProfit",
+		"body": "OrderCalcProfit(${1:action}, ${2:symbol}, ${3:volume}, ${4:price_open}, ${5:price_close}, ${6:profit})$0",
+		"description": "(bool) The function calculates the profit for the current account, in the current market conditions, based on the parameters passed. The function is used for pre-evaluation of the result of a trade operation. The value is returned in the account currency."
+	},
+	"OrderCheck": {
+		"prefix": "OrderCheck",
+		"body": "OrderCheck(${1:request}, ${2:result})$0",
+		"description": "(bool) The OrderCheck() function checks if there are enough money to execute a required trade operation. The check results are placed to the fields of the MqlTradeCheckResult structure."
+	},
+	"OrderGetDouble": {
+		"prefix": "OrderGetDouble",
+		"body": "OrderGetDouble(${1:property_id}, ${2:double_var})$0",
+		"description": "(bool) Returns the requested property of an order, pre-selected using OrderGetTicket or OrderSelect. The order property must be of the double type. There are 2 variants of the function."
+	},
+	"OrderGetInteger": {
+		"prefix": "OrderGetInteger",
+		"body": "OrderGetInteger(${1:property_id}, ${2:long_var})$0",
+		"description": "(bool) Returns the requested order property, pre-selected using OrderGetTicket or OrderSelect. Order property must be of the datetime, int type. There are 2 variants of the function."
+	},
+	"OrderGetString": {
+		"prefix": "OrderGetString",
+		"body": "OrderGetString(${1:property_id}, ${2:string_var})$0",
+		"description": "(bool) Returns the requested order property, pre-selected using OrderGetTicket or OrderSelect. The order property must be of the string type. There are 2 variants of the function."
+	},
+	"OrderGetTicket": {
+		"prefix": "OrderGetTicket",
+		"body": "OrderGetTicket(${1:index})$0",
+		"description": "(ulong) Returns ticket of a corresponding order and automatically selects the order for further working with it using functions."
+	},
+	"OrderSelect": {
+		"prefix": "OrderSelect",
+		"body": "OrderSelect(${1:ticket})$0",
+		"description": "(bool) Selects an order to work with. Returns true if the function has been successfully completed. Returns false if the function completion has failed. For more information about an error call GetLastError()."
+	},
+	"OrderSend": {
+		"prefix": "OrderSend",
+		"body": "OrderSend(${1:request}, ${2:result})$0",
+		"description": "(bool) The OrderSend() function is used for executing trade operations by sending requests to a trade server."
+	},
+	"OrderSendAsync": {
+		"prefix": "OrderSendAsync",
+		"body": "OrderSendAsync(${1:request}, ${2:result})$0",
+		"description": "(bool) The OrderSendAsync() function is used for conducting asynchronous trade operations without waiting for the trade server's response to a sent request. The function is designed for high-frequency trading, when under the terms of the trading algorithm it is unacceptable to waste time waiting for a response from the server."
+	},
+	"OrdersTotal": {
+		"prefix": "OrdersTotal",
+		"body": "OrdersTotal()$0",
+		"description": "(int) Returns the number of current orders."
+	},
+	"ParameterGetRange": {
+		"prefix": "ParameterGetRange",
+		"body": "ParameterGetRange(${1:name}, ${2:enable}, ${3:value}, ${4:start}, ${5:step}, ${6:stop})$0",
+		"description": "(bool) Receives data on the values range and the change step for an input variable when optimizing an Expert Advisor in the Strategy Tester. There are 2 variants of the function."
+	},
+	"ParameterSetRange": {
+		"prefix": "ParameterSetRange",
+		"body": "ParameterSetRange(${1:name}, ${2:enable}, ${3:value}, ${4:start}, ${5:step}, ${6:stop})$0",
+		"description": "(bool) Specifies the use of input variable when optimizing an Expert Advisor in the Strategy Tester: value, change step, initial and final values. There are 2 variants of the function."
+	},
+	"Period": {
+		"prefix": "Period",
+		"body": "Period()$0",
+		"description": "(ENUM_TIMEFRAMES) Returns the current chart timeframe."
+	},
+	"PeriodSeconds": {
+		"prefix": "PeriodSeconds",
+		"body": "PeriodSeconds(${1:period})$0",
+		"description": "(int) This function returns number of seconds in a period."
+	},
+	"PlaySound": {
+		"prefix": "PlaySound",
+		"body": "PlaySound(${1:filename})$0",
+		"description": "(bool) It plays a sound file."
+	},
+	"PlotIndexGetInteger": {
+		"prefix": "PlotIndexGetInteger",
+		"body": "PlotIndexGetInteger(${1:plot_index}, ${2:prop_id}, ${3:prop_modifier})$0",
+		"description": "(int) The function sets the value of the corresponding property of the corresponding indicator line. The indicator property must be of the int, color, bool or char type. There are 2 variants of the function."
+	},
+	"PlotIndexSetDouble": {
+		"prefix": "PlotIndexSetDouble",
+		"body": "PlotIndexSetDouble(${1:plot_index}, ${2:prop_id}, ${3:prop_value})$0",
+		"description": "(bool) The function sets the value of the corresponding property of the corresponding indicator line. The indicator property must be of the double type."
+	},
+	"PlotIndexSetInteger": {
+		"prefix": "PlotIndexSetInteger",
+		"body": "PlotIndexSetInteger(${1:plot_index}, ${2:prop_id}, ${3:prop_modifier}, ${4:prop_value})$0",
+		"description": "(bool) The function sets the value of the corresponding property of the corresponding indicator line. The indicator property must be of the int, char, bool or color type. There are 2 variants of the function."
+	},
+	"PlotIndexSetString": {
+		"prefix": "PlotIndexSetString",
+		"body": "PlotIndexSetString(${1:plot_index}, ${2:prop_id}, ${3:prop_value})$0",
+		"description": "(bool) The function sets the value of the corresponding property of the corresponding indicator line. The indicator property must be of the string type."
+	},
+	"Point": {
+		"prefix": "Point",
+		"body": "Point()$0",
+		"description": "(double) Returns the point size of the current symbol in the quote currency."
+	},
+	"PositionGetDouble": {
+		"prefix": "PositionGetDouble",
+		"body": "PositionGetDouble(${1:property_id}, ${2:double_var})$0",
+		"description": "(bool) The function returns the requested property of an open position, pre-selected using PositionGetSymbol or PositionSelect. The position property must be of the double type. There are 2 variants of the function."
+	},
+	"PositionGetInteger": {
+		"prefix": "PositionGetInteger",
+		"body": "PositionGetInteger(${1:property_id}, ${2:long_var})$0",
+		"description": "(bool) The function returns the requested property of an open position, pre-selected using PositionGetSymbol or PositionSelect. The position property should be of datetime, int type. There are 2 variants of the function."
+	},
+	"PositionGetString": {
+		"prefix": "PositionGetString",
+		"body": "PositionGetString(${1:property_id}, ${2:string_var})$0",
+		"description": "(bool) The function returns the requested property of an open position, pre-selected using PositionGetSymbol or PositionSelect. The position property should be of the string type. There are 2 variants of the function."
+	},
+	"PositionGetSymbol": {
+		"prefix": "PositionGetSymbol",
+		"body": "PositionGetSymbol(${1:index})$0",
+		"description": "(string) Returns the symbol corresponding to the open position and automatically selects the position for further working with it using functions PositionGetDouble, PositionGetInteger, PositionGetString."
+	},
+	"PositionGetTicket": {
+		"prefix": "PositionGetTicket",
+		"body": "PositionGetTicket(${1:index})$0",
+		"description": "(ulong) The function returns the ticket of a position with the specified index in the list of open positions and automatically selects the position to work with using functions PositionGetDouble, PositionGetInteger, PositionGetString."
+	},
+	"PositionSelect": {
+		"prefix": "PositionSelect",
+		"body": "PositionSelect(${1:symbol})$0",
+		"description": "(bool) Chooses an open position for further working with it. Returns true if the function is successfully completed. Returns false in case of failure. To obtain information about the error, call GetLastError()."
+	},
+	"PositionSelectByTicket": {
+		"prefix": "PositionSelectByTicket",
+		"body": "PositionSelectByTicket(${1:ticket})$0",
+		"description": "(bool) Selects an open position to work with based on the ticket number specified in the position. If successful, returns true. Returns false if the function failed. Call GetLastError() for error details."
+	},
+	"PositionsTotal": {
+		"prefix": "PositionsTotal",
+		"body": "PositionsTotal()$0",
+		"description": "(int) Returns the number of open positions."
+	},
+	"pow": {
+		"prefix": "pow",
+		"body": "pow(${1:base}, ${2:exponent})$0",
+		"description": "(double) The function raises a base to a specified power."
+	},
+	"Print": {
+		"prefix": "Print",
+		"body": "Print(${1:values})$0",
+		"description": "(void) It enters a message in the Expert Advisor log. Parameters can be of any type."
+	},
+	"PrintFormat": {
+		"prefix": "PrintFormat",
+		"body": "PrintFormat(${1:format_string}, ${2:values})$0",
+		"description": "(void) It formats and enters sets of symbols and values in the Expert Advisor log in accordance with a preset format."
+	},
+	"rand": {
+		"prefix": "rand",
+		"body": "rand()$0",
+		"description": "(int) Returns a pseudorandom integer within the range of 0 to 32767."
+	},
+	"ResetLastError": {
+		"prefix": "ResetLastError",
+		"body": "ResetLastError()$0",
+		"description": "(void) Sets the value of the predefined variable _LastError into zero."
+	},
+	"ResourceCreate": {
+		"prefix": "ResourceCreate",
+		"body": "ResourceCreate(${1:resource_name}, ${2:path}, ${3:data}, ${4:img_width}, ${5:img_height}, ${6:data_xoffset}, ${7:data_yoffset}, ${8:data_width}, ${9:color_format})$0",
+		"description": "(bool) Creates an image resource based on a data set. There are two variants of the function:"
+	},
+	"ResourceFree": {
+		"prefix": "ResourceFree",
+		"body": "ResourceFree(${1:resource_name})$0",
+		"description": "(bool) The function deletes dynamically created resource (freeing the memory allocated for it)."
+	},
+	"ResourceReadImage": {
+		"prefix": "ResourceReadImage",
+		"body": "ResourceReadImage(${1:resource_name}, ${2:data}, ${3:width}, ${4:height})$0",
+		"description": "(bool) The function reads data from the graphical resource created by ResourceCreate() function or saved in EX5 file during compilation."
+	},
+	"ResourceSave": {
+		"prefix": "ResourceSave",
+		"body": "ResourceSave(${1:resource_name}, ${2:file_name})$0",
+		"description": "(bool) Saves a resource into the specified file."
+	},
+	"round": {
+		"prefix": "round",
+		"body": "round(${1:value})$0",
+		"description": "(double) The function returns a value rounded off to the nearest integer of the specified numeric value."
+	},
+	"SendFTP": {
+		"prefix": "SendFTP",
+		"body": "SendFTP(${1:filename}, ${2:ftp_path})$0",
+		"description": "(bool) Sends a file at the address, specified in the setting window of the \"FTP\" tab."
+	},
+	"SendMail": {
+		"prefix": "SendMail",
+		"body": "SendMail(${1:subject}, ${2:some_text})$0",
+		"description": "(bool) Sends an email at the address specified in the settings window of the \"Email\" tab."
+	},
+	"SendNotification": {
+		"prefix": "SendNotification",
+		"body": "SendNotification(${1:text})$0",
+		"description": "(bool) Sends push notifications to the mobile terminals, whose MetaQuotes IDs are specified in the \"Notifications\" tab."
+	},
+	"SeriesInfoInteger": {
+		"prefix": "SeriesInfoInteger",
+		"body": "SeriesInfoInteger(${1:symbol_name}, ${2:timeframe}, ${3:prop_id}, ${4:long_var})$0",
+		"description": "(bool) Returns information about the state of historical data. There are 2 variants of function calls."
+	},
+	"SetIndexBuffer": {
+		"prefix": "SetIndexBuffer",
+		"body": "SetIndexBuffer(${1:index}, ${2:buffer}, ${3:data_type})$0",
+		"description": "(bool) The function binds a specified indicator buffer with one-dimensional dynamic array of the double type."
+	},
+	"ShortArrayToString": {
+		"prefix": "ShortArrayToString",
+		"body": "ShortArrayToString(${1:array}, ${2:start}, ${3:count})$0",
+		"description": "(string) It copies part of array into a returned string."
+	},
+	"ShortToString": {
+		"prefix": "ShortToString",
+		"body": "ShortToString(${1:symbol_code})$0",
+		"description": "(string) It converts the symbol code (unicode) into one-symbol string and returns resulting string."
+	},
+	"SignalBaseGetDouble": {
+		"prefix": "SignalBaseGetDouble",
+		"body": "SignalBaseGetDouble(${1:property_id})$0",
+		"description": "(double) Returns the value of double type property for selected signal."
+	},
+	"SignalBaseGetInteger": {
+		"prefix": "SignalBaseGetInteger",
+		"body": "SignalBaseGetInteger(${1:property_id})$0",
+		"description": "(long) Returns the value of integer type property for selected signal."
+	},
+	"SignalBaseGetString": {
+		"prefix": "SignalBaseGetString",
+		"body": "SignalBaseGetString(${1:property_id})$0",
+		"description": "(string) Returns the value of string type property for selected signal."
+	},
+	"SignalBaseSelect": {
+		"prefix": "SignalBaseSelect",
+		"body": "SignalBaseSelect(${1:index})$0",
+		"description": "(bool) Selects a signal from signals, available in terminal for further working with it."
+	},
+	"SignalBaseTotal": {
+		"prefix": "SignalBaseTotal",
+		"body": "SignalBaseTotal()$0",
+		"description": "(int) Returns the total amount of signals, available in terminal."
+	},
+	"SignalInfoGetDouble": {
+		"prefix": "SignalInfoGetDouble",
+		"body": "SignalInfoGetDouble(${1:property_id})$0",
+		"description": "(double) Returns the value of double type property of signal copy settings."
+	},
+	"SignalInfoGetInteger": {
+		"prefix": "SignalInfoGetInteger",
+		"body": "SignalInfoGetInteger(${1:property_id})$0",
+		"description": "(long) Returns the value of integer type property of signal copy settings."
+	},
+	"SignalInfoGetString": {
+		"prefix": "SignalInfoGetString",
+		"body": "SignalInfoGetString(${1:property_id})$0",
+		"description": "(string) Returns the value of string type property of signal copy settings."
+	},
+	"SignalInfoSetDouble": {
+		"prefix": "SignalInfoSetDouble",
+		"body": "SignalInfoSetDouble(${1:property_id}, ${2:value})$0",
+		"description": "(bool) Sets the value of double type property of signal copy settings."
+	},
+	"SignalInfoSetInteger": {
+		"prefix": "SignalInfoSetInteger",
+		"body": "SignalInfoSetInteger(${1:property_id}, ${2:value})$0",
+		"description": "(bool) Sets the value of integer type property of signal copy settings."
+	},
+	"SignalSubscribe": {
+		"prefix": "SignalSubscribe",
+		"body": "SignalSubscribe(${1:signal_id})$0",
+		"description": "(bool) Subscribes to the trading signal."
+	},
+	"SignalUnsubscribe": {
+		"prefix": "SignalUnsubscribe",
+		"body": "SignalUnsubscribe()$0",
+		"description": "(bool) Cancels subscription."
+	},
+	"sin": {
+		"prefix": "sin",
+		"body": "sin(${1:value})$0",
+		"description": "(double) Returns the sine of a specified angle."
+	},
+	"Sleep": {
+		"prefix": "Sleep",
+		"body": "Sleep(${1:milliseconds})$0",
+		"description": "(void) The function suspends execution of the current Expert Advisor or script within a specified interval."
+	},
+	"SocketCreate": {
+		"prefix": "SocketCreate",
+		"body": "SocketCreate(${1:flags})$0",
+		"description": "(int) Create a socket with specified flags and return its handle."
+	},
+	"SocketClose": {
+		"prefix": "SocketClose",
+		"body": "SocketClose(${1:socket})$0",
+		"description": "(bool) Close a socket."
+	},
+	"SocketConnect": {
+		"prefix": "SocketConnect",
+		"body": "SocketConnect(${1:socket}, ${2:server}, ${3:port}, ${4:timeout_receive_ms})$0",
+		"description": "(bool) Connect to the server with timeout control."
+	},
+	"SocketIsConnected": {
+		"prefix": "SocketIsConnected",
+		"body": "SocketIsConnected(${1:socket})$0",
+		"description": "(bool) Checks if the socket is currently connected."
+	},
+	"SocketIsReadable": {
+		"prefix": "SocketIsReadable",
+		"body": "SocketIsReadable(${1:socket})$0",
+		"description": "(uint) Get a number of bytes that can be read from a socket."
+	},
+	"SocketIsWritable": {
+		"prefix": "SocketIsWritable",
+		"body": "SocketIsWritable(${1:socket})$0",
+		"description": "(bool) Check whether data can be written to a socket at the current time."
+	},
+	"SocketTimeouts": {
+		"prefix": "SocketTimeouts",
+		"body": "SocketTimeouts(${1:socket}, ${2:timeout_send_ms}, ${3:timeout_receive_ms})$0",
+		"description": "(bool) Set timeouts for receiving and sending data for a socket system object."
+	},
+	"SocketRead": {
+		"prefix": "SocketRead",
+		"body": "SocketRead(${1:socket}, ${2:buffer}, ${3:buffer_maxlen}, ${4:timeout_ms})$0",
+		"description": "(int) Read data from a socket."
+	},
+	"SocketSend": {
+		"prefix": "SocketSend",
+		"body": "SocketSend(${1:socket}, ${2:buffer}, ${3:buffer_len})$0",
+		"description": "(int) Write data to a socket."
+	},
+	"SocketTlsHandshake": {
+		"prefix": "SocketTlsHandshake",
+		"body": "SocketTlsHandshake(${1:socket}, ${2:host})$0",
+		"description": "(bool) Initiate secure TLS (SSL) connection to a specified host via TLS Handshake protocol. During Handshake, a client and a server agree on connection parameters: applied protocol version and data encryption method."
+	},
+	"SocketTlsCertificate": {
+		"prefix": "SocketTlsCertificate",
+		"body": "SocketTlsCertificate(${1:socket}, ${2:subject}, ${3:issuer}, ${4:serial}, ${5:thumbprint}, ${6:expiration})$0",
+		"description": "(int) Get data on the certificate used to secure network connection."
+	},
+	"SocketTlsRead": {
+		"prefix": "SocketTlsRead",
+		"body": "SocketTlsRead(${1:socket}, ${2:buffer}, ${3:buffer_maxlen})$0",
+		"description": "(int) Read data from secure TLS connection."
+	},
+	"SocketTlsReadAvailable": {
+		"prefix": "SocketTlsReadAvailable",
+		"body": "SocketTlsReadAvailable(${1:socket}, ${2:buffer}, ${3:buffer_maxlen})$0",
+		"description": "(int) Read all available data from secure TLS connection."
+	},
+	"SocketTlsSend": {
+		"prefix": "SocketTlsSend",
+		"body": "SocketTlsSend(${1:socket}, ${2:buffer}, ${3:buffer_len})$0",
+		"description": "(int) Send data via secure TLS connection."
+	},
+	"sqrt": {
+		"prefix": "sqrt",
+		"body": "sqrt(${1:value})$0",
+		"description": "(double) Returns the square root of a number."
+	},
+	"srand": {
+		"prefix": "srand",
+		"body": "srand(${1:seed})$0",
+		"description": "(void) Sets the starting point for generating a series of pseudorandom integers."
+	},
+	"StringAdd": {
+		"prefix": "StringAdd",
+		"body": "StringAdd(${1:string_var}, ${2:add_substring})$0",
+		"description": "(bool) The function adds a substring to the end of a string."
+	},
+	"StringBufferLen": {
+		"prefix": "StringBufferLen",
+		"body": "StringBufferLen(${1:string_var})$0",
+		"description": "(int) The function returns the size of buffer allocated for the string."
+	},
+	"StringCompare": {
+		"prefix": "StringCompare",
+		"body": "StringCompare(${1:string1}, ${2:string2}, ${3:case_sensitive})$0",
+		"description": "(int) The function compares two strings and returns the comparison result in form of an integer."
+	},
+	"StringConcatenate": {
+		"prefix": "StringConcatenate",
+		"body": "StringConcatenate(${1:string_var}, ${2:values})$0",
+		"description": "(int) The function forms a string of passed parameters and returns the size of the formed string. Parameters can be of any type. Number of parameters can't be less than 2 or more than 64."
+	},
+	"StringFill": {
+		"prefix": "StringFill",
+		"body": "StringFill(${1:string_var}, ${2:character})$0",
+		"description": "(bool) It fills out a selected string by specified symbols."
+	},
+	"StringFind": {
+		"prefix": "StringFind",
+		"body": "StringFind(${1:string_value}, ${2:match_substring}, ${3:start_pos})$0",
+		"description": "(int) Search for a substring in a string."
+	},
+	"StringFormat": {
+		"prefix": "StringFormat",
+		"body": "StringFormat(${1:format}, ${2:values})$0",
+		"description": "(string) The function formats obtained parameters and returns a string."
+	},
+	"StringGetCharacter": {
+		"prefix": "StringGetCharacter",
+		"body": "StringGetCharacter(${1:string_value}, ${2:pos})$0",
+		"description": "(ushort) Returns value of a symbol, located in the specified position of a string."
+	},
+	"StringInit": {
+		"prefix": "StringInit",
+		"body": "StringInit(${1:string_var}, ${2:new_len}, ${3:character})$0",
+		"description": "(bool) Initializes a string by specified symbols and provides the specified string size."
+	},
+	"StringLen": {
+		"prefix": "StringLen",
+		"body": "StringLen(${1:string_value})$0",
+		"description": "(int) Returns the number of symbols in a string."
+	},
+	"StringReplace": {
+		"prefix": "StringReplace",
+		"body": "StringReplace(${1:str}, ${2:find}, ${3:replacement})$0",
+		"description": "(int) It replaces all the found substrings of a string by a set sequence of symbols."
+	},
+	"StringSetCharacter": {
+		"prefix": "StringSetCharacter",
+		"body": "StringSetCharacter(${1:string_var}, ${2:pos}, ${3:character})$0",
+		"description": "(bool) Returns copy of a string with a changed character in a specified position."
+	},
+	"StringSplit": {
+		"prefix": "StringSplit",
+		"body": "StringSplit(${1:string_value}, ${2:separator}, ${3:result})$0",
+		"description": "(int) Gets substrings by a specified separator from the specified string, returns the number of substrings obtained."
+	},
+	"StringSubstr": {
+		"prefix": "StringSubstr",
+		"body": "StringSubstr(${1:string_value}, ${2:start_pos}, ${3:length})$0",
+		"description": "(string) Extracts a substring from a text string starting from the specified position."
+	},
+	"StringToCharArray": {
+		"prefix": "StringToCharArray",
+		"body": "StringToCharArray(${1:text_string}, ${2:array}, ${3:start}, ${4:count}, ${5:codepage})$0",
+		"description": "(int) Symbol-wise copies a string converted from Unicode to ANSI, to a selected place of array of uchar type. It returns the number of copied elements."
+	},
+	"StringToColor": {
+		"prefix": "StringToColor",
+		"body": "StringToColor(${1:color_string})$0",
+		"description": "(color) Converting \"R,G,B\" string or string with color name into color type value."
+	},
+	"StringToDouble": {
+		"prefix": "StringToDouble",
+		"body": "StringToDouble(${1:value})$0",
+		"description": "(double) The function converts string containing a symbol representation of number into number of double type."
+	},
+	"StringToInteger": {
+		"prefix": "StringToInteger",
+		"body": "StringToInteger(${1:value})$0",
+		"description": "(long) The function converts string containing a symbol representation of number into number of long (integer) type."
+	},
+	"StringToLower": {
+		"prefix": "StringToLower",
+		"body": "StringToLower(${1:string_var})$0",
+		"description": "(bool) Transforms all symbols of a selected string into lowercase."
+	},
+	"StringToShortArray": {
+		"prefix": "StringToShortArray",
+		"body": "StringToShortArray(${1:text_string}, ${2:array}, ${3:start}, ${4:count})$0",
+		"description": "(int) The function symbol-wise copies a string into a specified place of an array of ushort type. It returns the number of copied elements."
+	},
+	"StringToTime": {
+		"prefix": "StringToTime",
+		"body": "StringToTime(${1:time_string})$0",
+		"description": "(datetime) Transforms the string containing time and/or date in the \"yyyy.mm.dd [hh:mi]\" format into the datetime type number."
+	},
+	"StringToUpper": {
+		"prefix": "StringToUpper",
+		"body": "StringToUpper(${1:string_var})$0",
+		"description": "(bool) Transforms all symbols of a selected string into capitals."
+	},
+	"StringTrimLeft": {
+		"prefix": "StringTrimLeft",
+		"body": "StringTrimLeft(${1:string_var})$0",
+		"description": "(int) The function cuts line feed characters, spaces and tabs in the left part of the string till the first meaningful symbol. The string is modified at place."
+	},
+	"StringTrimRight": {
+		"prefix": "StringTrimRight",
+		"body": "StringTrimRight(${1:string_var})$0",
+		"description": "(int) The function cuts line feed characters, spaces and tabs in the right part of the string after the last meaningful symbol. The string is modified at place."
+	},
+	"StructToTime": {
+		"prefix": "StructToTime",
+		"body": "StructToTime(${1:dt_struct})$0",
+		"description": "(datetime) Converts a structure variable MqlDateTime into a value of datetime type and returns the resulting value."
+	},
+	"Symbol": {
+		"prefix": "Symbol",
+		"body": "Symbol()$0",
+		"description": "(string) Returns the name of a symbol of the current chart."
+	},
+	"SymbolInfoDouble": {
+		"prefix": "SymbolInfoDouble",
+		"body": "SymbolInfoDouble(${1:name}, ${2:prop_id}, ${3:double_var})$0",
+		"description": "(bool) Returns the corresponding property of a specified symbol. There are 2 variants of the function."
+	},
+	"SymbolInfoInteger": {
+		"prefix": "SymbolInfoInteger",
+		"body": "SymbolInfoInteger(${1:name}, ${2:prop_id}, ${3:long_var})$0",
+		"description": "(bool) Returns the corresponding property of a specified symbol. There are 2 variants of the function."
+	},
+	"SymbolInfoMarginRate": {
+		"prefix": "SymbolInfoMarginRate",
+		"body": "SymbolInfoMarginRate(${1:name}, ${2:order_type}, ${3:initial_margin_rate}, ${4:maintenance_margin_rate})$0",
+		"description": "(bool) Returns the margin rates depending on the order type and direction."
+	},
+	"SymbolInfoSessionQuote": {
+		"prefix": "SymbolInfoSessionQuote",
+		"body": "SymbolInfoSessionQuote(${1:name}, ${2:day_of_week}, ${3:session_index}, ${4:from}, ${5:to})$0",
+		"description": "(bool) Allows receiving time of beginning and end of the specified quoting sessions for a specified symbol and day of week."
+	},
+	"SymbolInfoSessionTrade": {
+		"prefix": "SymbolInfoSessionTrade",
+		"body": "SymbolInfoSessionTrade(${1:name}, ${2:day_of_week}, ${3:session_index}, ${4:from}, ${5:to})$0",
+		"description": "(bool) Allows receiving time of beginning and end of the specified trading sessions for a specified symbol and day of week."
+	},
+	"SymbolInfoString": {
+		"prefix": "SymbolInfoString",
+		"body": "SymbolInfoString(${1:name}, ${2:prop_id}, ${3:string_var})$0",
+		"description": "(bool) Returns the corresponding property of a specified symbol. There are 2 variants of the function."
+	},
+	"SymbolInfoTick": {
+		"prefix": "SymbolInfoTick",
+		"body": "SymbolInfoTick(${1:symbol}, ${2:tick})$0",
+		"description": "(bool) The function returns current prices of a specified symbol in a variable of the MqlTick type."
+	},
+	"SymbolIsSynchronized": {
+		"prefix": "SymbolIsSynchronized",
+		"body": "SymbolIsSynchronized(${1:name})$0",
+		"description": "(bool) The function checks whether data of a selected symbol in the terminal are synchronized with data on the trade server."
+	},
+	"SymbolName": {
+		"prefix": "SymbolName",
+		"body": "SymbolName(${1:pos}, ${2:selected})$0",
+		"description": "(string) Returns the name of a symbol."
+	},
+	"SymbolSelect": {
+		"prefix": "SymbolSelect",
+		"body": "SymbolSelect(${1:name}, ${2:select})$0",
+		"description": "(bool) Selects a symbol in the Market Watch window or removes a symbol from the window."
+	},
+	"SymbolsTotal": {
+		"prefix": "SymbolsTotal",
+		"body": "SymbolsTotal(${1:selected})$0",
+		"description": "(int) Returns the number of available (selected in Market Watch or all) symbols."
+	},
+	"tan": {
+		"prefix": "tan",
+		"body": "tan(${1:rad})$0",
+		"description": "(double) The function returns a tangent of a number."
+	},
+	"TerminalClose": {
+		"prefix": "TerminalClose",
+		"body": "TerminalClose(${1:ret_code})$0",
+		"description": "(bool) The function commands the terminal to complete operation."
+	},
+	"TerminalInfoDouble": {
+		"prefix": "TerminalInfoDouble",
+		"body": "TerminalInfoDouble(${1:property_id})$0",
+		"description": "(double) Returns the value of a corresponding property of the mql5 program environment."
+	},
+	"TerminalInfoInteger": {
+		"prefix": "TerminalInfoInteger",
+		"body": "TerminalInfoInteger(${1:property_id})$0",
+		"description": "(int) Returns the value of a corresponding property of the mql5 program environment."
+	},
+	"TerminalInfoString": {
+		"prefix": "TerminalInfoString",
+		"body": "TerminalInfoString(${1:property_id})$0",
+		"description": "(string) Returns the value of a corresponding property of the mql5 program environment. The property must be of string type."
+	},
+	"TesterStatistics": {
+		"prefix": "TesterStatistics",
+		"body": "TesterStatistics(${1:statistic_id})$0",
+		"description": "(double) The function returns the value of the specified statistical parameter calculated based on testing results."
+	},
+	"TextGetSize": {
+		"prefix": "TextGetSize",
+		"body": "TextGetSize(${1:text}, ${2:width}, ${3:height})$0",
+		"description": "(bool) The function returns the line width and height at the current font settings."
+	},
+	"TextOut": {
+		"prefix": "TextOut",
+		"body": "TextOut(${1:text}, ${2:x}, ${3:y}, ${4:anchor}, ${5:data}, ${6:width}, ${7:height}, ${8:color}, ${9:color_format})$0",
+		"description": "(bool) The function displays a text in a custom array (buffer) and returns the result of that operation. The array is designed to create the graphical resource."
+	},
+	"TextSetFont": {
+		"prefix": "TextSetFont",
+		"body": "TextSetFont(${1:name}, ${2:size}, ${3:flags}, ${4:orientation})$0",
+		"description": "(bool) The function sets the font for displaying the text using drawing methods and returns the result of that operation. Arial font with the size -120 (12 pt) is used by default."
+	},
+	"TimeCurrent": {
+		"prefix": "TimeCurrent",
+		"body": "TimeCurrent(${1:dt_struct})$0",
+		"description": "(datetime) Returns the last known server time, time of the last quote receipt for one of the symbols selected in the \"Market Watch\" window. In the OnTick() handler, this function returns the time of the received handled tick. In other cases (for example, call in handlers OnInit(), OnDeinit(), OnTimer() and so on) this is the time of the last quote receipt for any symbol available in the \"Market Watch\" window, the time shown in the title of this window. The time value is formed on a trade server and does not depend on the time settings on your computer. There are 2 variants of the function."
+	},
+	"TimeDaylightSavings": {
+		"prefix": "TimeDaylightSavings",
+		"body": "TimeDaylightSavings()$0",
+		"description": "(int) Returns correction for daylight saving time in seconds, if the switch to summer time has been made. It depends on the time settings of your computer."
+	},
+	"TimeGMT": {
+		"prefix": "TimeGMT",
+		"body": "TimeGMT(${1:dt_struct})$0",
+		"description": "(datetime) Returns the GMT, which is calculated taking into account the DST switch by the local time on the computer where the client terminal is running. There are 2 variants of the function."
+	},
+	"TimeGMTOffset": {
+		"prefix": "TimeGMTOffset",
+		"body": "TimeGMTOffset()$0",
+		"description": "(int) Returns the current difference between GMT time and the local computer time in seconds, taking into account switch to winter or summer time. Depends on the time settings of your computer."
+	},
+	"TimeLocal": {
+		"prefix": "TimeLocal",
+		"body": "TimeLocal(${1:dt_struct})$0",
+		"description": "(datetime) Returns the local time of a computer, where the client terminal is running. There are 2 variants of the function."
+	},
+	"TimeToString": {
+		"prefix": "TimeToString",
+		"body": "TimeToString(${1:value}, ${2:mode})$0",
+		"description": "(string) Converting a value containing time in seconds elapsed since 01.01.1970 into a string of \"yyyy.mm.dd hh:mi\" format."
+	},
+	"TimeToStruct": {
+		"prefix": "TimeToStruct",
+		"body": "TimeToStruct(${1:dt}, ${2:dt_struct})$0",
+		"description": "(bool) Converts a value of datetime type (number of seconds since 01.01.1970) into a structure variable MqlDateTime."
+	},
+	"TimeTradeServer": {
+		"prefix": "TimeTradeServer",
+		"body": "TimeTradeServer(${1:dt_struct})$0",
+		"description": "(datetime) Returns the calculated current time of the trade server. Unlike TimeCurrent(), the calculation of the time value is performed in the client terminal and depends on the time settings on your computer. There are 2 variants of the function."
+	},
+	"UninitializeReason": {
+		"prefix": "UninitializeReason",
+		"body": "UninitializeReason()$0",
+		"description": "(int) Returns the code of a reason for deinitialization."
+	},
+	"WebRequest": {
+		"prefix": "WebRequest",
+		"body": "WebRequest(${1:method}, ${2:url}, ${3:headers}, ${4:cookie}, ${5:referer}, ${6:timeout}, ${7:data}, ${8:data_size}, ${9:result}, ${10:result_headers})$0",
+		"description": "(int) The function sends an HTTP request to a specified server. The function has two versions:"
+	},
+	"ZeroMemory": {
+		"prefix": "ZeroMemory",
+		"body": "ZeroMemory(${1:variable})$0",
+		"description": "(void) The function resets a variable passed to it by reference."
+	}
+}

@@ -66,13 +66,13 @@ function Hover_MQL() {
 
             if (!(word in obj_items)) return undefined;
             if (obj_items[word].group !== 2) return undefined;
-            const example = (typeof obj_items[word].code.map(match => match.label)[0] == 'undefined') ? '' : obj_items[word].code.map(match => match.label+'\n').join('\n'),
+            const example = (typeof obj_items[word].code.map(match => match.label)[0] == 'undefined') ? '' : obj_items[word].code.map(match => match.label + '\n').join('\n'),
                 dl = obj_items[word].description[loclang] ? obj_items[word].description[loclang] : obj_items[word].description.en,
                 description = (typeof dl == 'undefined') ? '' : dl,
                 contents = new vscode.MarkdownString(),
                 rex = /(\()(\w+)(\))(.+\n.*|.*)/;
 
-            contents.appendCodeblock(example, 'cpp');
+            contents.appendCodeblock(example, 'mql');
             contents.supportHtml = true;
 
             contents.appendMarkdown(
@@ -83,7 +83,7 @@ function Hover_MQL() {
                 const re = /(.+?(?=  ))(.+)/;
                 contents.appendMarkdown(' `' + item.replace(re, '$1') + '` -' + item.replace(re, '$2') + '<br>\n');
             });
-            
+
             return new vscode.Hover(contents);
         }
     }
@@ -99,40 +99,40 @@ function ItemProvider() {
                 regEx = new RegExp(prefix, 'i');
 
             return Object.values(obj_items).filter(name => name.label.substring(0, prefix.length).match(regEx)).map(match => {
-                    const item = new vscode.CompletionItem(match.label, match.group);
-                    item.insertText = new vscode.SnippetString(match.body);
-                    item.detail = match.description[loclang] ? match.description[loclang] : match.description.en;
-                    const contents = new vscode.MarkdownString();
-                    contents.appendCodeblock(match.code.map(match => match.label)[0]);
-                    if (match.group === 15) {
-                        if (match.label in colorW) {
-                            let clrRGB = colorW[match.label].split(',');                          
-                            contents.appendMarkdown(
-                                `<span style="background-color:#${rgbaToHex(+clrRGB[0], +clrRGB[1], +clrRGB[2])};">${Array.from({length: 55}, () => '&nbsp;').join('')}</span><br>\n`);
-                            contents.supportHtml = true;
-                        }
+                const item = new vscode.CompletionItem(match.label, match.group);
+                item.insertText = new vscode.SnippetString(match.body);
+                item.detail = match.description[loclang] ? match.description[loclang] : match.description.en;
+                const contents = new vscode.MarkdownString();
+                contents.appendCodeblock(match.code.map(match => match.label)[0]);
+                if (match.group === 15) {
+                    if (match.label in colorW) {
+                        let clrRGB = colorW[match.label].split(',');
+                        contents.appendMarkdown(
+                            `<span style="background-color:#${rgbaToHex(+clrRGB[0], +clrRGB[1], +clrRGB[2])};">${Array.from({ length: 55 }, () => '&nbsp;').join('')}</span><br>\n`);
+                        contents.supportHtml = true;
                     }
-                    contents.appendMarkdown(`![](${path})`);
-                    item.documentation = contents;
-                    return item;
-                });
+                }
+                contents.appendMarkdown(`![](${path})`);
+                item.documentation = contents;
+                return item;
+            });
         }
     }
 }
 
-function HelpProvider () {
+function HelpProvider() {
     return {
         provideSignatureHelp(document, position, token, context) {
             const loclang = language === 'zh-tw' ? 'zh-cn' : language,
-                  line = document.lineAt(position).text.substring(0, position.character);
+                line = document.lineAt(position).text.substring(0, position.character);
 
-            if(line.lastIndexOf('//') >= 0)
+            if (line.lastIndexOf('//') >= 0)
                 return undefined;
 
             let i = position.character - 1,
                 bracketCount = 0;
             while (i >= 0) {
-                const char = line.substring(i, i+1);
+                const char = line.substring(i, i + 1);
                 if (char == '(') {
                     if (bracketCount == 0)
                         break;
@@ -144,19 +144,19 @@ function HelpProvider () {
             }
 
             const nf = line.substring(0, i).match(/(?:\w+)(?=$)/gm);
-            if(!nf) 
+            if (!nf)
                 return undefined;
             const FunctionName = nf[0];
 
-            if (!(FunctionName in obj_items)) 
+            if (!(FunctionName in obj_items))
                 return undefined;
-            if (obj_items[FunctionName].group !== 2) 
+            if (obj_items[FunctionName].group !== 2)
                 return undefined;
 
             const sig = new vscode.SignatureHelp();
 
             sig.signatures = obj_items[FunctionName].code.map((str) => {
-                if(/(?<=\().+(?=\))/.exec(str.label))
+                if (/(?<=\().+(?=\))/.exec(str.label))
                     var jh = /(?<=\().+(?=\))/.exec(str.label)[0].split(',');
                 else jh = [str.label];
                 const arrParam = jh,
@@ -168,7 +168,7 @@ function HelpProvider () {
                 const info = new vscode.SignatureInformation(str.label, mdSig);
 
                 info.parameters = arrParam.map((item) => {
-                    if(/(?:.*\s)(.+)/g.exec(item))
+                    if (/(?:.*\s)(.+)/g.exec(item))
                         var xc = /(?:.*\s)(.+)/g.exec(item)[1];
                     else xc = item;
                     const npt = xc,
@@ -179,22 +179,22 @@ function HelpProvider () {
                         des = reg.exec(prm) !== null ? reg.exec(prm)[2] : '',
                         r = /(\[)(.+?)(\])(.*)/,
                         md = new vscode.MarkdownString(
-                            `<span style="color:#ffd700e6;">${des.replace(r,'$1')}</span><span style="color:#C678DD;">${des.replace(r,'$2')}</span>` +
-                            `<span style="color:#ffd700e6;">${des.replace(r,'$3')}</span><span style="color:#05AD97;">${des.replace(r,'$4')}</span>`);
+                            `<span style="color:#ffd700e6;">${des.replace(r, '$1')}</span><span style="color:#C678DD;">${des.replace(r, '$2')}</span>` +
+                            `<span style="color:#ffd700e6;">${des.replace(r, '$3')}</span><span style="color:#05AD97;">${des.replace(r, '$4')}</span>`);
                     md.supportHtml = true;
                     return (new vscode.ParameterInformation(item, md))
                 });
-                return(info);
+                return (info);
             });
 
             sig.activeSignature = context.triggerKind === 1 || (context.triggerKind === 2 && context.isRetrigger === false) ? 0 : context.activeSignatureHelp.activeSignature;
             let ui = (line.substring(i + 1).match(/(?:\w+|'\w+')(?:,|\s+,)/g) || []).length,
                 pr = obj_items[FunctionName].pr;
-            
-            if(pr > 0)
-                if(ui > pr-1)
-                    ui = pr-1;
-            
+
+            if (pr > 0)
+                if (ui > pr - 1)
+                    ui = pr - 1;
+
             sig.activeParameter = ui;
 
             return sig;
@@ -210,8 +210,9 @@ function ColorProvider() {
                     const colorName = match[0];
                     let clrRGB, hx, lr, lx;
 
-                    if (hx = colorName.match(/\b0x(?:[A-Fa-f0-9]{2})?(?:[A-Fa-f0-9]{6})\b/)){                       
-                        clrRGB = hexToRgbA(hx[0]);}
+                    if (hx = colorName.match(/\b0x(?:[A-Fa-f0-9]{2})?(?:[A-Fa-f0-9]{6})\b/)) {
+                        clrRGB = hexToRgbA(hx[0]);
+                    }
 
                     else if (colorName.includes(`C'`)) {
                         if (lr = colorName.match(/(?<=C')\d{1,3},\d{1,3},\d{1,3}(?=')/)) {
@@ -236,7 +237,7 @@ function ColorProvider() {
 
             Array.from(document.getText().matchAll(/\w+/g)).filter(x => x in colorW).forEach(item => {
 
-                const rgbCol = colorW[item[0]].split(',');                
+                const rgbCol = colorW[item[0]].split(',');
                 if (rgbCol) {
                     ret.push(new vscode.ColorInformation(new vscode.Range(
                         document.positionAt(item.index),
@@ -249,24 +250,24 @@ function ColorProvider() {
             return ret.filter(Boolean);
         },
 
-        provideColorPresentations(color, context){ 
+        provideColorPresentations(color, context) {
             const colorName = context.document.getText(context.range),
-                red = color.red*255,
-                green = color.green*255,
-                blue = color.blue*255,
-                alpha = color.alpha*255; 
+                red = color.red * 255,
+                green = color.green * 255,
+                blue = color.blue * 255,
+                alpha = color.alpha * 255;
 
-            if(colorName.match(/(?<=\b0x)(?:[A-Fa-f0-9]{2})?(?:[A-Fa-f0-9]{6})\b/)){                
+            if (colorName.match(/(?<=\b0x)(?:[A-Fa-f0-9]{2})?(?:[A-Fa-f0-9]{6})\b/)) {
                 return [new vscode.ColorPresentation(`0x${rgbaToHex(blue, green, red, round(alpha, 0))}`)];
             }
-            else if(colorName.includes(`C'`)) {
-                if(colorName.match(/(?<=C')\d{1,3},\d{1,3},\d{1,3}(?=')/)){
+            else if (colorName.includes(`C'`)) {
+                if (colorName.match(/(?<=C')\d{1,3},\d{1,3},\d{1,3}(?=')/)) {
                     const clrRGB = `${red},${green},${blue}`;
 
-                    for (let arg in colorW){
+                    for (let arg in colorW) {
                         if (colorW[arg] === clrRGB)
                             return [new vscode.ColorPresentation(arg)];
-                        
+
                     }
                     return [new vscode.ColorPresentation(`C'${clrRGB}'`)];
                 }
@@ -274,13 +275,13 @@ function ColorProvider() {
                     return [new vscode.ColorPresentation(`C'${dToHex(red, green, blue)}'`)]
                 }
             }
-            else if(colorName in colorW) {                
+            else if (colorName in colorW) {
                 const clrRGB = `${red},${green},${blue}`;
 
-                for (let arg in colorW){
-                    if (colorW[arg] === clrRGB)                       
+                for (let arg in colorW) {
+                    if (colorW[arg] === clrRGB)
                         return [new vscode.ColorPresentation(arg)];
-                    
+
                 }
                 return [new vscode.ColorPresentation(`C'${clrRGB}'`)];
             }
@@ -288,7 +289,7 @@ function ColorProvider() {
     }
 }
 
-function hexToRgbA(hexColor){
+function hexToRgbA(hexColor) {
     return [
         hexColor & 0xFF, (hexColor >> 8) & 0xFF, (hexColor >> 16) & 0xFF, (hexColor >> 24) & 0xFF ? ((hexColor >> 24) & 0xFF) : 255
     ]
@@ -307,7 +308,7 @@ function dToHex(r, g, b) {
 }
 
 function round(num, precision = 2) {
-	return +(Math.round(num + "e" + precision) + "e" + -precision);
+    return +(Math.round(num + "e" + precision) + "e" + -precision);
 }
 
 
