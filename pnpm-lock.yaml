@@ -18,8 +18,8 @@ importers:
         specifier: ~14.18.63
         version: 14.18.63
       '@types/vscode':
-        specifier: ^1.106.0
-        version: 1.106.0
+        specifier: 1.104.0
+        version: 1.104.0
       '@vscode/test-electron':
         specifier: ^1.6.2
         version: 1.6.2
@@ -106,8 +106,8 @@ packages:
   '@types/node@14.18.63':
     resolution: {integrity: sha512-fAtCfv4jJg+ExtXhvCkCqUKZ+4ok/JQk01qDKhL5BDDoS3AxKXhV5/MAVUZyQnSEd2GT92fkgZl0pz0Q0AzcIQ==}
 
-  '@types/vscode@1.106.0':
-    resolution: {integrity: sha512-88oUcEl9Wmlyt64pbvjLzyyFuFuPotdjwy+P+5ggg3DyTJSMWJD3ShX2ppya5mqrAYTKEhcaJBerdc5JTeb32w==}
+  '@types/vscode@1.104.0':
+    resolution: {integrity: sha512-0KwoU2rZ2ecsTGFxo4K1+f+AErRsYW0fsp6A0zufzGuhyczc2IoKqYqcwXidKXmy2u8YB2GsYsOtiI9Izx3Tig==}
 
   '@ungap/promise-all-settled@1.1.2':
     resolution: {integrity: sha512-sL/cEvJWAnClXw0wHk85/2L0G6Sj8UB0Ctc1TEMbKSsmpRosqhwj9gWgFRZSrBr2f9tiXISwNhCPmlfqUqyb9Q==}
@@ -812,7 +812,7 @@ snapshots:
 
   '@types/node@14.18.63': {}
 
-  '@types/vscode@1.106.0': {}
+  '@types/vscode@1.104.0': {}
 
   '@ungap/promise-all-settled@1.1.2': {}
 

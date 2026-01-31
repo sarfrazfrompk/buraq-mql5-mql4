@@ -802,6 +802,15 @@ function activate(context) {
             runBackgroundCheck(doc);
         }
     }));
+
+    // Auto-check on file change - re-check syntax when file content changes
+    context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(event => {
+        const doc = event.document;
+        const ext = pathModule.extname(doc.fileName).toLowerCase();
+        if (['.mq4', '.mq5', '.mqh'].includes(ext) && event.contentChanges.length > 0) {
+            runBackgroundCheck(doc);
+        }
+    }));
 }
 
 function deactivate() {
