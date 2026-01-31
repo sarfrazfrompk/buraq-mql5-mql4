@@ -1,3 +1,244 @@
 {
-    "en": {}
+    "runtime_errors": {
+        "0": {
+            "code": "ERR_NO_ERROR",
+            "description": "No error"
+        },
+        "1": {
+            "code": "ERR_NO_RESULT",
+            "description": "No error, but the result is unknown"
+        },
+        "2": {
+            "code": "ERR_COMMON_ERROR",
+            "description": "Common error"
+        },
+        "3": {
+            "code": "ERR_INVALID_TRADE_PARAMETERS",
+            "description": "Invalid trade parameters"
+        },
+        "4": {
+            "code": "ERR_SERVER_BUSY",
+            "description": "Trade server is busy"
+        },
+        "5": {
+            "code": "ERR_OLD_VERSION",
+            "description": "Old version of the client terminal"
+        },
+        "6": {
+            "code": "ERR_NO_CONNECTION",
+            "description": "No connection with trade server"
+        },
+        "7": {
+            "code": "ERR_NOT_ENOUGH_RIGHTS",
+            "description": "Not enough rights"
+        },
+        "8": {
+            "code": "ERR_TOO_FREQUENT_REQUESTS",
+            "description": "Too frequent requests"
+        },
+        "9": {
+            "code": "ERR_MALFUNCTIONAL_TRADE",
+            "description": "Malfunctional trade operation"
+        },
+        "64": {
+            "code": "ERR_ACCOUNT_DISABLED",
+            "description": "Account disabled"
+        },
+        "65": {
+            "code": "ERR_INVALID_ACCOUNT",
+            "description": "Invalid account"
+        },
+        "128": {
+            "code": "ERR_TRADE_TIMEOUT",
+            "description": "Trade timeout"
+        },
+        "129": {
+            "code": "ERR_INVALID_PRICE",
+            "description": "Invalid price"
+        },
+        "130": {
+            "code": "ERR_INVALID_STOPS",
+            "description": "Invalid stops"
+        },
+        "131": {
+            "code": "ERR_INVALID_TRADE_VOLUME",
+            "description": "Invalid trade volume"
+        },
+        "132": {
+            "code": "ERR_MARKET_CLOSED",
+            "description": "Market is closed"
+        },
+        "133": {
+            "code": "ERR_TRADE_DISABLED",
+            "description": "Trade is disabled"
+        },
+        "134": {
+            "code": "ERR_NOT_ENOUGH_MONEY",
+            "description": "Not enough money"
+        },
+        "135": {
+            "code": "ERR_PRICE_CHANGED",
+            "description": "Price changed"
+        },
+        "136": {
+            "code": "ERR_OFF_QUOTES",
+            "description": "Off quotes"
+        },
+        "137": {
+            "code": "ERR_BROKER_BUSY",
+            "description": "Broker is busy"
+        },
+        "138": {
+            "code": "ERR_REQUOTE",
+            "description": "Requote"
+        },
+        "139": {
+            "code": "ERR_ORDER_LOCKED",
+            "description": "Order is locked"
+        },
+        "140": {
+            "code": "ERR_LONG_POSITIONS_ONLY_ALLOWED",
+            "description": "Only buying is allowed"
+        },
+        "141": {
+            "code": "ERR_TOO_MANY_REQUESTS",
+            "description": "Too many requests"
+        },
+        "145": {
+            "code": "ERR_TRADE_MODIFY_DENIED",
+            "description": "Modification denied because order is too close to market"
+        },
+        "146": {
+            "code": "ERR_TRADE_CONTEXT_BUSY",
+            "description": "Trade context is busy"
+        },
+        "147": {
+            "code": "ERR_TRADE_EXPIRATION_DENIED",
+            "description": "Expirations are denied by broker"
+        },
+        "148": {
+            "code": "ERR_TRADE_TOO_MANY_ORDERS",
+            "description": "The amount of open and pending orders has reached the limit"
+        }
+    },
+    "mql_errors": {
+        "4000": {
+            "code": "ERR_NO_MQLERROR",
+            "description": "No error"
+        },
+        "4001": {
+            "code": "ERR_WRONG_FUNCTION_POINTER",
+            "description": "Wrong function pointer"
+        },
+        "4002": {
+            "code": "ERR_ARRAY_INDEX_OUT_OF_RANGE",
+            "description": "Array index is out of range"
+        },
+        "4003": {
+            "code": "ERR_NO_MEMORY_FOR_CALL_STACK",
+            "description": "No memory for function call stack"
+        },
+        "4013": {
+            "code": "ERR_ZERO_DIVIDE",
+            "description": "Zero divide"
+        },
+        "4017": {
+            "code": "ERR_DLL_CALLS_NOT_ALLOWED",
+            "description": "DLL calls are not allowed"
+        },
+        "4018": {
+            "code": "ERR_CANNOT_LOAD_LIBRARY",
+            "description": "Cannot load library"
+        },
+        "4019": {
+            "code": "ERR_CANNOT_CALL_FUNCTION",
+            "description": "Cannot call function"
+        },
+        "4105": {
+            "code": "ERR_NO_ORDER_SELECTED",
+            "description": "No order selected"
+        },
+        "4106": {
+            "code": "ERR_UNKNOWN_SYMBOL",
+            "description": "Unknown symbol"
+        },
+        "4109": {
+            "code": "ERR_TRADE_NOT_ALLOWED",
+            "description": "Trade is not allowed"
+        },
+        "4200": {
+            "code": "ERR_OBJECT_ALREADY_EXISTS",
+            "description": "Object already exists"
+        },
+        "4202": {
+            "code": "ERR_OBJECT_DOES_NOT_EXIST",
+            "description": "Object does not exist"
+        }
+    },
+    "error_constants": {
+        "ERR_NO_ERROR": {
+            "code": 0,
+            "description": "No error"
+        },
+        "ERR_NO_RESULT": {
+            "code": 1,
+            "description": "No error, but the result is unknown"
+        },
+        "ERR_COMMON_ERROR": {
+            "code": 2,
+            "description": "Common error"
+        },
+        "ERR_INVALID_TRADE_PARAMETERS": {
+            "code": 3,
+            "description": "Invalid trade parameters"
+        },
+        "ERR_SERVER_BUSY": {
+            "code": 4,
+            "description": "Trade server is busy"
+        },
+        "ERR_NO_CONNECTION": {
+            "code": 6,
+            "description": "No connection with trade server"
+        },
+        "ERR_MARKET_CLOSED": {
+            "code": 132,
+            "description": "Market is closed"
+        },
+        "ERR_TRADE_DISABLED": {
+            "code": 133,
+            "description": "Trade is disabled"
+        },
+        "ERR_NOT_ENOUGH_MONEY": {
+            "code": 134,
+            "description": "Not enough money"
+        },
+        "ERR_REQUOTE": {
+            "code": 138,
+            "description": "Requote"
+        },
+        "ERR_TRADE_CONTEXT_BUSY": {
+            "code": 146,
+            "description": "Trade context is busy"
+        },
+        "ERR_ZERO_DIVIDE": {
+            "code": 4013,
+            "description": "Zero divide"
+        },
+        "ERR_ARRAY_INDEX_OUT_OF_RANGE": {
+            "code": 4002,
+            "description": "Array index is out of range"
+        },
+        "ERR_NO_ORDER_SELECTED": {
+            "code": 4105,
+            "description": "No order selected"
+        },
+        "ERR_UNKNOWN_SYMBOL": {
+            "code": 4106,
+            "description": "Unknown symbol"
+        },
+        "ERR_TRADE_NOT_ALLOWED": {
+            "code": 4109,
+            "description": "Trade is not allowed"
+        }
+    }
 }

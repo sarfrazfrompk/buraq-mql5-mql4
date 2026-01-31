@@ -1,0 +1,55 @@
+{
+    "name": "MQL Set File",
+    "scopeName": "source.mql-set",
+    "fileTypes": [
+        "set"
+    ],
+    "patterns": [
+        {
+            "name": "comment.line.semicolon.mql-set",
+            "match": ";.*$"
+        },
+        {
+            "name": "comment.line.hash.mql-set",
+            "match": "#.*$"
+        },
+        {
+            "name": "keyword.other.section.mql-set",
+            "match": "^\\s*\\[.*\\]\\s*$"
+        },
+        {
+            "name": "variable.parameter.mql-set",
+            "match": "^([^=]+)(?==)"
+        },
+        {
+            "name": "keyword.operator.assignment.mql-set",
+            "match": "="
+        },
+        {
+            "name": "constant.numeric.mql-set",
+            "match": "(?<==)\\s*-?[0-9]+\\.?[0-9]*\\s*$"
+        },
+        {
+            "name": "string.unquoted.mql-set",
+            "match": "(?<==)\\s*[^0-9\\-].*$"
+        },
+        {
+            "name": "constant.language.boolean.true.mql-set",
+            "match": "(?<==)\\s*(true|yes|on|1)\\s*$",
+            "captures": {
+                "1": {
+                    "name": "constant.language.boolean.mql-set"
+                }
+            }
+        },
+        {
+            "name": "constant.language.boolean.false.mql-set",
+            "match": "(?<==)\\s*(false|no|off|0)\\s*$",
+            "captures": {
+                "1": {
+                    "name": "constant.language.boolean.mql-set"
+                }
+            }
+        }
+    ]
+}

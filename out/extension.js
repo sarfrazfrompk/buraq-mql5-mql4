@@ -86,7 +86,6 @@ const STATUS = {
 
 const { Help } = require("./help");
 const { ShowFiles, InsertNameFileMQH, InsertMQH, InsertNameFileMQL, InsertMQL, InsertResource, InsertImport, InsertTime, InsertIcon, OpenFileInMetaEditor, CreateComment } = require("./contextMenu");
-const { IconsInstallation } = require("./addIcon");
 const { Hover_log, DefinitionProvider, Hover_MQL, ItemProvider, HelpProvider, ColorProvider } = require("./provider");
 const { CreateProperties } = require("./createProperties");
 const ChartView = require("./chartView");
@@ -94,6 +93,10 @@ const { createDefinitionProvider, createReferenceProvider, createDocumentSymbolP
 const { createFoldingRangeProvider } = require("./foldingProvider");
 const { createCodeLensProvider, clearReferenceCache } = require("./codeLensProvider");
 const { createCodeActionProvider, registerCodeActionCommands } = require("./codeActionProvider");
+const { createErrorCodeHoverProvider } = require("./errorCodeDatabase");
+const { showDetectedPaths, autoConfigureIncludePaths } = require("./includePathDetector");
+const { showCompiledFileInfo, compareCompiledFilesCommand } = require("./compiledFileDiff");
+const { createDocumentLinkProvider } = require("./documentLinkProvider");
 const outputChannel = null; // Using Pseudoterminal instead
 let buraqTerminal = null;
 let writeEmitter = null;
@@ -885,7 +888,6 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.compileScript', () => Compile(2)));
     context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.help', () => Help(true)));
     context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.configurations', () => CreateProperties()));
-    context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.Addicon', () => IconsInstallation()));
     context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.Showfiles', () => ShowFiles('**/*.ex4', '**/*.ex5')));
     context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.InsMQL', () => InsertMQL()));
     context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.InsMQH', () => InsertMQH()));
@@ -913,6 +915,8 @@ function activate(context) {
     context.subscriptions.push(vscode.languages.registerWorkspaceSymbolProvider(createWorkspaceSymbolProvider()));
     context.subscriptions.push(vscode.languages.registerRenameProvider(mqlLanguages, createRenameProvider()));
     context.subscriptions.push(vscode.languages.registerFoldingRangeProvider(mqlLanguages, createFoldingRangeProvider()));
+    // Register Document Link Provider for #include navigation
+    context.subscriptions.push(vscode.languages.registerDocumentLinkProvider(mqlLanguages, createDocumentLinkProvider()));
 
     // Invalidate symbol cache when documents change
     context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(event => {
@@ -931,6 +935,20 @@ function activate(context) {
 
     // Register file template commands
     registerTemplateCommands(context);
+
+    // Register error code hover provider (shows descriptions for ERR_* codes)
+    context.subscriptions.push(vscode.languages.registerHoverProvider(mqlLanguages, createErrorCodeHoverProvider()));
+
+    // Register include path detection commands
+    context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.detectIncludePaths', showDetectedPaths));
+    context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.autoConfigureIncludePaths', autoConfigureIncludePaths));
+
+    // Register compiled file commands
+    context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.showCompiledFileInfo', showCompiledFileInfo));
+    context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.compareCompiledFiles', compareCompiledFilesCommand));
+
+    // Auto-configure include paths on first activation (if not already set)
+    autoConfigureIncludePaths();
 
     // Auto-check on file save - register handler for automatic diagnostics
     context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(doc => {

@@ -45,7 +45,11 @@
 		"onCommand:buraq_mql5_mql4.InsTime",
 		"onCommand:buraq_mql5_mql4.InsIcon",
 		"onCommand:buraq_mql5_mql4.commentary",
-		"onCommand:buraq_mql5_mql4.openInME"
+		"onCommand:buraq_mql5_mql4.openInME",
+		"onCommand:buraq_mql5_mql4.detectIncludePaths",
+		"onCommand:buraq_mql5_mql4.autoConfigureIncludePaths",
+		"onCommand:buraq_mql5_mql4.showCompiledFileInfo",
+		"onCommand:buraq_mql5_mql4.compareCompiledFiles"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -217,6 +221,16 @@
 				"mimetypes": [
 					"text/x-code-output"
 				]
+			},
+			{
+				"id": "mql-set",
+				"aliases": [
+					"MQL Set File",
+					"mql-set"
+				],
+				"extensions": [
+					".set"
+				]
 			}
 		],
 		"snippets": [
@@ -253,6 +267,11 @@
 				"language": "mql-output",
 				"scopeName": "mql.output",
 				"path": "./syntaxes/mql.out.tmLanguage"
+			},
+			{
+				"language": "mql-set",
+				"scopeName": "source.mql-set",
+				"path": "./syntaxes/mql-set.tmLanguage.json"
 			}
 		],
 		"commands": [
@@ -291,11 +310,6 @@
 			{
 				"command": "buraq_mql5_mql4.configurations",
 				"title": "%buraq_mql5_mql4.commands.configurations.title%",
-				"category": "MQL"
-			},
-			{
-				"command": "buraq_mql5_mql4.Addicon",
-				"title": "%buraq_mql5_mql4.commands.Addicon.title%",
 				"category": "MQL"
 			},
 			{
@@ -375,6 +389,26 @@
 					"dark": "./mql-media/quickfix-dark.svg",
 					"light": "./mql-media/quickfix-light.svg"
 				}
+			},
+			{
+				"command": "buraq_mql5_mql4.detectIncludePaths",
+				"title": "Detect Include Paths",
+				"category": "MQL"
+			},
+			{
+				"command": "buraq_mql5_mql4.autoConfigureIncludePaths",
+				"title": "Auto-Configure Include Paths",
+				"category": "MQL"
+			},
+			{
+				"command": "buraq_mql5_mql4.showCompiledFileInfo",
+				"title": "Show Compiled File Info",
+				"category": "MQL"
+			},
+			{
+				"command": "buraq_mql5_mql4.compareCompiledFiles",
+				"title": "Compare Compiled Files",
+				"category": "MQL"
 			}
 		],
 		"menus": {
