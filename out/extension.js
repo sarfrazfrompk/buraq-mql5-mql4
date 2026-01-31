@@ -90,6 +90,10 @@ const { IconsInstallation } = require("./addIcon");
 const { Hover_log, DefinitionProvider, Hover_MQL, ItemProvider, HelpProvider, ColorProvider } = require("./provider");
 const { CreateProperties } = require("./createProperties");
 const ChartView = require("./chartView");
+const { createDefinitionProvider, createReferenceProvider, createDocumentSymbolProvider, createWorkspaceSymbolProvider, createRenameProvider, invalidateCache } = require("./symbolProvider");
+const { createFoldingRangeProvider } = require("./foldingProvider");
+const { createCodeLensProvider, clearReferenceCache } = require("./codeLensProvider");
+const { createCodeActionProvider, registerCodeActionCommands } = require("./codeActionProvider");
 const outputChannel = null; // Using Pseudoterminal instead
 let buraqTerminal = null;
 let writeEmitter = null;
@@ -758,6 +762,113 @@ function showChangelog(context) {
     }
 }
 
+/**
+ * Register file template commands
+ */
+function registerTemplateCommands(context) {
+    const templateTypes = [
+        { command: 'newExpertAdvisor', label: 'Expert Advisor', ext4: '.mq4', ext5: '.mq5', template4: 'expert_advisor.mq4', template5: 'expert_advisor.mq5' },
+        { command: 'newIndicator', label: 'Indicator', ext4: '.mq4', ext5: '.mq5', template4: 'indicator.mq4', template5: 'indicator.mq5' },
+        { command: 'newScript', label: 'Script', ext4: '.mq4', ext5: '.mq5', template4: 'script.mq4', template5: 'script.mq5' },
+        { command: 'newLibrary', label: 'Library', ext4: '.mqh', ext5: '.mqh', template4: 'library.mqh', template5: 'library.mqh' }
+    ];
+
+    for (const type of templateTypes) {
+        context.subscriptions.push(
+            vscode.commands.registerCommand(`buraq_mql5_mql4.${type.command}`, async () => {
+                // Ask for MQL version
+                const version = await vscode.window.showQuickPick(['MQL5', 'MQL4'], {
+                    placeHolder: 'Select MQL version'
+                });
+
+                if (!version) return;
+
+                // Ask for file name
+                const fileName = await vscode.window.showInputBox({
+                    prompt: `Enter ${type.label} name`,
+                    placeHolder: `My${type.label.replace(/\s/g, '')}`,
+                    validateInput: (value) => {
+                        if (!value || !value.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/)) {
+                            return 'Invalid file name. Use letters, numbers, and underscores.';
+                        }
+                        return null;
+                    }
+                });
+
+                if (!fileName) return;
+
+                // Determine template and extension
+                const isMQL5 = version === 'MQL5';
+                const ext = isMQL5 ? type.ext5 : type.ext4;
+                const templateFile = isMQL5 ? type.template5 : type.template4;
+
+                // Read template
+                const templatePath = pathModule.join(__dirname, '../templates', templateFile);
+                let templateContent = '';
+
+                try {
+                    templateContent = fs.readFileSync(templatePath, 'utf8');
+                } catch (e) {
+                    vscode.window.showErrorMessage(`Template file not found: ${templatePath}`);
+                    return;
+                }
+
+                // Replace placeholders
+                const year = new Date().getFullYear();
+                const author = vscode.workspace.getConfiguration('buraq_mql5_mql4').get('author', 'Your Name');
+                const link = vscode.workspace.getConfiguration('buraq_mql5_mql4').get('link', 'https://www.example.com');
+
+                templateContent = templateContent
+                    .replace(/\$\{FILE_NAME\}/g, fileName + ext)
+                    .replace(/\$\{YEAR\}/g, year.toString())
+                    .replace(/\$\{AUTHOR\}/g, author)
+                    .replace(/\$\{LINK\}/g, link);
+
+                // Determine save location
+                let targetFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+
+                if (!targetFolder) {
+                    const selected = await vscode.window.showOpenDialog({
+                        canSelectFolders: true,
+                        canSelectFiles: false,
+                        canSelectMany: false,
+                        openLabel: 'Select folder'
+                    });
+
+                    if (selected && selected[0]) {
+                        targetFolder = selected[0].fsPath;
+                    } else {
+                        return;
+                    }
+                }
+
+                // Create the file
+                const targetPath = pathModule.join(targetFolder, fileName + ext);
+
+                if (fs.existsSync(targetPath)) {
+                    const overwrite = await vscode.window.showQuickPick(['Yes', 'No'], {
+                        placeHolder: `File ${fileName}${ext} already exists. Overwrite?`
+                    });
+
+                    if (overwrite !== 'Yes') return;
+                }
+
+                try {
+                    fs.writeFileSync(targetPath, templateContent, 'utf8');
+
+                    // Open the file
+                    const doc = await vscode.workspace.openTextDocument(targetPath);
+                    await vscode.window.showTextDocument(doc);
+
+                    vscode.window.showInformationMessage(`Created ${type.label}: ${fileName}${ext}`);
+                } catch (e) {
+                    vscode.window.showErrorMessage(`Failed to create file: ${e.message}`);
+                }
+            })
+        );
+    }
+}
+
 function activate(context) {
     CreateProperties();
     initializeBuraqTerminal();
@@ -795,6 +906,32 @@ function activate(context) {
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(mqlLanguages, ItemProvider()));
     sleep(1000).then(() => { context.subscriptions.push(vscode.languages.registerSignatureHelpProvider(mqlLanguages, HelpProvider(), '(', ',')); });
 
+    // Register new symbol providers (Phase 1 features)
+    context.subscriptions.push(vscode.languages.registerDefinitionProvider(mqlLanguages, createDefinitionProvider()));
+    context.subscriptions.push(vscode.languages.registerReferenceProvider(mqlLanguages, createReferenceProvider()));
+    context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(mqlLanguages, createDocumentSymbolProvider()));
+    context.subscriptions.push(vscode.languages.registerWorkspaceSymbolProvider(createWorkspaceSymbolProvider()));
+    context.subscriptions.push(vscode.languages.registerRenameProvider(mqlLanguages, createRenameProvider()));
+    context.subscriptions.push(vscode.languages.registerFoldingRangeProvider(mqlLanguages, createFoldingRangeProvider()));
+
+    // Invalidate symbol cache when documents change
+    context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(event => {
+        invalidateCache(event.document);
+        clearReferenceCache(); // Also clear code lens cache
+    }));
+
+    // Register Phase 2 providers (Code Quality & Productivity)
+    context.subscriptions.push(vscode.languages.registerCodeLensProvider(mqlLanguages, createCodeLensProvider()));
+    context.subscriptions.push(vscode.languages.registerCodeActionsProvider(mqlLanguages, createCodeActionProvider(), {
+        providedCodeActionKinds: [vscode.CodeActionKind.QuickFix, vscode.CodeActionKind.Refactor, vscode.CodeActionKind.Source]
+    }));
+
+    // Register code action commands
+    registerCodeActionCommands(context);
+
+    // Register file template commands
+    registerTemplateCommands(context);
+
     // Auto-check on file save - register handler for automatic diagnostics
     context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(doc => {
         const ext = pathModule.extname(doc.fileName).toLowerCase();
@@ -811,6 +948,70 @@ function activate(context) {
             runBackgroundCheck(doc);
         }
     }));
+
+    // Auto-check on file open
+    context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(doc => {
+        const ext = pathModule.extname(doc.fileName).toLowerCase();
+        if (['.mq4', '.mq5', '.mqh'].includes(ext)) {
+            runBackgroundCheck(doc);
+        }
+    }));
+
+    // Auto-check when switching to a different editor
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
+        if (editor && editor.document) {
+            const ext = pathModule.extname(editor.document.fileName).toLowerCase();
+            if (['.mq4', '.mq5', '.mqh'].includes(ext)) {
+                runBackgroundCheck(editor.document);
+            }
+        }
+    }));
+
+    // Auto-check when visible editors change
+    context.subscriptions.push(vscode.window.onDidChangeVisibleTextEditors(editors => {
+        for (const editor of editors) {
+            const ext = pathModule.extname(editor.document.fileName).toLowerCase();
+            if (['.mq4', '.mq5', '.mqh'].includes(ext)) {
+                runBackgroundCheck(editor.document);
+            }
+        }
+    }));
+
+    // Clear diagnostics when file is closed
+    context.subscriptions.push(vscode.workspace.onDidCloseTextDocument(doc => {
+        const ext = pathModule.extname(doc.fileName).toLowerCase();
+        if (['.mq4', '.mq5', '.mqh'].includes(ext)) {
+            // Clear diagnostics for this file when closed
+            if (diagnosticCollection) {
+                diagnosticCollection.delete(doc.uri);
+            }
+        }
+    }));
+
+    // Scan all open MQL files on activation
+    scanOpenMQLFiles();
+}
+
+// Scan all currently open MQL files and run background check
+async function scanOpenMQLFiles() {
+    // Small delay to ensure extension is fully activated
+    await sleep(500);
+
+    // Check all visible editors
+    for (const editor of vscode.window.visibleTextEditors) {
+        const ext = pathModule.extname(editor.document.fileName).toLowerCase();
+        if (['.mq4', '.mq5', '.mqh'].includes(ext)) {
+            runBackgroundCheck(editor.document);
+        }
+    }
+
+    // Also check open documents that might not be visible
+    for (const doc of vscode.workspace.textDocuments) {
+        const ext = pathModule.extname(doc.fileName).toLowerCase();
+        if (['.mq4', '.mq5', '.mqh'].includes(ext)) {
+            runBackgroundCheck(doc);
+        }
+    }
 }
 
 function deactivate() {

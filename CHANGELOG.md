@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.0] — 2026-01-31
+
+### ✨ Added
+- **Go To Definition:** Ctrl+Click on any symbol to jump to its definition
+- **Find All References:** Shift+F12 to find all usages of a symbol
+- **Symbol Outline:** Ctrl+Shift+O to view and navigate to all functions/classes
+- **Rename Symbol:** F2 to rename a symbol across all files
+- **Code Lens:** Reference counts displayed above functions and classes
+- **Quick Fix All:** New button in editor title bar to fix all issues at once
+- **Independent Quick Fix Analyzer:** Analyzes code without needing compiler errors
+- **File Templates:** Create new Expert Advisor, Script, Indicator, Library, Include, and Class files from templates
+
+### 🔧 Improved
+- **Enhanced Lifecycle Events:** Syntax checking now runs on file open, editor switch, and extension activation
+- **Code Folding:** Fixed to show both opening and closing brackets when folded
+- **Workspace Scanning:** Automatically scans all open MQL files on extension startup
+
+### 🐛 Fixed
+- **Go To Definition:** Now correctly finds function and class definitions
+- **Symbol Outline:** Fixed parsing to detect all symbols in MQL files
+- **Rename Symbol:** More reliable definition detection
+- **Code Lens:** Rewritten for better performance and reliability
+
+---
+
 ## [0.4.0] — 2026-01-30
 
 ### ✨ Added

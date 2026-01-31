@@ -12,7 +12,18 @@ Buraq MQL5 & MQL4 is a Visual Studio Code extension that brings comprehensive la
 - Help access with English language support for MQL4/MQL5
 - Context menu actions for inserting includes, resources, imports, and commentary
 - Keybindings for quick compile/check/help actions
-- Chart view with customizable MQL-Media branding (position: top-right, top-left, bottom-right, bottom-left)
+- Chart view with customizable MQL-Media branding
+
+### New in v0.5.0
+
+- **Go To Definition:** Ctrl+Click to jump to any symbol's definition
+- **Find All References:** Shift+F12 to find all usages of a function/variable
+- **Symbol Outline:** Ctrl+Shift+O to navigate functions and classes
+- **Rename Symbol:** F2 to rename symbols across all files
+- **Code Lens:** See reference counts above each function
+- **Quick Fix All:** One-click button to fix common issues (missing semicolons, etc.)
+- **File Templates:** Create Expert Advisors, Scripts, Indicators, and more from templates
+- **Auto-Diagnostics:** Problems panel updates on file open, edit, and save
 
 ## Installation
 
