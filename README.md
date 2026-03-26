@@ -14,6 +14,15 @@ Buraq MQL5 & MQL4 is a Visual Studio Code extension that brings comprehensive la
 - Keybindings for quick compile/check/help actions
 - Chart view with customizable MQL-Media branding
 
+### New in v0.6.0
+
+- **Buraq Compiler System**: Complete rewrite for reliable sequential compilation
+- **Auto-Compilation**: All workspace files compiled on extension load
+- **`.buraqignore` Support**: Exclude files using `.vscode/.buraqignore`
+- **Persistent Diagnostics**: Problems panel shows errors from all files simultaneously
+- **Centralized Logs**: All `.log` files stored in `.vscode/temp/`, auto-deleted
+- **Enhanced Error Detection**: Reliable error detection with path normalization
+
 ### New in v0.5.0
 
 - **Go To Definition:** Ctrl+Click to jump to any symbol's definition

@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.6.0] — 2026-03-26
+
+### ✨ Added
+- **Buraq Compiler System**: Complete rewrite of compilation infrastructure for reliability and performance
+- **Sequential Compilation**: Files compile one-by-one (no bulk processing) to prevent race conditions
+- **Auto-Compilation on Activation**: All MQL files in workspace automatically compiled when extension loads
+- **`.buraqignore` Support**: Exclude files/folders from compilation using `.vscode/.buraqignore` (gitignore-style patterns)
+- **Persistent Diagnostics**: Problems panel accumulates errors from all files (no overwriting when editing)
+- **Centralized Log Management**: All compiler `.log` files stored in `.vscode/temp/` folder, automatically deleted after processing
+- **Diagnostics Cache**: Maintains diagnostics from all files for consistent Problems panel display
+- **Enhanced Logging**: Detailed output panel logs for debugging compilation issues
+
+### 🔧 Improved
+- **Diagnostics Collection**: Fixed root cause where diagnostics were not appearing in Problems panel
+- **File Path Handling**: Robust path normalization handles both forward and backward slashes in compiler logs
+- **Error Detection**: Errors now reliably detected and displayed after file save
+- **Cache Management**: Diagnostics cache properly updated even when files have no errors (clears fixed errors)
+- **Include File Support**: Errors in included `.mqh` files properly tracked and displayed
+- **Graceful Fallbacks**: Handles missing log files and compilation failures without losing diagnostics
+
+### 🐛 Fixed
+- **Critical**: `diagnosticCollection` initialization added - diagnostics now appear in Problems panel
+- **Stale Errors**: Fixed issue where old errors persisted after being fixed
+- **Path Format Issues**: Fixed diagnostics not created when log file used different path format
+- **Cache Updates**: Cache now always updated for compiled files, even on success
+- **Include File Diagnostics**: Errors in include files now properly attributed to correct file
+
+### 📚 Documentation
+- **Buraq Compiler System**: Complete architecture documentation
+- **API Reference**: Module usage examples and configuration guide
+- **Troubleshooting**: Output panel logging guide
+
+---
+
 ## [0.5.0] — 2026-01-31
 
 ### ✨ Added
