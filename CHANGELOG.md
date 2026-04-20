@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.7.0] — 2026-04-20
+
+### ✨ Added
+- **Buraq Sidebar Dashboard**: A new "Buraq MQL" sidebar tab that gives you a quick overview of your project and lets you manage build tasks easily.
+- **Custom Buraq Terminal**: A beautiful new terminal for showing build results with gradient headers and colorful text for better readability.
+- **Project-wide Compilation**: New commands to compile all MQL files or a specific main file across your entire workspace.
+- **Diagnostics Manager**: A system that tracks all your code errors and warnings in a database so you never miss a fix.
+
+### 🔧 Improved
+- **Header File Warnings**: Better guidance when you try to compile `.mqh` files directly.
+- **Reliable Building**: A new queue system that handles multiple file compilations one after another without errors.
+
+
 ## [0.6.0] — 2026-03-26
 
 ### ✨ Added
