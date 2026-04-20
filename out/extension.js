@@ -181,6 +181,9 @@ catch (error) {
 
 async function Compile(rt) {
     initializeBuraqTerminal();
+    
+    // Automatically show dashboard when compiling
+    vscode.commands.executeCommand('buraq-mql-dashboard.focus');
 
     // CRITICAL: Clear terminal FIRST and wait for it to complete
     await clearTerminalCompletely();
@@ -801,7 +804,11 @@ function activate(context) {
 
         // REAL-TIME DASHBOARD UPDATES: Listen to queue events
         globalCompilationQueue.on('compiling', (file) => {
-            if (dashboardProvider) dashboardProvider.setCompiling(file);
+            if (dashboardProvider) {
+                dashboardProvider.setCompiling(file);
+                // Automatically reveal dashboard when a queue compilation starts
+                vscode.commands.executeCommand('buraq-mql-dashboard.focus');
+            }
         });
         globalCompilationQueue.on('finished', () => {
             if (dashboardProvider) {
@@ -997,6 +1004,9 @@ async function compileAllFilesOnActivation(scanner, queue, dashboard) {
         }
         
         console.log('[Buraq MQL] Found', files.length, 'files to compile');
+        
+        // Automatically show dashboard when auto-compilation starts on activation
+        vscode.commands.executeCommand('buraq-mql-dashboard.focus');
         
         // Enqueue all files for sequential compilation
         // The queue handles sequential processing automatically
