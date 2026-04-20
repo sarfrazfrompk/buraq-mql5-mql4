@@ -101,7 +101,7 @@ const { WorkspaceScanner, DiagnosticsManager, CompilationQueue } = require("./bu
 const outputChannel = null; // Using Pseudoterminal instead
 let buraqTerminal = null;
 let writeEmitter = null;
-let diagnosticCollection = null; // For Problems panel integration
+let diagnosticsManager = null; // Single source of truth for diagnostics
 
 function initializeBuraqTerminal() {
     if (!buraqTerminal) {
@@ -304,7 +304,7 @@ function Compile(rt) {
                         }
 
                         // Parse the log
-                        const log = replaceLog(data, rt === 1 || rt === 2);
+                        const log = replaceLog(data, rt === 1 || rt === 2, path);
                         const end = new Date();
 
                         // Delete log file using centralized manager if available
@@ -316,17 +316,12 @@ function Compile(rt) {
                             });
                         }
 
-                        // Update cache with new diagnostics and apply all cached diagnostics
-                        if (log.diagnostics && log.diagnostics.size > 0) {
-                            log.diagnostics.forEach((diagnostics, file) => {
-                                console.log('[Buraq MQL] Compile() Updating cache for:', file, 'with', diagnostics.length, 'diagnostics');
-                                allDiagnosticsCache.set(file, diagnostics);
-                            });
+                        // Use the global diagnosticsManager to update Problems panel
+                        if (diagnosticsManager) {
+                            // Update diagnostics for THIS compilation run
+                            // The manager will aggregate these with other runs in the persistent DB
+                            diagnosticsManager.setDiagnostics(path, log.diagnostics);
                         }
-                        
-                        // Apply ALL cached diagnostics
-                        console.log('[Buraq MQL] Compile() Applying', allDiagnosticsCache.size, 'files from cache');
-                        applyDiagnostics(allDiagnosticsCache);
 
                         switch (rt) {
                             case 0: writeToTerminal(log.text); writeSeparator(); resolve(); break;
@@ -359,61 +354,14 @@ function Compile(rt) {
     );
 }
 
-// Helper function to apply diagnostics to Problems panel
-function applyDiagnostics(diagnosticsMap) {
-    console.log('[Buraq MQL] === applyDiagnostics START ===');
-    console.log('[Buraq MQL] diagnosticCollection exists:', !!diagnosticCollection);
-    
-    if (!diagnosticCollection) {
-        console.error('[Buraq MQL] ERROR: diagnosticCollection is null! Cannot apply diagnostics.');
-        return;
-    }
-    
-    if (!diagnosticsMap) {
-        console.log('[Buraq MQL] No diagnostics map provided');
-        return;
-    }
-    
-    console.log('[Buraq MQL] Clearing all existing diagnostics');
-    diagnosticCollection.clear();
-    
-    if (diagnosticsMap && diagnosticsMap.size > 0) {
-        console.log('[Buraq MQL] Found', diagnosticsMap.size, 'files with diagnostics');
-        
-        let totalDiagnostics = 0;
-        diagnosticsMap.forEach((diagnostics, filePath) => {
-            console.log('[Buraq MQL] Processing file:', filePath);
-            console.log('[Buraq MQL]   Diagnostics count:', diagnostics.length);
-            
-            const uri = vscode.Uri.file(filePath);
-            console.log('[Buraq MQL]   URI:', uri.toString());
-            
-            diagnosticCollection.set(uri, diagnostics);
-            console.log('[Buraq MQL]   ✓ Set in Problems panel');
-            
-            totalDiagnostics += diagnostics.length;
-        });
-        
-        console.log('[Buraq MQL] Total diagnostics applied:', totalDiagnostics);
-    } else {
-        console.log('[Buraq MQL] No diagnostics to apply');
-    }
-    
-    console.log('[Buraq MQL] === applyDiagnostics END ===');
-}
-
 // Debounce timer for background checks
 let backgroundCheckTimer = null;
 // Log file manager instance for background checks
 let backgroundLogManager = null;
-// Store diagnostics from all files to preserve them
-let allDiagnosticsCache = new Map();
 
 // Run background syntax check on file save (silent, no terminal output)
 function runBackgroundCheck(document) {
     console.log('[Buraq MQL] runBackgroundCheck called for:', document.fileName);
-    console.log('[Buraq MQL] Document URI:', document.uri.toString());
-    console.log('[Buraq MQL] diagnosticCollection exists:', !!diagnosticCollection);
     
     // Debounce: clear previous timer and set new one
     if (backgroundCheckTimer) {
@@ -473,33 +421,17 @@ function runBackgroundCheck(document) {
                     fs.readFile(logFile, 'utf16le', (err, data) => {
                         if (!err && data) {
                             console.log('[Buraq MQL] Log data length:', data.length);
-                            const log = replaceLog(data, false);
-                            console.log('[Buraq MQL] Diagnostics count from log:', log.diagnostics ? log.diagnostics.size : 0);
+                            const log = replaceLog(data, false, filePath);
                             
-                            // CRITICAL: Always update cache for the compiled file
-                            // Even if there are no errors (clear old errors)
-                            const compiledFileDiagnostics = log.diagnostics && log.diagnostics.size > 0 
-                                ? log.diagnostics.get(filePath) || []
-                                : [];
-                            
-                            console.log('[Buraq MQL] Setting', compiledFileDiagnostics.length, 'diagnostics for compiled file:', filePath);
-                            allDiagnosticsCache.set(filePath, compiledFileDiagnostics);
-                            
-                            // Also handle any include files that had errors
-                            if (log.diagnostics && log.diagnostics.size > 0) {
-                                log.diagnostics.forEach((diagnostics, file) => {
-                                    if (file !== filePath) {
-                                        console.log('[Buraq MQL] Updating cache for include file:', file, 'with', diagnostics.length, 'diagnostics');
-                                        allDiagnosticsCache.set(file, diagnostics);
-                                    }
-                                });
+                            // Use the global diagnosticsManager to update Problems panel
+                            if (diagnosticsManager) {
+                                // Update diagnostics for THIS background check
+                                // The manager handles aggregation independently
+                                diagnosticsManager.setDiagnostics(filePath, log.diagnostics);
                             }
-
-                            // Apply ALL cached diagnostics (not just from this file)
-                            console.log('[Buraq MQL] Applying', allDiagnosticsCache.size, 'files from cache');
-                            applyDiagnostics(allDiagnosticsCache);
                             
                             // Log summary
+                            const compiledFileDiagnostics = (log.diagnostics && log.diagnostics.get(filePath)) || [];
                             const errorCount = compiledFileDiagnostics.filter(d => d.severity === vscode.DiagnosticSeverity.Error).length;
                             const warningCount = compiledFileDiagnostics.filter(d => d.severity === vscode.DiagnosticSeverity.Warning).length;
                             if (errorCount === 0 && warningCount === 0) {
@@ -510,8 +442,7 @@ function runBackgroundCheck(document) {
                         } else {
                             console.log('[Buraq MQL] Error reading log file:', err);
                             // If we can't read the log, clear diagnostics for this file
-                            allDiagnosticsCache.set(filePath, []);
-                            applyDiagnostics(allDiagnosticsCache);
+                            if (diagnosticsManager) diagnosticsManager.clearDiagnostics(filePath);
                         }
                         // Delete log file after processing (always delete from temp folder)
                         if (backgroundLogManager) {
@@ -523,8 +454,7 @@ function runBackgroundCheck(document) {
                 } else {
                     console.log('[Buraq MQL] Log file not found');
                     // If log file doesn't exist, clear diagnostics for this file
-                    allDiagnosticsCache.set(filePath, []);
-                    applyDiagnostics(allDiagnosticsCache);
+                    if (diagnosticsManager) diagnosticsManager.clearDiagnostics(filePath);
                 }
             }, 500); // Wait for log file to be written
         });
@@ -532,13 +462,15 @@ function runBackgroundCheck(document) {
 }
 
 
-function replaceLog(str, isFullCompile) {
+function replaceLog(str, isFullCompile, sourceFilePath) {
     let outputLines = [];
     let obj_hover = {};
     let hasErrors = false;
     let errorCount = 0;
     let warningCount = 0;
     let diagnosticsMap = new Map(); // Map<filePath, Diagnostic[]>
+    let involvedFiles = new Set();
+    if (sourceFilePath) involvedFiles.add(sourceFilePath);
 
     const lines = str.replace(/\u{FEFF}/gu, '').split('\n');
 
@@ -560,6 +492,7 @@ function replaceLog(str, isFullCompile) {
                 const link = url.pathToFileURL(pm[0]).href;
                 Object.assign(obj_hover, { [name]: { ['link']: link } });
                 outputLines.push(colorizeInfo(padText(STATUS.STEP, 12) + name));
+                involvedFiles.add(pm[0]);
             }
         }
         // Handle include files
@@ -572,6 +505,7 @@ function replaceLog(str, isFullCompile) {
                 const link_icl = url.pathToFileURL(pm[0]).href;
                 Object.assign(obj_hover, { [name_icl]: { ['link']: link_icl } });
                 outputLines.push(colorizeDim(padText('  └─ Include', 12) + name_icl));
+                involvedFiles.add(pm[0]);
             }
         }
         // Skip code generation messages
@@ -588,6 +522,7 @@ function replaceLog(str, isFullCompile) {
                 const link_info = pm ? url.pathToFileURL(pm[0]).href : '';
                 Object.assign(obj_hover, { [name_info]: { ['link']: link_info } });
                 outputLines.push(colorizeInfo(padText(STATUS.INFO, 12) + name_info));
+                if (pm) involvedFiles.add(pm[0]);
             }
         }
         // Handle result summary
@@ -657,6 +592,7 @@ function replaceLog(str, isFullCompile) {
                     }
                     
                     if (actualPath) {
+                        involvedFiles.add(actualPath);
                         const line = Math.max(0, lineNum - 1);
                         const col = Math.max(0, colNum - 1);
                         const range = new vscode.Range(line, col, line, col + 100); // Extend range to highlight more
@@ -693,9 +629,11 @@ function replaceLog(str, isFullCompile) {
     return {
         text: outputLines.join('\r\n'),
         error: hasErrors,
-        diagnostics: diagnosticsMap
+        diagnostics: diagnosticsMap,
+        involvedFiles: involvedFiles
     };
 }
+
 
 function FindParentFile() {
     const { document } = vscode.window.activeTextEditor;
@@ -1002,20 +940,15 @@ function activate(context) {
     initializeBuraqTerminal();
     showChangelog(context);
 
-    // CRITICAL: Initialize diagnostic collection for Problems panel
-    // This is required for applyDiagnostics() to work
-    diagnosticCollection = vscode.languages.createDiagnosticCollection('mql');
-    context.subscriptions.push(diagnosticCollection);
-    console.log('[Buraq MQL] diagnosticCollection initialized');
-
     // Initialize new Buraq Compiler modules
     const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
 
-    if (workspaceRoot) {
-        // Initialize DiagnosticsManager for persistent Problems panel
-        const diagnosticsManager = new DiagnosticsManager();
-        diagnosticsManager.initialize(context);
+    // CRITICAL: Initialize DiagnosticsManager first
+    diagnosticsManager = new DiagnosticsManager();
+    diagnosticsManager.initialize(context);
+    console.log('[Buraq MQL] DiagnosticsManager initialized');
 
+    if (workspaceRoot) {
         // Initialize CompilationQueue for sequential compilation
         const compilationQueue = new CompilationQueue(workspaceRoot, diagnosticsManager);
 
@@ -1151,13 +1084,9 @@ function activate(context) {
         const ext = pathModule.extname(doc.fileName).toLowerCase();
         if (['.mq4', '.mq5', '.mqh'].includes(ext)) {
             // Clear diagnostics for this file when closed
-            if (diagnosticCollection) {
-                diagnosticCollection.delete(doc.uri);
-            }
-            // Also remove from cache
-            if (allDiagnosticsCache) {
-                allDiagnosticsCache.delete(doc.fileName);
-                console.log('[Buraq MQL] Removed from cache:', doc.fileName);
+            if (diagnosticsManager) {
+                diagnosticsManager.clearDiagnostics(doc.fileName);
+                console.log('[Buraq MQL] Cleared diagnostics for closed file:', doc.fileName);
             }
         }
     }));

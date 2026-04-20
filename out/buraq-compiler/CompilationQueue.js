@@ -234,8 +234,9 @@ class CompilationQueue {
         // Parse diagnostics using DiagnosticsManager
         const parseResult = this.diagnosticsManager.parseLog(logContent, filePath);
 
-        // Set diagnostics for this file (preserves other files' diagnostics)
-        this.diagnosticsManager.setDiagnostics(filePath, parseResult.diagnostics);
+        // Update diagnostics using the new aggregated/independent system
+        // We pass the main compiled file (filePath) as the key
+        this.diagnosticsManager.setDiagnostics(filePath, parseResult.diagnosticsByFile);
 
         return {
             success: !parseResult.hasErrors,
@@ -243,11 +244,13 @@ class CompilationQueue {
             hasErrors: parseResult.hasErrors,
             errorCount: parseResult.errorCount,
             warningCount: parseResult.warningCount,
-            diagnostics: parseResult.diagnostics,
+            diagnosticsByFile: parseResult.diagnosticsByFile,
             outputLines: parseResult.outputLines,
             logFile: logFile
         };
     }
+
+
 
     /**
      * Resolve MetaEditor path (from your existing code)

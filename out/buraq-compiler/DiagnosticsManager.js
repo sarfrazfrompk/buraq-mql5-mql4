@@ -6,133 +6,195 @@ const pathModule = require('path');
 
 /**
  * DiagnosticsManager - Manages per-file diagnostics in Problems panel
- * Accumulates diagnostics from all compiled files without overwriting
+ * Uses a JSON file in .vscode folder as a persistent single source of truth.
+ * Each compilation result is stored independently in the database.
  */
 class DiagnosticsManager {
     constructor() {
-        // Map<filePath, Diagnostic[]> - Stores diagnostics per file
-        this.diagnosticsMap = new Map();
-        // DiagnosticCollection for VS Code Problems panel
         this.collection = null;
+        this.dbPath = null;
+        this.workspaceRoot = null;
     }
 
     /**
-     * Initialize the diagnostic collection
+     * Initialize the diagnostic collection and persistent database
      * @param {vscode.ExtensionContext} context - Extension context for subscriptions
      */
     initialize(context) {
         this.collection = vscode.languages.createDiagnosticCollection('mql');
         context.subscriptions.push(this.collection);
-        console.log('[DiagnosticsManager] Initialized with collection');
+        
+        this.workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        if (this.workspaceRoot) {
+            const vscodeDir = pathModule.join(this.workspaceRoot, '.vscode');
+            if (!fs.existsSync(vscodeDir)) {
+                fs.mkdirSync(vscodeDir, { recursive: true });
+            }
+            this.dbPath = pathModule.join(vscodeDir, 'buraq-diagnostics.json');
+            
+            // Initial load from DB to Problems panel
+            this.refreshFromDatabase();
+        }
+        
+        console.log('[DiagnosticsManager] Initialized with aggregated persistent DB:', this.dbPath);
     }
 
     /**
-     * Set diagnostics for a specific file
-     * This updates only the specified file's diagnostics, preserving others
-     * @param {string} filePath - Absolute path to the source file
-     * @param {vscode.Diagnostic[]} diagnostics - Array of diagnostics for this file
+     * Refresh the Problems panel by aggregating all errors from the JSON database
      */
-    setDiagnostics(filePath, diagnostics) {
-        if (!filePath || !this.collection) {
-            console.log('[DiagnosticsManager] Cannot set diagnostics - not initialized or invalid path');
+    refreshFromDatabase() {
+        if (!this.dbPath || !fs.existsSync(this.dbPath) || !this.collection) {
             return;
         }
 
-        // Store in our internal map
-        this.diagnosticsMap.set(filePath, diagnostics || []);
+        try {
+            const content = fs.readFileSync(this.dbPath, 'utf8');
+            const db = JSON.parse(content);
+            
+            // Map to aggregate errors by the file they occur in
+            const aggregated = new Map(); // Map<actualFilePath, vscode.Diagnostic[]>
+            
+            // db keys are the 'compiled files' (sourceFilePath)
+            Object.keys(db).forEach(sourcePath => {
+                const errors = db[sourcePath];
+                if (!Array.isArray(errors)) return;
 
-        // Update VS Code's Problems panel for this specific file
-        const uri = vscode.Uri.file(filePath);
-        this.collection.set(uri, diagnostics || []);
-
-        console.log('[DiagnosticsManager] Set', (diagnostics || []).length, 'diagnostics for:', filePath);
+                errors.forEach(err => {
+                    const targetFile = err.file;
+                    if (!aggregated.has(targetFile)) {
+                        aggregated.set(targetFile, []);
+                    }
+                    
+                    const range = new vscode.Range(
+                        err.range.start.line,
+                        err.range.start.character,
+                        err.range.end.line,
+                        err.range.end.character
+                    );
+                    
+                    const severity = err.severity === 'Error' ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning;
+                    const diag = new vscode.Diagnostic(range, err.message, severity);
+                    diag.source = 'Buraq Compiler';
+                    diag.code = err.code;
+                    
+                    // Simple de-duplication: check if same error already exists for this file from another compilation
+                    const existing = aggregated.get(targetFile);
+                    const isDuplicate = existing.some(e => 
+                        e.message === diag.message && 
+                        e.range.isEqual(diag.range) && 
+                        e.severity === diag.severity
+                    );
+                    
+                    if (!isDuplicate) {
+                        existing.push(diag);
+                    }
+                });
+            });
+            
+            // Clear current collection and apply aggregated results
+            this.collection.clear();
+            aggregated.forEach((diagnostics, filePath) => {
+                this.collection.set(vscode.Uri.file(filePath), diagnostics);
+            });
+            
+            console.log('[DiagnosticsManager] Problems panel refreshed (aggregated)');
+        } catch (error) {
+            console.error('[DiagnosticsManager] Error refreshing from database:', error);
+        }
     }
 
     /**
-     * Get diagnostics for a specific file
-     * @param {string} filePath - Absolute path to the source file
-     * @returns {vscode.Diagnostic[]} - Array of diagnostics
+     * Set diagnostics for a specific compilation run
+     * @param {string} sourceFilePath - The main file that was compiled
+     * @param {Map<string, vscode.Diagnostic[]>} diagnosticsByFile - Map of actual file -> diagnostics
      */
-    getDiagnostics(filePath) {
-        return this.diagnosticsMap.get(filePath) || [];
-    }
+    setDiagnostics(sourceFilePath, diagnosticsByFile) {
+        if (!sourceFilePath || !this.dbPath) return;
 
-    /**
-     * Clear diagnostics for a specific file
-     * @param {string} filePath - Absolute path to the source file
-     */
-    clearDiagnostics(filePath) {
-        if (!filePath || !this.collection) {
-            return;
+        // 1. Read the DB
+        let db = {};
+        if (fs.existsSync(this.dbPath)) {
+            try {
+                db = JSON.parse(fs.readFileSync(this.dbPath, 'utf8'));
+            } catch (e) { db = {}; }
         }
 
-        this.diagnosticsMap.delete(filePath);
-        const uri = vscode.Uri.file(filePath);
-        this.collection.delete(uri);
+        // 2. Prepare serializable diagnostics for this compilation source
+        const serializableErrors = [];
+        if (diagnosticsByFile && diagnosticsByFile.size > 0) {
+            diagnosticsByFile.forEach((diagnostics, actualFile) => {
+                diagnostics.forEach(d => {
+                    serializableErrors.push({
+                        file: actualFile,
+                        message: d.message,
+                        range: {
+                            start: { line: d.range.start.line, character: d.range.start.character },
+                            end: { line: d.range.end.line, character: d.range.end.character }
+                        },
+                        severity: d.severity === vscode.DiagnosticSeverity.Error ? 'Error' : 'Warning',
+                        code: d.code
+                    });
+                });
+            });
+        }
 
-        console.log('[DiagnosticsManager] Cleared diagnostics for:', filePath);
+        // 3. Update the entry for this specific source file
+        if (serializableErrors.length > 0) {
+            db[sourceFilePath] = serializableErrors;
+        } else {
+            // If compilation is clean, remove its entry entirely
+            delete db[sourceFilePath];
+        }
+
+        // 4. Save back to DB
+        try {
+            fs.writeFileSync(this.dbPath, JSON.stringify(db, null, 4), 'utf8');
+        } catch (error) {
+            console.error('[DiagnosticsManager] Error saving database:', error);
+        }
+
+        // 5. Refresh the Problems panel with the new state
+        this.refreshFromDatabase();
     }
 
     /**
-     * Clear all diagnostics from all files
+     * Clear diagnostics for a specific compiled file
+     * @param {string} sourceFilePath 
+     */
+    clearDiagnostics(sourceFilePath) {
+        this.setDiagnostics(sourceFilePath, new Map());
+    }
+
+    /**
+     * Clear all diagnostics from DB and Problems panel
      */
     clearAll() {
-        if (!this.collection) {
-            return;
+        if (this.dbPath && fs.existsSync(this.dbPath)) {
+            try {
+                fs.writeFileSync(this.dbPath, JSON.stringify({}, null, 4), 'utf8');
+            } catch (e) {}
         }
-
-        this.diagnosticsMap.clear();
-        this.collection.clear();
-
-        console.log('[DiagnosticsManager] Cleared all diagnostics');
-    }
-
-    /**
-     * Get all diagnostics from all files
-     * @returns {Map<string, vscode.Diagnostic[]>} - Map of filePath to diagnostics
-     */
-    getAllDiagnostics() {
-        return new Map(this.diagnosticsMap);
-    }
-
-    /**
-     * Get total count of all diagnostics
-     * @returns {Object} - Count of errors and warnings
-     */
-    getCount() {
-        let errorCount = 0;
-        let warningCount = 0;
-
-        for (const [filePath, diagnostics] of this.diagnosticsMap) {
-            for (const diagnostic of diagnostics) {
-                if (diagnostic.severity === vscode.DiagnosticSeverity.Error) {
-                    errorCount++;
-                } else if (diagnostic.severity === vscode.DiagnosticSeverity.Warning) {
-                    warningCount++;
-                }
-            }
+        if (this.collection) {
+            this.collection.clear();
         }
-
-        return { errors: errorCount, warnings: warningCount, total: errorCount + warningCount };
     }
 
     /**
      * Parse compiler log and extract diagnostics
-     * This integrates with your existing replaceLog logic
      * @param {string} logContent - Raw log content from compiler
      * @param {string} sourceFilePath - Path to the source file being compiled
-     * @returns {Object} - { diagnostics: Diagnostic[], hasErrors: boolean, outputLines: string[] }
+     * @returns {Object}
      */
     parseLog(logContent, sourceFilePath) {
         const outputLines = [];
-        const diagnostics = [];
+        const diagnosticsByFile = new Map();
+        const involvedFiles = new Set([sourceFilePath]);
         let hasErrors = false;
         let errorCount = 0;
         let warningCount = 0;
 
         const lines = logContent.replace(/\u{FEFF}/gu, '').split('\n');
 
-        // ANSI color helpers (from your existing code)
         const ANSI_COLORS = {
             RED: '\x1b[31m',
             GREEN: '\x1b[32m',
@@ -141,36 +203,26 @@ class DiagnosticsManager {
             RESET: '\x1b[0m'
         };
 
-        function colorizeError(text) {
-            return `${ANSI_COLORS.RED}${text}${ANSI_COLORS.RESET}`;
-        }
-
-        function colorizeWarning(text) {
-            return `${ANSI_COLORS.YELLOW}${text}${ANSI_COLORS.RESET}`;
-        }
-
-        function colorizeInfo(text) {
-            return `${ANSI_COLORS.BLUE}${text}${ANSI_COLORS.RESET}`;
-        }
-
-        function colorizeSuccess(text) {
-            return `${ANSI_COLORS.GREEN}${text}${ANSI_COLORS.RESET}`;
-        }
+        const colorizeError = (t) => `${ANSI_COLORS.RED}${t}${ANSI_COLORS.RESET}`;
+        const colorizeWarning = (t) => `${ANSI_COLORS.YELLOW}${t}${ANSI_COLORS.RESET}`;
+        const colorizeInfo = (t) => `${ANSI_COLORS.BLUE}${t}${ANSI_COLORS.RESET}`;
+        const colorizeSuccess = (t) => `${ANSI_COLORS.GREEN}${t}${ANSI_COLORS.RESET}`;
 
         lines.forEach(item => {
             const trimmed = item.trim();
             if (!trimmed) return;
 
-            // Handle result summary
+            if (trimmed.includes(': information: including')) {
+                const pm = item.match(/[a-z]:\\.+(?= :)/gi);
+                if (pm) involvedFiles.add(pm[0].trim());
+            }
+
             if (trimmed.includes('Result:') || trimmed.includes(': information: result')) {
                 const ecMatch = item.match(/(\d+)\s+error/i);
                 const wcMatch = item.match(/(\d+)\s+warning/i);
-
                 errorCount = ecMatch ? parseInt(ecMatch[1]) : 0;
                 warningCount = wcMatch ? parseInt(wcMatch[1]) : 0;
-
                 outputLines.push('');
-
                 if (errorCount > 0) {
                     hasErrors = true;
                     outputLines.push(colorizeError(`[ERROR]   Compilation failed: ${errorCount} error(s), ${warningCount} warning(s)`));
@@ -179,10 +231,7 @@ class DiagnosticsManager {
                 } else {
                     outputLines.push(colorizeSuccess('[SUCCESS] Compilation successful - no errors or warnings'));
                 }
-            }
-            // Handle errors and warnings
-            // MetaEditor format: FilePath(line,col) : error NNN: message
-            else {
+            } else {
                 const errorRegex = /^(.+)\((\d+),(\d+)\)\s*:\s*(error|warning)\s+(\d+):\s*(.+)$/i;
                 const match = trimmed.match(errorRegex);
 
@@ -193,62 +242,49 @@ class DiagnosticsManager {
                     const errType = match[4].toLowerCase();
                     const errCode = match[5];
                     const errMessage = match[6].trim();
-
                     const isError = errType === 'error';
 
-                    // Add to terminal output
                     const statusIndicator = isError ? '[ERROR]  ' : '[WARNING]';
                     const colorFunc = isError ? colorizeError : colorizeWarning;
-                    const fullMessage = `${errType} ${errCode}: ${errMessage}`;
-                    const posStr = `(${lineNum},${colNum})`;
-                    outputLines.push(colorFunc(padText(statusIndicator, 12) + fullMessage + ' ' + posStr));
+                    outputLines.push(colorFunc(padText(statusIndicator, 12) + `${errType} ${errCode}: ${errMessage} (${lineNum},${colNum})`));
 
-                    // Build diagnostic for Problems panel
-                    if (filePath && fs.existsSync(filePath)) {
-                        const line = Math.max(0, lineNum - 1);
-                        const col = Math.max(0, colNum - 1);
-                        const range = new vscode.Range(line, col, line, col + 100);
-                        const severity = isError ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning;
-                        const diagnostic = new vscode.Diagnostic(range, errMessage, severity);
-                        diagnostic.source = 'Buraq Compiler';
-                        diagnostic.code = errCode;
-                        diagnostics.push(diagnostic);
+                    if (filePath) {
+                        const normalizedPath = filePath.replace(/\//g, '\\');
+                        let actualPath = fs.existsSync(normalizedPath) ? normalizedPath : (fs.existsSync(filePath) ? filePath : null);
+
+                        if (actualPath) {
+                            involvedFiles.add(actualPath);
+                            const line = Math.max(0, lineNum - 1);
+                            const col = Math.max(0, colNum - 1);
+                            const range = new vscode.Range(line, col, line, col + 100);
+                            const severity = isError ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning;
+                            const diagnostic = new vscode.Diagnostic(range, errMessage, severity);
+                            diagnostic.source = 'Buraq Compiler';
+                            diagnostic.code = errCode;
+                            
+                            if (!diagnosticsByFile.has(actualPath)) diagnosticsByFile.set(actualPath, []);
+                            diagnosticsByFile.get(actualPath).push(diagnostic);
+                        }
                     }
-                }
-                // Handle other informational messages
-                else if (trimmed.includes(': information:')) {
-                    // Skip or log info messages
-                } else {
-                    // Other messages
+                } else if (!trimmed.includes(': information:')) {
                     const isError = trimmed.toLowerCase().includes('error');
-                    const statusIndicator = isError ? '[ERROR]  ' : '[INFO]   ';
                     const colorFunc = isError ? colorizeError : colorizeInfo;
-                    outputLines.push(colorFunc(padText(statusIndicator, 12) + trimmed));
+                    outputLines.push(colorFunc(padText(isError ? '[ERROR]  ' : '[INFO]   ', 12) + trimmed));
                 }
             }
         });
 
         return {
-            diagnostics: diagnostics,
-            hasErrors: hasErrors,
-            outputLines: outputLines,
-            errorCount: errorCount,
-            warningCount: warningCount
+            diagnosticsByFile,
+            involvedFiles,
+            hasErrors,
+            outputLines,
+            errorCount,
+            warningCount
         };
-    }
-
-    /**
-     * Get the diagnostic collection
-     * @returns {vscode.DiagnosticCollection}
-     */
-    getCollection() {
-        return this.collection;
     }
 }
 
-/**
- * Helper function to pad text (from your existing code)
- */
 function padText(text, width, align = 'left') {
     const visibleLen = text.replace(/\x1b\[[0-9;]*m/g, '').length;
     const padding = width - visibleLen;
@@ -257,9 +293,9 @@ function padText(text, width, align = 'left') {
     switch (align) {
         case 'right': return spaces + text;
         case 'center':
-            const leftPad = Math.floor(padding / 2);
-            const rightPad = padding - leftPad;
-            return ' '.repeat(leftPad) + text + ' '.repeat(rightPad);
+            const lp = Math.floor(padding / 2);
+            const rp = padding - lp;
+            return ' '.repeat(lp) + text + ' '.repeat(rp);
         default: return text + spaces;
     }
 }
