@@ -53,6 +53,24 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "buraq-mql-sidebar",
+					"title": "Buraq MQL",
+					"icon": "mql-images/mql-icon.png"
+				}
+			]
+		},
+		"views": {
+			"buraq-mql-sidebar": [
+				{
+					"type": "webview",
+					"id": "buraq-mql-dashboard",
+					"name": "MQL Dashboard"
+				}
+			]
+		},
 		"configuration": {
 			"title": "Buraq MQL5 & MQL4",
 			"properties": {
@@ -408,6 +426,16 @@
 			{
 				"command": "buraq_mql5_mql4.compareCompiledFiles",
 				"title": "Compare Compiled Files",
+				"category": "MQL"
+			},
+			{
+				"command": "buraq_mql5_mql4.compileAllWorkspace",
+				"title": "Compile All MQL Files",
+				"category": "MQL"
+			},
+			{
+				"command": "buraq_mql5_mql4.compileMainFile",
+				"title": "Compile Main MQL File",
 				"category": "MQL"
 			}
 		],

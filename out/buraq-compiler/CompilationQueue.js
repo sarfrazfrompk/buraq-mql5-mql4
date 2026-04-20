@@ -6,14 +6,16 @@ const fs = require('fs');
 const pathModule = require('path');
 const { LogFileManager } = require('./LogFileManager');
 const { DiagnosticsManager } = require('./DiagnosticsManager');
+const EventEmitter = require('events');
 
 /**
  * CompilationQueue - Sequential compilation manager
  * Compiles files one by one, waiting for each to complete before proceeding
  * No timers, no race conditions, proper Promise-based completion
  */
-class CompilationQueue {
+class CompilationQueue extends EventEmitter {
     constructor(workspaceRoot, diagnosticsManager) {
+        super();
         this.workspaceRoot = workspaceRoot;
         this.diagnosticsManager = diagnosticsManager;
         this.logFileManager = new LogFileManager(workspaceRoot);
@@ -79,6 +81,9 @@ class CompilationQueue {
      */
     async processQueue() {
         if (this.isCompiling || this.queue.length === 0) {
+            if (this.queue.length === 0 && !this.isCompiling) {
+                this.emit('finished');
+            }
             return;
         }
 
@@ -88,6 +93,7 @@ class CompilationQueue {
         this.compilingSet.add(queueItem.filePath);
 
         console.log('[CompilationQueue] Processing:', queueItem.filePath);
+        this.emit('compiling', this.currentFile);
 
         try {
             const result = await this.compileFile(queueItem.filePath, queueItem.options);
@@ -112,6 +118,7 @@ class CompilationQueue {
                 setImmediate(() => this.processQueue());
             } else {
                 console.log('[CompilationQueue] Queue empty, compilation complete');
+                this.emit('finished');
             }
         }
     }

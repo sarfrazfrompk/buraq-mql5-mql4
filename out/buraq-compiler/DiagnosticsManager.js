@@ -32,8 +32,9 @@ class DiagnosticsManager {
             }
             this.dbPath = pathModule.join(vscodeDir, 'buraq-diagnostics.json');
             
-            // Initial load from DB to Problems panel
-            this.refreshFromDatabase();
+            // FRESH START: Clear database on load as requested
+            this.clearAll();
+            console.log('[DiagnosticsManager] Database cleared for fresh compilation');
         }
         
         console.log('[DiagnosticsManager] Initialized with aggregated persistent DB:', this.dbPath);

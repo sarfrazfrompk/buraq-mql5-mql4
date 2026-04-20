@@ -102,6 +102,8 @@ const outputChannel = null; // Using Pseudoterminal instead
 let buraqTerminal = null;
 let writeEmitter = null;
 let diagnosticsManager = null; // Single source of truth for diagnostics
+let dashboardProvider = null; // Dashboard UI provider
+let globalCompilationQueue = null; // Module-level queue instance
 
 function initializeBuraqTerminal() {
     if (!buraqTerminal) {
@@ -428,6 +430,7 @@ function runBackgroundCheck(document) {
                                 // Update diagnostics for THIS background check
                                 // The manager handles aggregation independently
                                 diagnosticsManager.setDiagnostics(filePath, log.diagnostics);
+                                if (dashboardProvider) dashboardProvider.update();
                             }
                             
                             // Log summary
@@ -948,21 +951,62 @@ function activate(context) {
     diagnosticsManager.initialize(context);
     console.log('[Buraq MQL] DiagnosticsManager initialized');
 
+    // Initialize Dashboard Provider
+    dashboardProvider = new (require('./MQLDashboardProvider'))(context.extensionUri, diagnosticsManager);
+    context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider('buraq-mql-dashboard', dashboardProvider)
+    );
+
     if (workspaceRoot) {
-        // Initialize CompilationQueue for sequential compilation
-        const compilationQueue = new CompilationQueue(workspaceRoot, diagnosticsManager);
+        // Initialize global CompilationQueue for sequential compilation
+        globalCompilationQueue = new CompilationQueue(workspaceRoot, diagnosticsManager);
+
+        // REAL-TIME DASHBOARD UPDATES: Listen to queue events
+        globalCompilationQueue.on('compiling', (file) => {
+            if (dashboardProvider) dashboardProvider.setCompiling(file);
+        });
+        globalCompilationQueue.on('finished', () => {
+            if (dashboardProvider) {
+                dashboardProvider.setCompiling(null);
+                dashboardProvider.update();
+            }
+        });
 
         // Initialize WorkspaceScanner for auto-compilation on activation
         const workspaceScanner = new WorkspaceScanner(workspaceRoot);
 
-        // Store in context for access by commands
+        // Store in context for access by other parts of the extension
         context.globalState.update('buraqCompilerInitialized', true);
-        context.workspaceState.update('compilationQueue', compilationQueue);
-        context.workspaceState.update('diagnosticsManager', diagnosticsManager);
         context.workspaceState.update('workspaceScanner', workspaceScanner);
 
+        // Register Dashboard-specific commands
+        context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.compileAllWorkspace', async () => {
+            if (globalCompilationQueue && workspaceRoot) {
+                const scanner = new WorkspaceScanner(workspaceRoot);
+                vscode.window.showInformationMessage('Compiling all MQL files in workspace...');
+                const files = await scanner.scan();
+                await globalCompilationQueue.enqueueAll(files, { checkOnly: false });
+                if (dashboardProvider) dashboardProvider.update();
+            }
+        }));
+
+        context.subscriptions.push(vscode.commands.registerCommand('buraq_mql5_mql4.compileMainFile', async () => {
+            if (globalCompilationQueue && workspaceRoot) {
+                // Search for the first .mq5 file in the root
+                const files = await vscode.workspace.findFiles('*.mq5', null, 1);
+                if (files.length > 0) {
+                    vscode.window.showInformationMessage(`Compiling main file: ${pathModule.basename(files[0].fsPath)}`);
+                    await globalCompilationQueue.enqueue(files[0].fsPath, { checkOnly: false });
+                    if (dashboardProvider) dashboardProvider.update();
+                } else {
+                    vscode.window.showErrorMessage('No .mq5 file found in the root of the workspace.');
+                    if (dashboardProvider) dashboardProvider.setCompiling(null);
+                }
+            }
+        }));
+
         // Auto-compile all MQL files on activation (sequential, respecting .buraqignore)
-        compileAllFilesOnActivation(workspaceScanner, compilationQueue);
+        compileAllFilesOnActivation(workspaceScanner, globalCompilationQueue, dashboardProvider);
     }
 
     const chartView = new ChartView(context);
@@ -1099,7 +1143,7 @@ function activate(context) {
  * Compile all MQL files on extension activation
  * Scans workspace, respects .buraqignore, compiles sequentially
  */
-async function compileAllFilesOnActivation(scanner, queue) {
+async function compileAllFilesOnActivation(scanner, queue, dashboard) {
     console.log('[Buraq MQL] Starting auto-compilation on activation...');
     
     try {
@@ -1122,6 +1166,9 @@ async function compileAllFilesOnActivation(scanner, queue) {
         
         const status = queue.getStatus();
         console.log('[Buraq MQL] Auto-compilation complete. Results:', status.resultsCount, 'files processed');
+        
+        // Update dashboard after auto-compilation
+        if (dashboard) dashboard.update();
         
     } catch (error) {
         console.error('[Buraq MQL] Error during auto-compilation:', error.message);

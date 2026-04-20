@@ -35,10 +35,29 @@
                 "settings": {
                     "foreground": "#6796E6"
                 }
+            },
+            {
+                "scope": "comment.line.double-slash.mql",
+                "settings": {
+                    "foreground": "#51ff00",
+                    "fontStyle": "italic"
+                }
+            },
+            {
+                "scope": "comment.block.mql",
+                "settings": {
+                    "foreground": "#51ff00",
+                    "fontStyle": "italic"
+                }
             }
         ]
     },
     "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
         "**/*.ex4": true,
         "**/*.ex5": true
     }
