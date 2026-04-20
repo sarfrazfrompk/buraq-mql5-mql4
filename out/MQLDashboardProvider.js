@@ -61,44 +61,53 @@ class MQLDashboardProvider {
     }
 
     _getStats() {
-        let totalErrors = 0;
-        let totalWarnings = 0;
-        let filesWithErrors = 0;
+        const uniqueErrors = new Set();
+        const uniqueWarnings = new Set();
+        const errorFiles = new Set();
         const reports = [];
 
         if (this._diagnosticsManager && this._diagnosticsManager.dbPath && fs.existsSync(this._diagnosticsManager.dbPath)) {
             try {
                 const db = JSON.parse(fs.readFileSync(this._diagnosticsManager.dbPath, 'utf8'));
                 const compiledSources = Object.keys(db);
-                const errorFiles = new Set();
                 
                 compiledSources.forEach(source => {
                     const errors = db[source];
+                    let sErr = 0;
+                    let sWarn = 0;
+
                     errors.forEach(err => {
+                        // Create a unique key to prevent double-counting shared header errors
+                        const key = `${err.file}:${err.range.start.line}:${err.range.start.character}:${err.severity}:${err.message}`;
+                        
+                        if (err.severity === 'Error') {
+                            uniqueErrors.add(key);
+                            sErr++;
+                        } else {
+                            uniqueWarnings.add(key);
+                            sWarn++;
+                        }
                         errorFiles.add(err.file);
-                        if (err.severity === 'Error') totalErrors++;
-                        else totalWarnings++;
                     });
 
                     reports.push({
                         source: path.basename(source),
                         fullPath: source,
-                        errorCount: errors.filter(e => e.severity === 'Error').length,
-                        warningCount: errors.filter(e => e.severity === 'Warning').length,
+                        errorCount: sErr,
+                        warningCount: sWarn,
                         time: new Date().toLocaleTimeString()
                     });
                 });
-
-                filesWithErrors = errorFiles.size;
             } catch (e) {
                 console.error('Error reading stats:', e);
             }
         }
 
         return {
-            totalErrors,
-            totalWarnings,
-            filesWithErrors,
+            totalErrors: uniqueErrors.size,
+            totalWarnings: uniqueWarnings.size,
+            totalProblems: uniqueErrors.size + uniqueWarnings.size,
+            filesWithErrors: errorFiles.size,
             reports: reports.slice(-10).reverse()
         };
     }
@@ -113,12 +122,14 @@ class MQLDashboardProvider {
                     body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); padding: 10px; overflow-x: hidden; }
                     .card { background: var(--vscode-sideBar-background); border: 1px solid var(--vscode-panel-border); padding: 15px; border-radius: 5px; margin-bottom: 15px; }
                     .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-                    .stat-item { text-align: center; padding: 10px; background: var(--vscode-editor-background); border-radius: 4px; }
+                    .stat-item { text-align: center; padding: 10px; background: var(--vscode-editor-background); border-radius: 4px; border: 1px solid transparent; }
                     .stat-value { font-size: 20px; font-weight: bold; display: block; }
                     .stat-label { font-size: 10px; opacity: 0.8; text-transform: uppercase; }
+                    .error-box { border-color: var(--vscode-errorForeground); }
+                    .warning-box { border-color: var(--vscode-charts-yellow); }
                     .error { color: var(--vscode-errorForeground); }
                     .warning { color: var(--vscode-charts-yellow); }
-                    .success { color: var(--vscode-charts-green); }
+                    .total { color: var(--vscode-foreground); opacity: 0.9; }
                     button { 
                         width: 100%; padding: 10px; margin-bottom: 8px; cursor: pointer;
                         background: var(--vscode-button-background); color: var(--vscode-button-foreground);
@@ -144,15 +155,22 @@ class MQLDashboardProvider {
                     .report-item:hover { background: var(--vscode-list-hoverBackground); }
                     .report-meta { opacity: 0.7; font-size: 10px; display: flex; justify-content: space-between; margin-top: 4px; }
                     #current-file { color: var(--vscode-focusBorder); word-break: break-all; font-family: monospace; }
+                    .badge { padding: 2px 5px; border-radius: 3px; font-size: 9px; font-weight: bold; }
+                    .badge-error { background: var(--vscode-errorForeground); color: white; }
+                    .badge-warn { background: var(--vscode-charts-yellow); color: black; }
                 </style>
             </head>
             <body>
                 <div class="stats-grid">
-                    <div class="stat-item">
+                    <div class="stat-item" style="grid-column: span 2; background: var(--vscode-sideBar-background); border: 1px solid var(--vscode-panel-border);">
+                        <span id="total-count" class="stat-value total">0</span>
+                        <span class="stat-label">Total Problems</span>
+                    </div>
+                    <div class="stat-item error-box">
                         <span id="err-count" class="stat-value error">0</span>
                         <span class="stat-label">Errors</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item warning-box">
                         <span id="warn-count" class="stat-value warning">0</span>
                         <span class="stat-label">Warnings</span>
                     </div>
@@ -200,28 +218,21 @@ class MQLDashboardProvider {
                             }
                         }
 
-                        // Attach listeners directly to avoid DOMContentLoaded races
-                        const setupButtons = () => {
+                        function init() {
                             const btnCompileAll = document.getElementById('compileAll');
                             const btnCompileMain = document.getElementById('compileMain');
                             const btnRefresh = document.getElementById('refresh');
 
-                            if (btnCompileAll) {
-                                btnCompileAll.onclick = () => {
-                                    setLoading('compileAll', true);
-                                    vscode.postMessage({ type: 'compileAll' });
-                                };
-                            }
-                            if (btnCompileMain) {
-                                btnCompileMain.onclick = () => {
-                                    setLoading('compileMain', true);
-                                    vscode.postMessage({ type: 'compileMain' });
-                                };
-                            }
-                            if (btnRefresh) {
-                                btnRefresh.onclick = () => vscode.postMessage({ type: 'refresh' });
-                            }
-                        };
+                            if (btnCompileAll) btnCompileAll.onclick = () => {
+                                setLoading('compileAll', true);
+                                vscode.postMessage({ type: 'compileAll' });
+                            };
+                            if (btnCompileMain) btnCompileMain.onclick = () => {
+                                setLoading('compileMain', true);
+                                vscode.postMessage({ type: 'compileMain' });
+                            };
+                            if (btnRefresh) btnRefresh.onclick = () => vscode.postMessage({ type: 'refresh' });
+                        }
 
                         window.addEventListener('message', event => {
                             const message = event.data;
@@ -229,6 +240,7 @@ class MQLDashboardProvider {
                                 const stats = message.stats;
                                 document.getElementById('err-count').textContent = stats.totalErrors;
                                 document.getElementById('warn-count').textContent = stats.totalWarnings;
+                                document.getElementById('total-count').textContent = stats.totalProblems;
                                 
                                 const list = document.getElementById('reports-list');
                                 if (stats.reports.length === 0) {
@@ -240,7 +252,10 @@ class MQLDashboardProvider {
                                             <div class="report-item" onclick="openFile('\${safePath}')">
                                                 <div>\${r.source}</div>
                                                 <div class="report-meta">
-                                                    <span class="\${r.errorCount > 0 ? 'error' : 'success'}">\${r.errorCount} Errors, \${r.warningCount} Warnings</span>
+                                                    <span>
+                                                        <span class="badge badge-error">\${r.errorCount} E</span>
+                                                        <span class="badge badge-warn">\${r.warningCount} W</span>
+                                                    </span>
                                                     <span>\${r.time}</span>
                                                 </div>
                                             </div>
@@ -255,7 +270,6 @@ class MQLDashboardProvider {
                                     fileName.textContent = message.fileName;
                                 } else {
                                     card.style.display = 'none';
-                                    // Reset loading states when compilation finishes
                                     setLoading('compileAll', false);
                                     setLoading('compileMain', false);
                                 }
@@ -266,8 +280,7 @@ class MQLDashboardProvider {
                             vscode.postMessage({ type: 'openFile', filePath: path });
                         };
 
-                        // Initialize
-                        setupButtons();
+                        init();
                     })();
                 </script>
             </body>
