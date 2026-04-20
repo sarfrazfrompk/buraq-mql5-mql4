@@ -22,16 +22,12 @@ class MQLDashboardProvider {
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
         webviewView.webview.onDidReceiveMessage(data => {
-            console.log('[MQLDashboardProvider] Received message:', data.type);
             switch (data.type) {
                 case 'compileAll':
                     vscode.commands.executeCommand('buraq_mql5_mql4.compileAllWorkspace');
                     break;
                 case 'compileMain':
                     vscode.commands.executeCommand('buraq_mql5_mql4.compileMainFile');
-                    break;
-                case 'refresh':
-                    this.update();
                     break;
                 case 'openFile':
                     if (data.filePath) {
@@ -63,39 +59,30 @@ class MQLDashboardProvider {
     _getStats() {
         const uniqueErrors = new Set();
         const uniqueWarnings = new Set();
-        const errorFiles = new Set();
-        const reports = [];
+        const fileIssueMap = new Map(); // Map<actualFilePath, {errors: Set, warnings: Set}>
 
         if (this._diagnosticsManager && this._diagnosticsManager.dbPath && fs.existsSync(this._diagnosticsManager.dbPath)) {
             try {
                 const db = JSON.parse(fs.readFileSync(this._diagnosticsManager.dbPath, 'utf8'));
-                const compiledSources = Object.keys(db);
                 
-                compiledSources.forEach(source => {
+                Object.keys(db).forEach(source => {
                     const errors = db[source];
-                    let sErr = 0;
-                    let sWarn = 0;
-
                     errors.forEach(err => {
-                        // Create a unique key to prevent double-counting shared header errors
-                        const key = `${err.file}:${err.range.start.line}:${err.range.start.character}:${err.severity}:${err.message}`;
+                        const filePath = err.file;
+                        const errorKey = `${filePath}:${err.range.start.line}:${err.range.start.character}:${err.severity}:${err.message}`;
                         
-                        if (err.severity === 'Error') {
-                            uniqueErrors.add(key);
-                            sErr++;
-                        } else {
-                            uniqueWarnings.add(key);
-                            sWarn++;
+                        if (!fileIssueMap.has(filePath)) {
+                            fileIssueMap.set(filePath, { errors: new Set(), warnings: new Set() });
                         }
-                        errorFiles.add(err.file);
-                    });
 
-                    reports.push({
-                        source: path.basename(source),
-                        fullPath: source,
-                        errorCount: sErr,
-                        warningCount: sWarn,
-                        time: new Date().toLocaleTimeString()
+                        const fileStats = fileIssueMap.get(filePath);
+                        if (err.severity === 'Error') {
+                            uniqueErrors.add(errorKey);
+                            fileStats.errors.add(errorKey);
+                        } else {
+                            uniqueWarnings.add(errorKey);
+                            fileStats.warnings.add(errorKey);
+                        }
                     });
                 });
             } catch (e) {
@@ -103,12 +90,31 @@ class MQLDashboardProvider {
             }
         }
 
+        const reports = [];
+        fileIssueMap.forEach((stats, filePath) => {
+            if (stats.errors.size > 0 || stats.warnings.size > 0) {
+                reports.push({
+                    source: path.basename(filePath),
+                    fullPath: filePath,
+                    errorCount: stats.errors.size,
+                    warningCount: stats.warnings.size,
+                    time: 'Active' // These are active issues
+                });
+            }
+        });
+
+        // Sort: Most errors first
+        reports.sort((a, b) => {
+            if (b.errorCount !== a.errorCount) return b.errorCount - a.errorCount;
+            return b.warningCount - a.warningCount;
+        });
+
         return {
             totalErrors: uniqueErrors.size,
             totalWarnings: uniqueWarnings.size,
             totalProblems: uniqueErrors.size + uniqueWarnings.size,
-            filesWithErrors: errorFiles.size,
-            reports: reports.slice(-10).reverse()
+            filesWithErrors: fileIssueMap.size,
+            reports: reports
         };
     }
 
@@ -119,86 +125,178 @@ class MQLDashboardProvider {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
-                    body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); padding: 10px; overflow-x: hidden; }
-                    .card { background: var(--vscode-sideBar-background); border: 1px solid var(--vscode-panel-border); padding: 15px; border-radius: 5px; margin-bottom: 15px; }
-                    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-                    .stat-item { text-align: center; padding: 10px; background: var(--vscode-editor-background); border-radius: 4px; border: 1px solid transparent; }
-                    .stat-value { font-size: 20px; font-weight: bold; display: block; }
-                    .stat-label { font-size: 10px; opacity: 0.8; text-transform: uppercase; }
-                    .error-box { border-color: var(--vscode-errorForeground); }
-                    .warning-box { border-color: var(--vscode-charts-yellow); }
-                    .error { color: var(--vscode-errorForeground); }
-                    .warning { color: var(--vscode-charts-yellow); }
-                    .total { color: var(--vscode-foreground); opacity: 0.9; }
-                    button { 
-                        width: 100%; padding: 10px; margin-bottom: 8px; cursor: pointer;
-                        background: var(--vscode-button-background); color: var(--vscode-button-foreground);
-                        border: none; border-radius: 2px; position: relative;
-                        transition: opacity 0.2s;
+                    :root {
+                        --container-padding: 12px;
+                        --card-radius: 6px;
+                    }
+                    body { 
+                        font-family: var(--vscode-font-family); 
+                        color: var(--vscode-foreground); 
+                        padding: var(--container-padding); 
+                        background-color: var(--vscode-sideBar-background);
+                        overflow-x: hidden;
+                        font-size: var(--vscode-font-size);
+                    }
+                    
+                    /* Stats Cards */
+                    .overview { margin-bottom: 20px; }
+                    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+                    
+                    .stat-card {
+                        background: var(--vscode-sideBarSectionHeader-background);
+                        padding: 12px;
+                        border-radius: var(--card-radius);
+                        border: 1px solid var(--vscode-panel-border);
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        transition: transform 0.1s;
+                    }
+                    
+                    .stat-card.wide { grid-column: span 2; padding: 15px; border-bottom: 3px solid var(--vscode-button-background); }
+                    .stat-card.error { border-bottom: 3px solid var(--vscode-errorForeground); }
+                    .stat-card.warning { border-bottom: 3px solid var(--vscode-charts-yellow); }
+                    
+                    .stat-value { font-size: 22px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+                    .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; }
+                    
+                    /* Compile Status */
+                    #compiling-card {
+                        background: var(--vscode-editor-background);
+                        border: 1px dashed var(--vscode-focusBorder);
+                        padding: 12px;
+                        border-radius: var(--card-radius);
+                        margin-bottom: 20px;
+                        animation: pulse 2s infinite ease-in-out;
+                    }
+                    @keyframes pulse {
+                        0% { opacity: 0.8; } 50% { opacity: 1; border-color: var(--vscode-button-background); } 100% { opacity: 0.8; }
+                    }
+                    
+                    .status-header { display: flex; align-items: center; gap: 8px; color: var(--vscode-focusBorder); margin-bottom: 6px; }
+                    .spinner-small { width: 12px; height: 12px; border: 2px solid var(--vscode-focusBorder); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+                    
+                    /* Buttons */
+                    .actions { margin-bottom: 24px; }
+                    .section-title { font-size: 11px; font-weight: 600; opacity: 0.6; margin-bottom: 10px; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+                    .section-title::after { content: ""; flex: 1; height: 1px; background: var(--vscode-panel-border); }
+                    
+                    button {
+                        width: 100%;
+                        padding: 8px 12px;
+                        margin-bottom: 8px;
+                        cursor: pointer;
+                        border: none;
+                        border-radius: var(--card-radius);
+                        background: var(--vscode-button-background);
+                        color: var(--vscode-button-foreground);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        gap: 8px;
+                        font-weight: 500;
+                        transition: filter 0.2s;
                     }
                     button:hover { background: var(--vscode-button-hoverBackground); }
                     button.secondary { background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); }
-                    button:disabled { opacity: 0.6; cursor: wait; }
+                    button.secondary:hover { background: var(--vscode-button-secondaryHoverBackground); }
+                    
+                    button:disabled { opacity: 0.6; cursor: not-allowed; }
                     .loading-spinner {
                         display: none;
-                        width: 12px; height: 12px;
-                        border: 2px solid rgba(255,255,255,0.3);
-                        border-top-color: #fff;
-                        border-radius: 50%;
+                        width: 14px; height: 14px;
+                        border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%;
                         animation: spin 0.8s linear infinite;
-                        position: absolute; right: 10px; top: 12px;
                     }
-                    button.loading .loading-spinner { display: inline-block; }
+                    button.loading .loading-spinner { display: block; }
+                    button.loading span { opacity: 0.7; }
+                    
                     @keyframes spin { to { transform: rotate(360deg); } }
-                    h3 { margin-top: 0; font-size: 14px; border-bottom: 1px solid var(--vscode-panel-border); padding-bottom: 5px; }
-                    .report-item { font-size: 12px; padding: 8px; border-bottom: 1px solid var(--vscode-panel-border); cursor: pointer; }
-                    .report-item:hover { background: var(--vscode-list-hoverBackground); }
-                    .report-meta { opacity: 0.7; font-size: 10px; display: flex; justify-content: space-between; margin-top: 4px; }
-                    #current-file { color: var(--vscode-focusBorder); word-break: break-all; font-family: monospace; }
-                    .badge { padding: 2px 5px; border-radius: 3px; font-size: 9px; font-weight: bold; }
-                    .badge-error { background: var(--vscode-errorForeground); color: white; }
-                    .badge-warn { background: var(--vscode-charts-yellow); color: black; }
+                    
+                    /* Reports List */
+                    .reports-container { max-height: 400px; overflow-y: auto; padding-right: 4px; }
+                    .report-item {
+                        background: var(--vscode-editor-background);
+                        padding: 14px 12px;
+                        border-radius: var(--card-radius);
+                        border: 1px solid var(--vscode-panel-border);
+                        margin-bottom: 10px;
+                        cursor: pointer;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 8px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                    }
+                    .report-item:hover { 
+                        border-color: var(--vscode-focusBorder); 
+                        background: var(--vscode-list-hoverBackground);
+                        transform: translateY(-1px);
+                    }
+                    
+                    .report-header { display: flex; justify-content: space-between; align-items: flex-start; }
+                    .file-name { font-weight: 600; font-size: 13px; color: var(--vscode-button-background); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+                    .report-time { font-size: 10px; opacity: 0.6; font-family: monospace; }
+                    
+                    .report-badges { display: flex; gap: 6px; margin-top: 2px; }
+                    .badge {
+                        padding: 1px 6px;
+                        border-radius: 10px;
+                        font-size: 9px;
+                        font-weight: 700;
+                        display: flex;
+                        align-items: center;
+                        gap: 3px;
+                    }
+                    .badge.error { background: var(--vscode-errorForeground); color: white; }
+                    .badge.warning { background: var(--vscode-charts-yellow); color: black; }
+                    .badge.success { background: var(--vscode-charts-green); color: white; }
+                    
+                    .empty-state { text-align: center; padding: 30px 10px; opacity: 0.4; font-size: 11px; font-style: italic; }
                 </style>
             </head>
             <body>
-                <div class="stats-grid">
-                    <div class="stat-item" style="grid-column: span 2; background: var(--vscode-sideBar-background); border: 1px solid var(--vscode-panel-border);">
-                        <span id="total-count" class="stat-value total">0</span>
-                        <span class="stat-label">Total Problems</span>
-                    </div>
-                    <div class="stat-item error-box">
-                        <span id="err-count" class="stat-value error">0</span>
-                        <span class="stat-label">Errors</span>
-                    </div>
-                    <div class="stat-item warning-box">
-                        <span id="warn-count" class="stat-value warning">0</span>
-                        <span class="stat-label">Warnings</span>
+                <div class="overview">
+                    <div class="section-title">Workspace Health</div>
+                    <div class="stats-grid">
+                        <div class="stat-card wide">
+                            <span id="total-count" class="stat-value">0</span>
+                            <span class="stat-label">Issues Found</span>
+                        </div>
+                        <div class="stat-card error">
+                            <span id="err-count" class="stat-value" style="color: var(--vscode-errorForeground)">0</span>
+                            <span class="stat-label">Errors</span>
+                        </div>
+                        <div class="stat-card warning">
+                            <span id="warn-count" class="stat-value" style="color: var(--vscode-charts-yellow)">0</span>
+                            <span class="stat-label">Warnings</span>
+                        </div>
                     </div>
                 </div>
 
-                <div id="compiling-card" class="card" style="display: none; border-color: var(--vscode-focusBorder);">
-                    <h3 style="color: var(--vscode-focusBorder);">⚡ Compiling...</h3>
-                    <div id="current-file" style="font-size: 11px; font-weight: bold;"></div>
-                    <div style="font-size: 9px; opacity: 0.8; margin-top: 5px;">Buraq is processing your files</div>
+                <div id="compiling-card" style="display: none;">
+                    <div class="status-header">
+                        <div class="spinner-small"></div>
+                        <span style="font-weight: 600; font-size: 12px;">Active Compilation</span>
+                    </div>
+                    <div id="current-file" style="font-family: monospace; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
                 </div>
 
-                <div class="card">
-                    <h3>Actions</h3>
+                <div class="actions">
+                    <div class="section-title">Commands</div>
                     <button id="compileMain">
-                        <span>Compile Main File (.mq5)</span>
                         <div class="loading-spinner"></div>
+                        <span>Build Main (.mq5)</span>
                     </button>
                     <button id="compileAll" class="secondary">
-                        <span>Compile All Files</span>
                         <div class="loading-spinner"></div>
+                        <span>Compile Workspace</span>
                     </button>
-                    <button id="refresh" class="secondary" style="font-size: 10px; padding: 4px;">Refresh Dashboard</button>
                 </div>
 
-                <div class="card">
-                    <h3>Recent Reports</h3>
-                    <div id="reports-list">
-                        <div style="opacity: 0.5; text-align: center; font-size: 11px; padding: 10px;">No recent compilations</div>
+                <div class="reports">
+                    <div class="section-title">Recent Activity</div>
+                    <div id="reports-list" class="reports-container">
+                        <div class="empty-state">No compilation history found</div>
                     </div>
                 </div>
 
@@ -219,19 +317,14 @@ class MQLDashboardProvider {
                         }
 
                         function init() {
-                            const btnCompileAll = document.getElementById('compileAll');
-                            const btnCompileMain = document.getElementById('compileMain');
-                            const btnRefresh = document.getElementById('refresh');
-
-                            if (btnCompileAll) btnCompileAll.onclick = () => {
+                            document.getElementById('compileAll').onclick = () => {
                                 setLoading('compileAll', true);
                                 vscode.postMessage({ type: 'compileAll' });
                             };
-                            if (btnCompileMain) btnCompileMain.onclick = () => {
+                            document.getElementById('compileMain').onclick = () => {
                                 setLoading('compileMain', true);
                                 vscode.postMessage({ type: 'compileMain' });
                             };
-                            if (btnRefresh) btnRefresh.onclick = () => vscode.postMessage({ type: 'refresh' });
                         }
 
                         window.addEventListener('message', event => {
@@ -244,20 +337,25 @@ class MQLDashboardProvider {
                                 
                                 const list = document.getElementById('reports-list');
                                 if (stats.reports.length === 0) {
-                                    list.innerHTML = '<div style="opacity: 0.5; text-align: center; font-size: 11px; padding: 10px;">No recent compilations</div>';
+                                    list.innerHTML = '<div class="empty-state">No compilation history found</div>';
                                 } else {
                                     list.innerHTML = stats.reports.map(r => {
                                         const safePath = r.fullPath.replace(/\\\\/g, '\\\\\\\\').replace(/'/g, "\\\\'");
+                                        let badgeHtml = '';
+                                        if (r.errorCount > 0 || r.warningCount > 0) {
+                                            if (r.errorCount > 0) badgeHtml += \`<span class="badge error">\${r.errorCount} E</span>\`;
+                                            if (r.warningCount > 0) badgeHtml += \`<span class="badge warning">\${r.warningCount} W</span>\`;
+                                        } else {
+                                            badgeHtml = \`<span class="badge success">CLEAN</span>\`;
+                                        }
+                                        
                                         return \`
                                             <div class="report-item" onclick="openFile('\${safePath}')">
-                                                <div>\${r.source}</div>
-                                                <div class="report-meta">
-                                                    <span>
-                                                        <span class="badge badge-error">\${r.errorCount} E</span>
-                                                        <span class="badge badge-warn">\${r.warningCount} W</span>
-                                                    </span>
-                                                    <span>\${r.time}</span>
+                                                <div class="report-header">
+                                                    <div class="file-name">\${r.source}</div>
+                                                    <div class="report-time">\${r.time}</div>
                                                 </div>
+                                                <div class="report-badges">\${badgeHtml}</div>
                                             </div>
                                         \`;
                                     }).join('');

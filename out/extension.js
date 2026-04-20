@@ -954,7 +954,11 @@ function activate(context) {
     // Initialize Dashboard Provider
     dashboardProvider = new (require('./MQLDashboardProvider'))(context.extensionUri, diagnosticsManager);
     context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider('buraq-mql-dashboard', dashboardProvider)
+        vscode.window.registerWebviewViewProvider('buraq-mql-dashboard', dashboardProvider, {
+            webviewOptions: {
+                retainContextWhenHidden: true
+            }
+        })
     );
 
     if (workspaceRoot) {
