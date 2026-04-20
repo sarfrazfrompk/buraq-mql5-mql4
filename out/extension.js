@@ -75,6 +75,102 @@ function colorizeDim(text) {
     return colorizeText(text, ANSI_COLORS.DIM);
 }
 
+// Helper to create a 24-bit color gradient (TrueColor) for terminal text
+function createGradientText(text, startRGB, endRGB) {
+    let result = '';
+    const steps = text.length;
+    for (let i = 0; i < steps; i++) {
+        // Linear interpolation for R, G, B
+        const r = Math.round(startRGB[0] + (endRGB[0] - startRGB[0]) * (i / (steps - 1 || 1)));
+        const g = Math.round(startRGB[1] + (endRGB[1] - startRGB[1]) * (i / (steps - 1 || 1)));
+        const b = Math.round(startRGB[2] + (endRGB[2] - startRGB[2]) * (i / (steps - 1 || 1)));
+        
+        // \x1b[38;2;<r>;<g>;<b>m for foreground color
+        result += `\x1b[38;2;${r};${g};${b}m${text[i]}`;
+    }
+    return result + ANSI_COLORS.RESET;
+}
+
+function writeModernHeader(extension, wn) {
+    if (buraqTerminal && writeEmitter) {
+        let label = 'Buraq MQL5';
+        if (extension === '.mq4' || (extension === '.mqh' && wn)) {
+            label = 'Buraq MQL4';
+        }
+        
+        // --- 3D BIG FONT DEFINITION ---
+        const BIG_FONT = {
+            'B': ['██████╗ ', '██╔══██╗', '██████╔╝', '██╔══██╗', '██████╔╝'],
+            'u': ['██╗   ██╗', '██║   ██║', '██║   ██║', '██║   ██║', '╚██████╔╝'],
+            'r': ['██████╗ ', '██╔══██╗', '██████╔╝', '██╔══██╗', '██║  ██║'],
+            'a': [' █████╗ ', '██╔══██╗', '███████║', '██╔══██║', '██║  ██║'],
+            'q': [' ██████╗ ', '██╔═══██╗', '██║   ██║', '██║   ██║', '╚██████╔╝'],
+            'M': ['███╗   ███╗', '████╗ ████║', '██╔████╔██║', '██║╚██╔╝██║', '██║ ╚═╝ ██║'],
+            'Q': [' ██████╗ ', '██╔═══██╗', '██║   ██║', '██║▄▄ ██║', '╚██████╔╝'],
+            'L': ['██╗     ', '██║     ', '██║     ', '██║     ', '███████╗'],
+            '4': ['██╗  ██╗', '██║  ██║', '███████║', '╚═══██║ ', '    ██║ '],
+            '5': ['███████╗', '██╔════╝', '███████╗', '╚════██║', '███████╗'],
+            ' ': ['    ', '    ', '    ', '    ', '    ']
+        };
+
+        const chars = label.split('');
+        const rows = 5;
+        let outputRows = ['', '', '', '', ''];
+        
+        // Assemble rows and calculate total width
+        let totalWidth = 0;
+        chars.forEach(char => {
+            const pattern = BIG_FONT[char] || BIG_FONT[' '];
+            pattern.forEach((line, i) => {
+                outputRows[i] += line + '  ';
+            });
+            totalWidth += pattern[0].length + 2;
+        });
+
+        // 24-bit Gradient Colors
+        const startRGB = [0, 162, 255]; // Blue
+        const endRGB = [255, 69, 58];   // Red
+        const shadowRGB = [60, 60, 60];  // Dark Gray for 3D depth
+
+        // Render with horizontal gradient and shadow
+        let renderedLines = [];
+        
+        // Add top padding
+        writeEmitter.fire('\r\n');
+
+        outputRows.forEach((row, rowIndex) => {
+            let rowContent = '';
+            for (let colIndex = 0; colIndex < row.length; colIndex++) {
+                const char = row[colIndex];
+                if (char === ' ') {
+                    rowContent += ' ';
+                    continue;
+                }
+
+                // Calculate color for this column
+                const ratio = colIndex / (row.length - 1 || 1);
+                const r = Math.round(startRGB[0] + (endRGB[0] - startRGB[0]) * ratio);
+                const g = Math.round(startRGB[1] + (endRGB[1] - startRGB[1]) * ratio);
+                const b = Math.round(startRGB[2] + (endRGB[2] - startRGB[2]) * ratio);
+                
+                // Colorize the character
+                rowContent += `\x1b[38;2;${r};${g};${b}m${char}`;
+            }
+            
+            // Add a simple 3D shadow offset to each row for depth
+            const shadowLine = `\x1b[38;2;${shadowRGB[0]};${shadowRGB[1]};${shadowRGB[2]};2m`; // Dim shadow
+            
+            // Center the entire block (terminal is 80 units wide)
+            const padding = Math.max(0, Math.floor((80 - row.length) / 2));
+            const centeredLine = ' '.repeat(padding) + rowContent + ANSI_COLORS.RESET;
+            writeEmitter.fire(centeredLine + '\r\n');
+        });
+
+        // Add bottom padding
+        writeEmitter.fire('\r\n');
+    }
+}
+
 // Status indicators for Buraq Terminal - Simplified for better alignment
 const STATUS = {
     ERROR: '[ERROR]  ',
@@ -243,7 +339,10 @@ async function Compile(rt) {
 
                 // Wait a moment after clearing before writing new content
                 setTimeout(() => {
-                    // Write header after clearing has completed
+                    // Write modern gradient header
+                    writeModernHeader(extension, wn);
+                    
+                    // Write execution details
                     writeSeparator();
                     writeFormattedLine(STATUS.INFO, `Starting ${teq}`, `[${time}]`);
                     writeFormattedLine(STATUS.STEP, `Target file`, fileName);
