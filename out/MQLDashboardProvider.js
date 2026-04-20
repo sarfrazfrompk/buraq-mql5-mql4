@@ -57,9 +57,9 @@ class MQLDashboardProvider {
     }
 
     _getStats() {
-        const uniqueErrors = new Set();
-        const uniqueWarnings = new Set();
-        const fileIssueMap = new Map(); // Map<actualFilePath, {errors: Set, warnings: Set}>
+        let totalErrors = 0;
+        let totalWarnings = 0;
+        const fileIssueMap = new Map(); // Map<actualFilePath, {errors: number, warnings: number}>
 
         if (this._diagnosticsManager && this._diagnosticsManager.dbPath && fs.existsSync(this._diagnosticsManager.dbPath)) {
             try {
@@ -67,21 +67,23 @@ class MQLDashboardProvider {
                 
                 Object.keys(db).forEach(source => {
                     const errors = db[source];
+                    if (!Array.isArray(errors)) return;
+
                     errors.forEach(err => {
                         const filePath = err.file;
-                        const errorKey = `${filePath}:${err.range.start.line}:${err.range.start.character}:${err.severity}:${err.message}`;
+                        // NO DE-DUPLICATION: Every entry in the DB contributes to the count
                         
                         if (!fileIssueMap.has(filePath)) {
-                            fileIssueMap.set(filePath, { errors: new Set(), warnings: new Set() });
+                            fileIssueMap.set(filePath, { errors: 0, warnings: 0 });
                         }
 
                         const fileStats = fileIssueMap.get(filePath);
                         if (err.severity === 'Error') {
-                            uniqueErrors.add(errorKey);
-                            fileStats.errors.add(errorKey);
+                            totalErrors++;
+                            fileStats.errors++;
                         } else {
-                            uniqueWarnings.add(errorKey);
-                            fileStats.warnings.add(errorKey);
+                            totalWarnings++;
+                            fileStats.warnings++;
                         }
                     });
                 });
@@ -92,13 +94,13 @@ class MQLDashboardProvider {
 
         const reports = [];
         fileIssueMap.forEach((stats, filePath) => {
-            if (stats.errors.size > 0 || stats.warnings.size > 0) {
+            if (stats.errors > 0 || stats.warnings > 0) {
                 reports.push({
                     source: path.basename(filePath),
                     fullPath: filePath,
-                    errorCount: stats.errors.size,
-                    warningCount: stats.warnings.size,
-                    time: 'Active' // These are active issues
+                    errorCount: stats.errors,
+                    warningCount: stats.warnings,
+                    time: 'Active'
                 });
             }
         });
@@ -110,13 +112,14 @@ class MQLDashboardProvider {
         });
 
         return {
-            totalErrors: uniqueErrors.size,
-            totalWarnings: uniqueWarnings.size,
-            totalProblems: uniqueErrors.size + uniqueWarnings.size,
+            totalErrors: totalErrors,
+            totalWarnings: totalWarnings,
+            totalProblems: totalErrors + totalWarnings,
             filesWithErrors: fileIssueMap.size,
             reports: reports
         };
     }
+
 
     _getHtmlForWebview(webview) {
         return `<!DOCTYPE html>

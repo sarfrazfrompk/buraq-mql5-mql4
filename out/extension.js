@@ -305,8 +305,8 @@ function Compile(rt) {
                             return vscode.window.showErrorMessage(`${lg['err_read_log']} ${err}`), resolve();
                         }
 
-                        // Parse the log
-                        const log = replaceLog(data, rt === 1 || rt === 2, path);
+                        // Parse the log using centralized DiagnosticsManager
+                        const log = diagnosticsManager.parseLog(data, path);
                         const end = new Date();
 
                         // Delete log file using centralized manager if available
@@ -318,16 +318,15 @@ function Compile(rt) {
                             });
                         }
 
-                        // Use the global diagnosticsManager to update Problems panel
+                        // Update persistent diagnostics database
                         if (diagnosticsManager) {
-                            // Update diagnostics for THIS compilation run
-                            // The manager will aggregate these with other runs in the persistent DB
-                            diagnosticsManager.setDiagnostics(path, log.diagnostics);
+                            diagnosticsManager.setDiagnostics(path, log.diagnosticsByFile);
                         }
 
                         switch (rt) {
-                            case 0: writeToTerminal(log.text); writeSeparator(); resolve(); break;
-                            case 1: writeToTerminal(log.text); writeSeparator(); resolve(); break;
+                            case 0: writeToTerminal(log.outputLines.join('\r\n')); writeSeparator(); resolve(); break;
+                            case 1: writeToTerminal(log.outputLines.join('\r\n')); writeSeparator(); resolve(); break;
+
                             case 2:
                                 if (!log.error) {
                                     let TimeClose = (Math.ceil((end - startT) * 0.01) * 100);
@@ -340,10 +339,11 @@ function Compile(rt) {
                                         writeSeparator();
                                         return resolve();
                                     }
-                                    writeToTerminal(log.text + '\n' + colorizeInfo(padText(STATUS.INFO, 12) + lg['info_log_compile']));
+                                    writeToTerminal(log.outputLines.join('\r\n') + '\r\n' + colorizeInfo(padText(STATUS.INFO, 12) + lg['info_log_compile']));
                                 } else {
-                                    writeToTerminal(log.text);
+                                    writeToTerminal(log.outputLines.join('\r\n'));
                                 }
+
                                 writeSeparator();
                                 resolve();
                                 break;
@@ -423,24 +423,21 @@ function runBackgroundCheck(document) {
                     fs.readFile(logFile, 'utf16le', (err, data) => {
                         if (!err && data) {
                             console.log('[Buraq MQL] Log data length:', data.length);
-                            const log = replaceLog(data, false, filePath);
+                            const log = diagnosticsManager.parseLog(data, filePath);
                             
                             // Use the global diagnosticsManager to update Problems panel
                             if (diagnosticsManager) {
-                                // Update diagnostics for THIS background check
-                                // The manager handles aggregation independently
-                                diagnosticsManager.setDiagnostics(filePath, log.diagnostics);
+                                diagnosticsManager.setDiagnostics(filePath, log.diagnosticsByFile);
                                 if (dashboardProvider) dashboardProvider.update();
                             }
                             
-                            // Log summary
-                            const compiledFileDiagnostics = (log.diagnostics && log.diagnostics.get(filePath)) || [];
-                            const errorCount = compiledFileDiagnostics.filter(d => d.severity === vscode.DiagnosticSeverity.Error).length;
-                            const warningCount = compiledFileDiagnostics.filter(d => d.severity === vscode.DiagnosticSeverity.Warning).length;
+                            // Log summary using accurate centralized counts
+                            const errorCount = log.errorCount;
+                            const warningCount = log.warningCount;
                             if (errorCount === 0 && warningCount === 0) {
                                 console.log('[Buraq MQL] ✓ No errors in', filePath);
                             } else {
-                                console.log('[Buraq MQL] ✗ Found', errorCount, 'errors and', warningCount, 'warnings in', filePath);
+                                console.log('[Buraq MQL] ✗ Found', errorCount, 'errors and', warningCount, 'warnings across all files during check of', filePath);
                             }
                         } else {
                             console.log('[Buraq MQL] Error reading log file:', err);
@@ -465,177 +462,7 @@ function runBackgroundCheck(document) {
 }
 
 
-function replaceLog(str, isFullCompile, sourceFilePath) {
-    let outputLines = [];
-    let obj_hover = {};
-    let hasErrors = false;
-    let errorCount = 0;
-    let warningCount = 0;
-    let diagnosticsMap = new Map(); // Map<filePath, Diagnostic[]>
-    let involvedFiles = new Set();
-    if (sourceFilePath) involvedFiles.add(sourceFilePath);
 
-    const lines = str.replace(/\u{FEFF}/gu, '').split('\n');
-
-    lines.forEach(item => {
-        const trimmed = item.trim();
-        if (!trimmed) return;
-
-        // Debug: Log ALL lines to understand log format
-        console.log('[Buraq MQL] LOG LINE:', trimmed.substring(0, 150));
-
-        // Handle compilation/checking info
-        if (trimmed.includes(': information: compiling') || trimmed.includes(': information: checking')) {
-            const action = isFullCompile ? 'compiling' : 'checking';
-            const mm = item.match(new RegExp(`(?<=${action}.).+'`, 'gi'));
-            const pm = item.match(/[a-z]:\\.+(?= :)/gi);
-
-            if (mm && pm) {
-                const name = mm[0].replace(/'/g, '');
-                const link = url.pathToFileURL(pm[0]).href;
-                Object.assign(obj_hover, { [name]: { ['link']: link } });
-                outputLines.push(colorizeInfo(padText(STATUS.STEP, 12) + name));
-                involvedFiles.add(pm[0]);
-            }
-        }
-        // Handle include files
-        else if (trimmed.includes(': information: including')) {
-            const mm = item.match(/(?<=information: including ).+'/gi);
-            const pm = item.match(/[a-z]:\\.+(?= :)/gi);
-
-            if (mm && pm) {
-                const name_icl = mm[0].replace(/'/g, '');
-                const link_icl = url.pathToFileURL(pm[0]).href;
-                Object.assign(obj_hover, { [name_icl]: { ['link']: link_icl } });
-                outputLines.push(colorizeDim(padText('  └─ Include', 12) + name_icl));
-                involvedFiles.add(pm[0]);
-            }
-        }
-        // Skip code generation messages
-        else if (trimmed.includes('information: generating code') || trimmed.includes('information: code generated')) {
-            return;
-        }
-        // Handle info messages
-        else if (trimmed.includes('information: info')) {
-            const mm = item.match(/(?<=information: ).+/gi);
-            const pm = item.match(/[a-z]:\\.+(?= :)/gi);
-
-            if (mm) {
-                const name_info = mm[0];
-                const link_info = pm ? url.pathToFileURL(pm[0]).href : '';
-                Object.assign(obj_hover, { [name_info]: { ['link']: link_info } });
-                outputLines.push(colorizeInfo(padText(STATUS.INFO, 12) + name_info));
-                if (pm) involvedFiles.add(pm[0]);
-            }
-        }
-        // Handle result summary
-        else if (trimmed.includes('Result:') || trimmed.includes(': information: result')) {
-            const ecMatch = item.match(/(\d+)\s+error/i);
-            const wcMatch = item.match(/(\d+)\s+warning/i);
-
-            errorCount = ecMatch ? parseInt(ecMatch[1]) : 0;
-            warningCount = wcMatch ? parseInt(wcMatch[1]) : 0;
-
-            outputLines.push(''); // Empty line before result
-
-            if (errorCount > 0) {
-                hasErrors = true;
-                outputLines.push(colorizeError(padText(STATUS.ERROR, 12) + `Compilation failed: ${errorCount} error(s), ${warningCount} warning(s)`));
-            } else if (warningCount > 0) {
-                outputLines.push(colorizeWarning(padText(STATUS.WARNING, 12) + `Compilation completed with ${warningCount} warning(s)`));
-            } else {
-                outputLines.push(colorizeSuccess(padText(STATUS.SUCCESS, 12) + 'Compilation successful - no errors or warnings'));
-            }
-        }
-        // Handle errors and warnings
-        // MetaEditor format: FilePath(line,col) : error NNN: message
-        else {
-            // Regex to match: D:\path\file.mq5(7,1) : error 149: message
-            const errorRegex = /^(.+)\((\d+),(\d+)\)\s*:\s*(error|warning)\s+(\d+):\s*(.+)$/i;
-            const match = trimmed.match(errorRegex);
-
-            if (match) {
-                const filePath = match[1].trim();
-                const lineNum = parseInt(match[2]);
-                const colNum = parseInt(match[3]);
-                const errType = match[4].toLowerCase(); // 'error' or 'warning'
-                const errCode = match[5];
-                const errMessage = match[6].trim();
-
-                const isError = errType === 'error';
-                const posStr = `(${lineNum},${colNum})`;
-                const fullMessage = `${errType} ${errCode}: ${errMessage}`;
-
-                console.log('[Buraq MQL] Matched error:', filePath, 'line:', lineNum, 'col:', colNum, 'msg:', errMessage);
-
-                // Add to hover info
-                const key = fullMessage + ' ' + posStr;
-                const href = url.pathToFileURL(filePath).href + '#' + lineNum + ',' + colNum;
-                Object.assign(obj_hover, { [key]: { ['link']: href, ['number']: errCode } });
-
-                // Add to terminal output
-                const statusIndicator = isError ? STATUS.ERROR : STATUS.WARNING;
-                const colorFunc = isError ? colorizeError : colorizeWarning;
-                outputLines.push(colorFunc(padText(statusIndicator, 12) + fullMessage + ' ' + posStr));
-
-                // Build diagnostic for Problems panel
-                if (filePath) {
-                    // Normalize the file path (handle both forward and backward slashes)
-                    const normalizedPath = filePath.replace(/\//g, '\\');
-                    const altPath = filePath.replace(/\\/g, '/');
-                    
-                    // Try to find the file with different path formats
-                    let actualPath = null;
-                    if (fs.existsSync(normalizedPath)) {
-                        actualPath = normalizedPath;
-                    } else if (fs.existsSync(altPath)) {
-                        actualPath = altPath;
-                    } else if (fs.existsSync(filePath)) {
-                        actualPath = filePath;
-                    }
-                    
-                    if (actualPath) {
-                        involvedFiles.add(actualPath);
-                        const line = Math.max(0, lineNum - 1);
-                        const col = Math.max(0, colNum - 1);
-                        const range = new vscode.Range(line, col, line, col + 100); // Extend range to highlight more
-                        const severity = isError ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning;
-                        const diagnostic = new vscode.Diagnostic(range, errMessage, severity);
-                        diagnostic.source = 'Buraq Compiler';
-                        diagnostic.code = errCode;
-
-                        if (!diagnosticsMap.has(actualPath)) {
-                            diagnosticsMap.set(actualPath, []);
-                        }
-                        diagnosticsMap.get(actualPath).push(diagnostic);
-                        console.log('[Buraq MQL] Added diagnostic:', errMessage, 'at line', line, 'col', col, 'for file:', actualPath);
-                    } else {
-                        console.log('[Buraq MQL] File not found (tried multiple paths):', filePath, normalizedPath, altPath);
-                    }
-                } else {
-                    console.log('[Buraq MQL] No file path in error message');
-                }
-            } else {
-                // Fallback for other message formats
-                const name_res = trimmed;
-                if (name_res && !name_res.includes(': information:')) {
-                    const isError = name_res.toLowerCase().includes('error');
-                    const statusIndicator = isError ? STATUS.ERROR : STATUS.INFO;
-                    const colorFunc = isError ? colorizeError : colorizeInfo;
-                    outputLines.push(colorFunc(padText(statusIndicator, 12) + name_res));
-                }
-            }
-        }
-    });
-
-    exports.obj_hover = obj_hover;
-    return {
-        text: outputLines.join('\r\n'),
-        error: hasErrors,
-        diagnostics: diagnosticsMap,
-        involvedFiles: involvedFiles
-    };
-}
 
 
 function FindParentFile() {

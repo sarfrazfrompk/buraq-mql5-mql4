@@ -41,6 +41,21 @@ class DiagnosticsManager {
     }
 
     /**
+     * Get the canonical form of a file path (resolves casing on Windows)
+     * @param {string} filePath 
+     * @returns {string}
+     */
+    getCanonicalPath(filePath) {
+        if (!filePath) return filePath;
+        try {
+            return vscode.Uri.file(filePath).fsPath;
+        } catch (e) {
+            return filePath;
+        }
+    }
+
+
+    /**
      * Refresh the Problems panel by aggregating all errors from the JSON database
      */
     refreshFromDatabase() {
@@ -78,17 +93,9 @@ class DiagnosticsManager {
                     diag.source = 'Buraq Compiler';
                     diag.code = err.code;
                     
-                    // Simple de-duplication: check if same error already exists for this file from another compilation
-                    const existing = aggregated.get(targetFile);
-                    const isDuplicate = existing.some(e => 
-                        e.message === diag.message && 
-                        e.range.isEqual(diag.range) && 
-                        e.severity === diag.severity
-                    );
-                    
-                    if (!isDuplicate) {
-                        existing.push(diag);
-                    }
+                    // MOVED: No de-duplication as per user request to match compiler exactly
+                    aggregated.get(targetFile).push(diag);
+
                 });
             });
             
@@ -110,7 +117,9 @@ class DiagnosticsManager {
      * @param {Map<string, vscode.Diagnostic[]>} diagnosticsByFile - Map of actual file -> diagnostics
      */
     setDiagnostics(sourceFilePath, diagnosticsByFile) {
-        if (!sourceFilePath || !this.dbPath) return;
+        const canonicalSource = this.getCanonicalPath(sourceFilePath);
+        if (!canonicalSource || !this.dbPath) return;
+
 
         // 1. Read the DB
         let db = {};
@@ -124,9 +133,11 @@ class DiagnosticsManager {
         const serializableErrors = [];
         if (diagnosticsByFile && diagnosticsByFile.size > 0) {
             diagnosticsByFile.forEach((diagnostics, actualFile) => {
+                const canonicalActual = this.getCanonicalPath(actualFile);
                 diagnostics.forEach(d => {
                     serializableErrors.push({
-                        file: actualFile,
+                        file: canonicalActual,
+
                         message: d.message,
                         range: {
                             start: { line: d.range.start.line, character: d.range.start.character },
@@ -141,11 +152,12 @@ class DiagnosticsManager {
 
         // 3. Update the entry for this specific source file
         if (serializableErrors.length > 0) {
-            db[sourceFilePath] = serializableErrors;
+            db[canonicalSource] = serializableErrors;
         } else {
             // If compilation is clean, remove its entry entirely
-            delete db[sourceFilePath];
+            delete db[canonicalSource];
         }
+
 
         // 4. Save back to DB
         try {
@@ -219,19 +231,11 @@ class DiagnosticsManager {
             }
 
             if (trimmed.includes('Result:') || trimmed.includes(': information: result')) {
-                const ecMatch = item.match(/(\d+)\s+error/i);
-                const wcMatch = item.match(/(\d+)\s+warning/i);
-                errorCount = ecMatch ? parseInt(ecMatch[1]) : 0;
-                warningCount = wcMatch ? parseInt(wcMatch[1]) : 0;
                 outputLines.push('');
-                if (errorCount > 0) {
-                    hasErrors = true;
-                    outputLines.push(colorizeError(`[ERROR]   Compilation failed: ${errorCount} error(s), ${warningCount} warning(s)`));
-                } else if (warningCount > 0) {
-                    outputLines.push(colorizeWarning(`[WARNING] Compilation completed with ${warningCount} warning(s)`));
-                } else {
-                    outputLines.push(colorizeSuccess('[SUCCESS] Compilation successful - no errors or warnings'));
-                }
+                // Note: We ignore the counts from the Result line as per user request to use our own manual count
+                // Final summary output will be added at the end of parseLog instead of here if needed,
+                // or we just let the caller handle it. For now, we'll keep the logic that builds outputLines.
+
             } else {
                 const errorRegex = /^(.+)\((\d+),(\d+)\)\s*:\s*(error|warning)\s+(\d+):\s*(.+)$/i;
                 const match = trimmed.match(errorRegex);
@@ -249,12 +253,22 @@ class DiagnosticsManager {
                     const colorFunc = isError ? colorizeError : colorizeWarning;
                     outputLines.push(colorFunc(padText(statusIndicator, 12) + `${errType} ${errCode}: ${errMessage} (${lineNum},${colNum})`));
 
+                    // Manual counting as requested by user
+                    if (isError) {
+                        errorCount++;
+                    } else {
+                        warningCount++;
+                    }
+
+
                     if (filePath) {
                         const normalizedPath = filePath.replace(/\//g, '\\');
-                        let actualPath = fs.existsSync(normalizedPath) ? normalizedPath : (fs.existsSync(filePath) ? filePath : null);
+                        let resolvedPath = fs.existsSync(normalizedPath) ? normalizedPath : (fs.existsSync(filePath) ? filePath : null);
 
-                        if (actualPath) {
+                        if (resolvedPath) {
+                            const actualPath = this.getCanonicalPath(resolvedPath);
                             involvedFiles.add(actualPath);
+
                             const line = Math.max(0, lineNum - 1);
                             const col = Math.max(0, colNum - 1);
                             const range = new vscode.Range(line, col, line, col + 100);
@@ -275,6 +289,19 @@ class DiagnosticsManager {
             }
         });
 
+        // Determine overall success based on manual counts
+        hasErrors = errorCount > 0;
+
+        // Post-process outputLines to add the manual summary at the end for consistent terminal output
+        if (hasErrors) {
+            outputLines.push(colorizeError(padText('[ERROR]  ', 12) + `Compilation failed: ${errorCount} error(s), ${warningCount} warning(s)`));
+        } else if (warningCount > 0) {
+            outputLines.push(colorizeWarning(padText('[WARNING]', 12) + `Compilation completed with ${warningCount} warning(s)`));
+        } else {
+            outputLines.push(colorizeSuccess(padText('[SUCCESS]', 12) + 'Compilation successful - no errors or warnings'));
+        }
+
+
         return {
             diagnosticsByFile,
             involvedFiles,
@@ -283,6 +310,7 @@ class DiagnosticsManager {
             errorCount,
             warningCount
         };
+
     }
 }
 
