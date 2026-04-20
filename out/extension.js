@@ -179,11 +179,11 @@ catch (error) {
     lg = require('../landes.json');
 }
 
-function Compile(rt) {
+async function Compile(rt) {
     initializeBuraqTerminal();
 
     // CRITICAL: Clear terminal FIRST and wait for it to complete
-    clearTerminalCompletely();
+    await clearTerminalCompletely();
 
     FixFormatting();
     vscode.commands.executeCommand('workbench.action.files.saveAll');
@@ -200,18 +200,16 @@ function Compile(rt) {
 
     let logFile, command, MetaDir, incDir, CommM, CommI, teq, includefile, log;
 
-    if (extension === '.mq4' || extension === '.mqh' && wn && rt === 0) {
+    if (extension === '.mq4' || (extension === '.mqh' && wn)) {
         MetaDir = resolveMetaEditorPath(4, config.Metaeditor.Metaeditor4Dir);
         incDir = config.Metaeditor.Include4Dir;
         CommM = lg['path_editor4'];
         CommI = lg['path_include_4'];
-    } else if (extension === '.mq5' || extension === '.mqh' && !wn && rt === 0) {
+    } else if (extension === '.mq5' || (extension === '.mqh' && !wn)) {
         MetaDir = resolveMetaEditorPath(5, config.Metaeditor.Metaeditor5Dir);
         incDir = config.Metaeditor.Include5Dir;
         CommM = lg['path_editor5'];
         CommI = lg['path_include_5'];
-    } else if (extension === '.mqh' && rt !== 0) {
-        return vscode.window.showWarningMessage(lg['mqh']);
     } else {
         return undefined;
     }
@@ -350,7 +348,7 @@ function Compile(rt) {
                         }
                     });
                     sleep(30000).then(() => { resolve(); });
-                }, 50); // Wait 50ms after clearing before writing new content
+                }, 150); // Wait 150ms after clearing before writing new content (increased for reliability)
             });
         }
     );
@@ -545,15 +543,22 @@ function writeSeparator() {
     }
 }
 
-function clearTerminalCompletely() {
+async function clearTerminalCompletely() {
     if (buraqTerminal && writeEmitter) {
         try {
+            // Small delay to ensure terminal is ready if it was just initialized
+            await sleep(50);
+            
             // Use the most comprehensive clear sequence
             // \x1b[3J - Clear scrollback buffer
             // \x1b[2J - Clear entire screen
             // \x1b[H - Move cursor to home (1,1)
             // \x1b[0m - Reset all attributes
-            writeEmitter.fire('\x1b[3J\x1b[2J\x1b[H\x1b[0m');
+            // \x1bc - Reset terminal (RIS)
+            writeEmitter.fire('\x1b[3J\x1b[2J\x1b[H\x1b[0m\x1bc');
+            
+            // Wait a moment for reset to process
+            await sleep(50);
         } catch (e) {
             // If clearing fails, try to recreate the terminal
             if (buraqTerminal) {
@@ -577,7 +582,9 @@ function clearTerminalCompletely() {
             initializeBuraqTerminal();
             if (writeEmitter) {
                 try {
-                    writeEmitter.fire('\x1b[3J\x1b[2J\x1b[H\x1b[0m');
+                    await sleep(50);
+                    writeEmitter.fire('\x1b[3J\x1b[2J\x1b[H\x1b[0m\x1bc');
+                    await sleep(50);
                 } catch (retryError) {
                     // Final fallback - just continue
                 }

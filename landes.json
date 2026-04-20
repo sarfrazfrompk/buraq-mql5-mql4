@@ -6,7 +6,7 @@
     "path_editor5": "Invalid path to \"metaeditor.exe\": MQL5",
     "path_include_4": "Invalid path to 'Include': MQL4",
     "path_include_5": "Invalid path to 'Include': MQL5",
-    "mqh": "To compilation, you need to write in the first line \"mqh\" of the document, the name of the \"mql\" file. Example: //###<Experts/Examples/MACD Sample.mq5>",
+    "mqh": "MQL header files (.mqh) cannot be compiled directly. Only .mq4 or .mq5 files are compilable. To verify your code, you can perform a syntax check by clicking the ✔ (tick) button in the editor title bar.",
     "editor64": "Error transferring data to MetaEditor!!! \n[Warning] Perhaps you need to replace",
     "editor64to": "to",
     "err_read_log": "Error reading log file.",
