@@ -10,11 +10,14 @@ const { WorkspaceScanner } = require('./WorkspaceScanner');
 const { LogFileManager } = require('./LogFileManager');
 const { DiagnosticsManager } = require('./DiagnosticsManager');
 const { CompilationQueue } = require('./CompilationQueue');
+const { resolveMetaEditorPath, compileFileCore } = require('./compilerCore');
 
 module.exports = {
     BuraqIgnoreParser,
     WorkspaceScanner,
     LogFileManager,
     DiagnosticsManager,
-    CompilationQueue
+    CompilationQueue,
+    resolveMetaEditorPath,
+    compileFileCore
 };

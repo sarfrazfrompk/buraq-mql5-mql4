@@ -6,6 +6,7 @@ const fs = require('fs');
 const pathModule = require('path');
 const sleep = require('util').promisify(setTimeout);
 const language = vscode.env.language;
+const { compileFileCore } = require('./buraq-compiler/compilerCore');
 
 // ANSI Color codes for Buraq Terminal
 const ANSI_COLORS = {
@@ -286,172 +287,49 @@ async function Compile(rt) {
 
     FixFormatting();
     vscode.commands.executeCommand('workbench.action.files.saveAll');
-    const NameFileMQL = rt != 0 ? FindParentFile() : '',
-        path = NameFileMQL != undefined ? (fs.existsSync(NameFileMQL) ? NameFileMQL : vscode.window.activeTextEditor.document.fileName) : vscode.window.activeTextEditor.document.fileName,
-        config = vscode.workspace.getConfiguration('buraq_mql5_mql4'),
-        fileName = pathModule.basename(path),
-        extension = pathModule.extname(path),
-        PathScript = pathModule.join(__dirname, '../', 'mql-files', 'BuraqCompiler.exe'),
-        logDir = config.LogFile.NameLog, Timemini = config.Script.Timetomini,
-        mme = config.Script.MiniME, cme = config.Script.CloseME,
-        wn = vscode.workspace.name.includes('MQL4'), startT = new Date(),
-        time = `${tf(startT, 'h')}:${tf(startT, 'm')}:${tf(startT, 's')}`;
-
-    let logFile, command, MetaDir, incDir, CommM, CommI, teq, includefile, log;
-
-    if (extension === '.mq4' || (extension === '.mqh' && wn)) {
-        MetaDir = resolveMetaEditorPath(4, config.Metaeditor.Metaeditor4Dir);
-        incDir = config.Metaeditor.Include4Dir;
-        CommM = lg['path_editor4'];
-        CommI = lg['path_include_4'];
-    } else if (extension === '.mq5' || (extension === '.mqh' && !wn)) {
-        MetaDir = resolveMetaEditorPath(5, config.Metaeditor.Metaeditor5Dir);
-        incDir = config.Metaeditor.Include5Dir;
-        CommM = lg['path_editor5'];
-        CommI = lg['path_include_5'];
-    } else {
-        return undefined;
-    }
-
-    // Use centralized LogFileManager to create log in .vscode/temp
+    
+    const activeEditor = vscode.window.activeTextEditor;
+    if (!activeEditor) return;
+    
+    const filePath = activeEditor.document.fileName;
     const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     let logFileManager = null;
     if (workspaceRoot) {
         logFileManager = new (require('./buraq-compiler').LogFileManager)(workspaceRoot);
     }
 
-    vscode.window.withProgress(
+    const logger = {
+        initializeTerminal: initializeBuraqTerminal,
+        clearTerminal: clearTerminalCompletely,
+        writeModernHeader: writeModernHeader,
+        writeSeparator: writeSeparator,
+        writeFormattedLine: writeFormattedLine,
+        writeToTerminal: writeToTerminal
+    };
+
+    return vscode.window.withProgress(
         {
             location: vscode.ProgressLocation.Window,
             title: `Buraq MQL5 & MQL4: ${rt === 0 ? lg['checking'] : lg['compiling']}`,
         },
-        () => {
-            return new Promise((resolve) => {
-
-                switch (rt) {
-                    case 0: teq = lg['checking'];
-                        break;
-                    case 1: teq = lg['compiling'];
-                        break;
-                    case 2: teq = lg['comp_usi_script'];
-                        break;
-                }
-
-                // Wait a moment after clearing before writing new content
-                setTimeout(() => {
-                    // Write modern gradient header
-                    writeModernHeader(extension, wn);
-                    
-                    // Write execution details
-                    writeSeparator();
-                    writeFormattedLine(STATUS.INFO, `Starting ${teq}`, `[${time}]`);
-                    writeFormattedLine(STATUS.STEP, `Target file`, fileName);
-                    writeSeparator();
-
-                    const Nm = pathModule.basename(MetaDir), Pm = pathModule.dirname(MetaDir);
-
-                    if (!(MetaDir && fs.existsSync(MetaDir))) {
-                        writeFormattedLine(STATUS.ERROR, CommM, '');
-                        writeFormattedLine(STATUS.ERROR, `Path not found`, MetaDir);
-                        writeSeparator();
-                        return resolve();
-                    }
-
-                    if (incDir.length) {
-                        if (!fs.existsSync(incDir)) {
-                            writeFormattedLine(STATUS.ERROR, CommI, '');
-                            writeFormattedLine(STATUS.ERROR, `Path not found`, incDir);
-                            writeSeparator();
-                            return resolve();
-                        } else {
-                            includefile = ` /include:"${incDir}"`;
-                        }
-                    } else {
-                        includefile = '';
-                    }
-
-                    // Use centralized log file manager if available, otherwise use old logic
-                    if (logFileManager) {
-                        logFile = logFileManager.getLogPath(path);
-                        console.log('[Buraq MQL] Using centralized log path:', logFile);
-                    } else if (logDir.length) {
-                        if (pathModule.extname(logDir) === '.log') {
-                            logFile = path.replace(fileName, logDir);
-                        } else {
-                            logFile = path.replace(fileName, logDir + '.log');
-                        }
-                    } else {
-                        logFile = path.replace(fileName, fileName.match(/.+(?=\.)/) + '.log');
-                    }
-
-                    command = `"${MetaDir}" /compile:"${path}"${includefile}${rt === 1 || (rt === 2 && cme) ? '' : ' /s'} /log:"${logFile}"`;
-
-                    childProcess.exec(command, (err, stdout, stderror) => {
-
-                        if (stderror) {
-                            writeFormattedLine(STATUS.ERROR, lg['editor64'], CommM);
-                            writeFormattedLine(STATUS.ERROR, `Current path`, MetaDir);
-                            writeFormattedLine(STATUS.WARNING, lg['editor64to'], '');
-                            writeFormattedLine(STATUS.INFO, `Suggested path`, `${Pm}\\${(Nm === 'metaeditor.exe' ? 'metaeditor64.exe' : 'metaeditor.exe')}`);
-                            writeSeparator();
-                            return resolve();
-                        }
-
-                        try {
-                            var data = fs.readFileSync(logFile, 'utf16le');
-                        } catch (err) {
-                            writeFormattedLine(STATUS.ERROR, lg['err_read_log'], String(err));
-                            writeSeparator();
-                            return vscode.window.showErrorMessage(`${lg['err_read_log']} ${err}`), resolve();
-                        }
-
-                        // Parse the log using centralized DiagnosticsManager
-                        const log = diagnosticsManager.parseLog(data, path);
-                        const end = new Date();
-
-                        // Delete log file using centralized manager if available
-                        if (logFileManager && config.LogFile.DeleteLog !== false) {
-                            logFileManager.deleteLogSync(logFile);
-                        } else if (config.LogFile.DeleteLog) {
-                            fs.unlink(logFile, (err) => {
-                                err && vscode.window.showErrorMessage(lg['err_remove_log']);
-                            });
-                        }
-
-                        // Update persistent diagnostics database
-                        if (diagnosticsManager) {
-                            diagnosticsManager.setDiagnostics(path, log.diagnosticsByFile);
-                        }
-
-                        switch (rt) {
-                            case 0: writeToTerminal(log.outputLines.join('\r\n')); writeSeparator(); resolve(); break;
-                            case 1: writeToTerminal(log.outputLines.join('\r\n')); writeSeparator(); resolve(); break;
-
-                            case 2:
-                                if (!log.error) {
-                                    let TimeClose = (Math.ceil((end - startT) * 0.01) * 100);
-                                    command = `"${PathScript}" "${MetaDir}" "${path}" ${mme ? 1 : 0} ${Timemini} ${cme ? 1 : 0} ${TimeClose} ${Nm}`;
-                                    try {
-                                        childProcess.exec(command);
-                                    }
-                                    catch (error) {
-                                        writeFormattedLine(STATUS.ERROR, lg['err_start_script'], '');
-                                        writeSeparator();
-                                        return resolve();
-                                    }
-                                    writeToTerminal(log.outputLines.join('\r\n') + '\r\n' + colorizeInfo(padText(STATUS.INFO, 12) + lg['info_log_compile']));
-                                } else {
-                                    writeToTerminal(log.outputLines.join('\r\n'));
-                                }
-
-                                writeSeparator();
-                                resolve();
-                                break;
-                        }
-                    });
-                    sleep(30000).then(() => { resolve(); });
-                }, 150); // Wait 150ms after clearing before writing new content (increased for reliability)
-            });
+        async () => {
+            try {
+                // Wait 150ms after clearing/formatting before starting compilation
+                await sleep(150);
+                
+                await compileFileCore(
+                    filePath,
+                    rt,
+                    {
+                        logger,
+                        parentFileSearch: true
+                    },
+                    diagnosticsManager,
+                    logFileManager
+                );
+            } catch (error) {
+                console.error('[Buraq MQL] Unified compile failed:', error);
+            }
         }
     );
 }
@@ -470,32 +348,9 @@ function runBackgroundCheck(document) {
         clearTimeout(backgroundCheckTimer);
     }
 
-    backgroundCheckTimer = setTimeout(() => {
+    backgroundCheckTimer = setTimeout(async () => {
         const filePath = document.fileName;
-        const extension = pathModule.extname(filePath).toLowerCase();
-        const config = vscode.workspace.getConfiguration('buraq_mql5_mql4');
-        const wn = vscode.workspace.name ? vscode.workspace.name.includes('MQL4') : false;
-
-        console.log('[Buraq MQL] File extension:', extension);
-
-        let MetaDir;
-        if (extension === '.mq4' || (extension === '.mqh' && wn)) {
-            MetaDir = resolveMetaEditorPath(4, config.Metaeditor.Metaeditor4Dir);
-        } else if (extension === '.mq5' || (extension === '.mqh' && !wn)) {
-            MetaDir = resolveMetaEditorPath(5, config.Metaeditor.Metaeditor5Dir);
-        } else {
-            console.log('[Buraq MQL] Not an MQL file, skipping');
-            return;
-        }
-
-        console.log('[Buraq MQL] MetaEditor path:', MetaDir);
-
-        if (!MetaDir || !fs.existsSync(MetaDir)) {
-            console.log('[Buraq MQL] MetaEditor not found at:', MetaDir);
-            return;
-        }
-
-        // Use centralized LogFileManager to create log in .vscode/temp
+        
         if (!backgroundLogManager) {
             const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
             if (workspaceRoot) {
@@ -503,62 +358,22 @@ function runBackgroundCheck(document) {
             }
         }
 
-        const fileName = pathModule.basename(filePath);
-        const logFile = backgroundLogManager
-            ? backgroundLogManager.getLogPath(filePath)
-            : pathModule.join(pathModule.dirname(filePath), fileName.replace(/\.(mq4|mq5|mqh)$/i, '.log'));
-
-        // Build MetaEditor command for syntax check (silent mode)
-        const command = `"${MetaDir}" /s /compile:"${filePath}" /log:"${logFile}"`;
-        console.log('[Buraq MQL] Running command:', command);
-        console.log('[Buraq MQL] Log file path:', logFile);
-
-        childProcess.exec(command, { windowsHide: true }, (error, stdout, stderr) => {
-            console.log('[Buraq MQL] Compilation finished, error:', error ? error.message : 'none');
-            // Read log file after compilation
-            setTimeout(() => {
-                console.log('[Buraq MQL] Checking for log file:', logFile);
-                if (fs.existsSync(logFile)) {
-                    console.log('[Buraq MQL] Log file exists, reading...');
-                    fs.readFile(logFile, 'utf16le', (err, data) => {
-                        if (!err && data) {
-                            console.log('[Buraq MQL] Log data length:', data.length);
-                            const log = diagnosticsManager.parseLog(data, filePath);
-                            
-                            // Use the global diagnosticsManager to update Problems panel
-                            if (diagnosticsManager) {
-                                diagnosticsManager.setDiagnostics(filePath, log.diagnosticsByFile);
-                                if (dashboardProvider) dashboardProvider.update();
-                            }
-                            
-                            // Log summary using accurate centralized counts
-                            const errorCount = log.errorCount;
-                            const warningCount = log.warningCount;
-                            if (errorCount === 0 && warningCount === 0) {
-                                console.log('[Buraq MQL] ✓ No errors in', filePath);
-                            } else {
-                                console.log('[Buraq MQL] ✗ Found', errorCount, 'errors and', warningCount, 'warnings across all files during check of', filePath);
-                            }
-                        } else {
-                            console.log('[Buraq MQL] Error reading log file:', err);
-                            // If we can't read the log, clear diagnostics for this file
-                            if (diagnosticsManager) diagnosticsManager.clearDiagnostics(filePath);
-                        }
-                        // Delete log file after processing (always delete from temp folder)
-                        if (backgroundLogManager) {
-                            backgroundLogManager.deleteLogSync(logFile);
-                        } else if (config.LogFile && config.LogFile.DeleteLog) {
-                            fs.unlink(logFile, () => { });
-                        }
-                    });
-                } else {
-                    console.log('[Buraq MQL] Log file not found');
-                    // If log file doesn't exist, clear diagnostics for this file
-                    if (diagnosticsManager) diagnosticsManager.clearDiagnostics(filePath);
-                }
-            }, 500); // Wait for log file to be written
-        });
-    }, 300); // 300ms debounce delay
+        try {
+            await compileFileCore(
+                filePath,
+                0, // Syntax check
+                {
+                    silentWorkspace: true,
+                    parentFileSearch: false
+                },
+                diagnosticsManager,
+                backgroundLogManager
+            );
+            if (dashboardProvider) dashboardProvider.update();
+        } catch (err) {
+            console.error('[Buraq MQL] Background check error:', err);
+        }
+    }, 500);
 }
 
 
@@ -905,8 +720,6 @@ function activate(context) {
         globalCompilationQueue.on('compiling', (file) => {
             if (dashboardProvider) {
                 dashboardProvider.setCompiling(file);
-                // Automatically reveal dashboard when a queue compilation starts
-                vscode.commands.executeCommand('buraq-mql-dashboard.focus');
             }
         });
         globalCompilationQueue.on('finished', () => {
@@ -929,6 +742,8 @@ function activate(context) {
                 const scanner = new WorkspaceScanner(workspaceRoot);
                 vscode.window.showInformationMessage('Compiling all MQL files in workspace...');
                 const files = await scanner.scan();
+                // Focus dashboard once when manual compilation starts
+                vscode.commands.executeCommand('buraq-mql-dashboard.focus');
                 await globalCompilationQueue.enqueueAll(files, { checkOnly: false });
                 if (dashboardProvider) dashboardProvider.update();
             }
@@ -940,6 +755,8 @@ function activate(context) {
                 const files = await vscode.workspace.findFiles('*.mq5', null, 1);
                 if (files.length > 0) {
                     vscode.window.showInformationMessage(`Compiling main file: ${pathModule.basename(files[0].fsPath)}`);
+                    // Focus dashboard once when manual compilation starts
+                    vscode.commands.executeCommand('buraq-mql-dashboard.focus');
                     await globalCompilationQueue.enqueue(files[0].fsPath, { checkOnly: false });
                     if (dashboardProvider) dashboardProvider.update();
                 } else {
@@ -1199,43 +1016,4 @@ module.exports = {
     deactivate,
     compileFileWithQueue
 }
-
-function resolveMetaEditorPath(v, p) {
-    try {
-        let input = String(p || '').trim();
-        const wf = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders[0] ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
-        if (input.length && !pathModule.isAbsolute(input) && wf) input = pathModule.join(wf, input);
-        const candidates = [];
-        if (input.length) {
-            if (fs.existsSync(input)) {
-                const st = fs.statSync(input);
-                if (st.isFile()) candidates.push(input);
-                else if (st.isDirectory()) {
-                    ['metaeditor.exe', 'metaeditor64.exe', 'MetaEditor.exe', 'MetaEditor64.exe'].forEach(n => candidates.push(pathModule.join(input, n)));
-                }
-            } else {
-                const d = pathModule.dirname(input);
-                ['metaeditor.exe', 'metaeditor64.exe', 'MetaEditor.exe', 'MetaEditor64.exe'].forEach(n => candidates.push(pathModule.join(d, n)));
-            }
-        }
-        const fallbacks = v === 5 ? [
-            'C:\\Program Files\\MetaTrader 5\\metaeditor64.exe',
-            'C:\\Program Files\\MetaTrader 5\\metaeditor.exe',
-            'C:\\Program Files (x86)\\MetaTrader 5\\metaeditor.exe',
-            'C:\\MT5_Install\\MetaTrader\\metaeditor.exe'
-        ] : [
-            'C:\\Program Files\\MetaTrader 4\\metaeditor.exe',
-            'C:\\Program Files (x86)\\MetaTrader 4\\metaeditor.exe',
-            'C:\\MT4_Install\\MetaTrader\\metaeditor.exe'
-        ];
-        candidates.push(...fallbacks);
-        for (const c of candidates) {
-            try {
-                if (fs.existsSync(c)) { fs.accessSync(c, fs.constants.R_OK); return c; }
-            } catch (e) { }
-        }
-        return input;
-    } catch (e) {
-        return p;
-    }
-}
+

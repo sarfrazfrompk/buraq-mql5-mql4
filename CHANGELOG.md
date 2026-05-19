@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.8.0] — 2026-05-19
+
+### ✨ Added
+- **Recursive Include Scanner**: Automatically tracks all recursively included files (`#include`) for any compilation target to ensure include files are updated or cleaned up dynamically.
+
+### 🔧 Improved
+- **Unified Compilation Infrastructure**: Consolidated syntax-checking and compilation workflows under a single compilation core, ensuring identical output behavior and formatting between manual commands and the dashboard builder.
+- **Independent Diagnostics Storage**: Re-architected the `buraq-diagnostics.json` database to store errors keyed directly by the actual file path where they occurred rather than the compiled parent file, preventing diagnostics from include files from polluting other files.
+- **Robust Relative Path Resolution**: Added support in the compiler log parser to resolve relative include paths (e.g. `structure\WavePipeline.mqh`) using the compiled file directory, workspace root, and configured Include directories.
+- **Single-File Diagnostic Clearing**: Optimized `clearDiagnostics` to only remove diagnostics for the closed document, preserving diagnostics of other open or dependent files.
+
+### 🐛 Fixed
+- **Dashboard Redirection**: Fixed the dashboard automatically focusing and pulling the user back when navigating to other tabs after the first load.
+- **Consistent Error Count**: Aligned compiler error/warning reporting across the dashboard queue and the Problems panel, ensuring exact parity with the official MetaTrader compiler outputs.
+
 ## [0.7.0] — 2026-04-20
 
 ### ✨ Added

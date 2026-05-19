@@ -70,17 +70,17 @@ class DiagnosticsManager {
             // Map to aggregate errors by the file they occur in
             const aggregated = new Map(); // Map<actualFilePath, vscode.Diagnostic[]>
             
-            // db keys are the 'compiled files' (sourceFilePath)
-            Object.keys(db).forEach(sourcePath => {
-                const errors = db[sourcePath];
+            // db keys are the actual files that have errors
+            Object.keys(db).forEach(filePath => {
+                const errors = db[filePath];
                 if (!Array.isArray(errors)) return;
 
+                const canonicalPath = this.getCanonicalPath(filePath);
+                if (!aggregated.has(canonicalPath)) {
+                    aggregated.set(canonicalPath, []);
+                }
+
                 errors.forEach(err => {
-                    const targetFile = err.file;
-                    if (!aggregated.has(targetFile)) {
-                        aggregated.set(targetFile, []);
-                    }
-                    
                     const range = new vscode.Range(
                         err.range.start.line,
                         err.range.start.character,
@@ -93,9 +93,7 @@ class DiagnosticsManager {
                     diag.source = 'Buraq Compiler';
                     diag.code = err.code;
                     
-                    // MOVED: No de-duplication as per user request to match compiler exactly
-                    aggregated.get(targetFile).push(diag);
-
+                    aggregated.get(canonicalPath).push(diag);
                 });
             });
             
@@ -105,7 +103,7 @@ class DiagnosticsManager {
                 this.collection.set(vscode.Uri.file(filePath), diagnostics);
             });
             
-            console.log('[DiagnosticsManager] Problems panel refreshed (aggregated)');
+            console.log('[DiagnosticsManager] Problems panel refreshed');
         } catch (error) {
             console.error('[DiagnosticsManager] Error refreshing from database:', error);
         }
@@ -120,7 +118,6 @@ class DiagnosticsManager {
         const canonicalSource = this.getCanonicalPath(sourceFilePath);
         if (!canonicalSource || !this.dbPath) return;
 
-
         // 1. Read the DB
         let db = {};
         if (fs.existsSync(this.dbPath)) {
@@ -129,15 +126,19 @@ class DiagnosticsManager {
             } catch (e) { db = {}; }
         }
 
-        // 2. Prepare serializable diagnostics for this compilation source
-        const serializableErrors = [];
-        if (diagnosticsByFile && diagnosticsByFile.size > 0) {
-            diagnosticsByFile.forEach((diagnostics, actualFile) => {
-                const canonicalActual = this.getCanonicalPath(actualFile);
+        // 2. Resolve all involved files (compiled file + all recursively included files)
+        const involvedFiles = getIncludedFilesRecursive(canonicalSource, this.workspaceRoot);
+
+        // 3. Update the database entries for all involved files
+        involvedFiles.forEach(file => {
+            const canonicalFile = this.getCanonicalPath(file);
+            const diagnostics = diagnosticsByFile.get(canonicalFile);
+
+            if (diagnostics && diagnostics.length > 0) {
+                const serializableErrors = [];
                 diagnostics.forEach(d => {
                     serializableErrors.push({
-                        file: canonicalActual,
-
+                        file: canonicalFile,
                         message: d.message,
                         range: {
                             start: { line: d.range.start.line, character: d.range.start.character },
@@ -147,17 +148,11 @@ class DiagnosticsManager {
                         code: d.code
                     });
                 });
-            });
-        }
-
-        // 3. Update the entry for this specific source file
-        if (serializableErrors.length > 0) {
-            db[canonicalSource] = serializableErrors;
-        } else {
-            // If compilation is clean, remove its entry entirely
-            delete db[canonicalSource];
-        }
-
+                db[canonicalFile] = serializableErrors;
+            } else {
+                delete db[canonicalFile];
+            }
+        });
 
         // 4. Save back to DB
         try {
@@ -174,8 +169,26 @@ class DiagnosticsManager {
      * Clear diagnostics for a specific compiled file
      * @param {string} sourceFilePath 
      */
-    clearDiagnostics(sourceFilePath) {
-        this.setDiagnostics(sourceFilePath, new Map());
+    clearDiagnostics(filePath) {
+        const canonicalPath = this.getCanonicalPath(filePath);
+        if (!canonicalPath || !this.dbPath) return;
+
+        let db = {};
+        if (fs.existsSync(this.dbPath)) {
+            try {
+                db = JSON.parse(fs.readFileSync(this.dbPath, 'utf8'));
+            } catch (e) { db = {}; }
+        }
+
+        delete db[canonicalPath];
+
+        try {
+            fs.writeFileSync(this.dbPath, JSON.stringify(db, null, 4), 'utf8');
+        } catch (error) {
+            console.error('[DiagnosticsManager] Error saving database:', error);
+        }
+
+        this.refreshFromDatabase();
     }
 
     /**
@@ -263,7 +276,32 @@ class DiagnosticsManager {
 
                     if (filePath) {
                         const normalizedPath = filePath.replace(/\//g, '\\');
-                        let resolvedPath = fs.existsSync(normalizedPath) ? normalizedPath : (fs.existsSync(filePath) ? filePath : null);
+                        let resolvedPath = null;
+                        
+                        if (fs.existsSync(normalizedPath)) {
+                            resolvedPath = normalizedPath;
+                        } else if (fs.existsSync(filePath)) {
+                            resolvedPath = filePath;
+                        } else {
+                            // Try resolving relative paths
+                            const config = vscode.workspace.getConfiguration('buraq_mql5_mql4');
+                            const isMQL4 = (vscode.workspace.name || '').includes('MQL4') || (sourceFilePath.includes('MQL4') || sourceFilePath.includes('mql4'));
+                            const incDir = isMQL4 ? config.Metaeditor?.Include4Dir : config.Metaeditor?.Include5Dir;
+
+                            const candidates = [
+                                pathModule.resolve(pathModule.dirname(sourceFilePath), filePath),
+                                pathModule.resolve(this.workspaceRoot || '', filePath)
+                            ];
+                            if (incDir) {
+                                candidates.push(pathModule.resolve(incDir, filePath));
+                            }
+                            for (const cand of candidates) {
+                                if (fs.existsSync(cand)) {
+                                    resolvedPath = cand;
+                                    break;
+                                }
+                            }
+                        }
 
                         if (resolvedPath) {
                             const actualPath = this.getCanonicalPath(resolvedPath);
@@ -327,6 +365,59 @@ function padText(text, width, align = 'left') {
             return ' '.repeat(lp) + text + ' '.repeat(rp);
         default: return text + spaces;
     }
+}
+
+/**
+ * Resolve include directive name to absolute path
+ */
+function resolveIncludePath(includeName, currentDir, workspaceRoot) {
+    // 1. Try relative to currentDir (for "LocalPath")
+    const localPath = pathModule.resolve(currentDir, includeName);
+    if (fs.existsSync(localPath)) return localPath;
+    
+    // 2. Try relative to the Include directory from configuration
+    const config = vscode.workspace.getConfiguration('buraq_mql5_mql4');
+    const isMQL4 = (vscode.workspace.name || '').includes('MQL4') || (currentDir.toLowerCase().includes('mql4'));
+    const incDir = isMQL4 ? config.Metaeditor?.Include4Dir : config.Metaeditor?.Include5Dir;
+    if (incDir) {
+        const includePath = pathModule.resolve(incDir, includeName);
+        if (fs.existsSync(includePath)) return includePath;
+    }
+    
+    // 3. Try relative to workspace root
+    if (workspaceRoot) {
+        const workspacePath = pathModule.resolve(workspaceRoot, includeName);
+        if (fs.existsSync(workspacePath)) return workspacePath;
+    }
+    
+    return null;
+}
+
+/**
+ * Get all recursively included files for a given MQL source file
+ */
+function getIncludedFilesRecursive(filePath, workspaceRoot, visited = new Set()) {
+    try {
+        const canonical = vscode.Uri.file(filePath).fsPath;
+        if (visited.has(canonical)) return visited;
+        visited.add(canonical);
+        
+        if (!fs.existsSync(canonical)) return visited;
+        const content = fs.readFileSync(canonical, 'utf8');
+        const includeRegex = /#include\s*<([^>]+)>|#include\s*"([^"]+)"/g;
+        let match;
+        const currentDir = pathModule.dirname(canonical);
+        while ((match = includeRegex.exec(content)) !== null) {
+            const includeName = match[1] || match[2];
+            const resolved = resolveIncludePath(includeName, currentDir, workspaceRoot);
+            if (resolved) {
+                getIncludedFilesRecursive(resolved, workspaceRoot, visited);
+            }
+        }
+    } catch (e) {
+        console.error('[DiagnosticsManager] Error parsing includes:', e);
+    }
+    return visited;
 }
 
 module.exports = { DiagnosticsManager };
