@@ -4,17 +4,11 @@
   A premium Visual Studio Code extension delivering comprehensive language support, compilation workflows, and developer productivity tools for MetaQuotes Language (MQL4/MQL5) used in MetaTrader platforms.
 </p>
 
-<p align="left">
-  <a href="https://marketplace.visualstudio.com/items?itemName=sarfrazfrompk.buraq-mql5-mql4">
-    <img src="https://img.shields.io/visual-studio-marketplace/v/sarfrazfrompk.buraq-mql5-mql4?style=flat-square&label=Marketplace&color=0078d7" alt="Marketplace Version"/>
-  </a>
-  <a href="https://github.com/sarfrazfrompk/buraq-mql5-mql4">
-    <img src="https://img.shields.io/github/stars/sarfrazfrompk/buraq-mql5-mql4?style=flat-square&color=brightgreen" alt="GitHub Stars"/>
-  </a>
-  <img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-orange?style=flat-square" alt="License"/>
-</p>
+<p align="left"><img src="mql-images/mql5-icon.png" height="30" style="vertical-align: middle; margin-right: 4px;" alt="MQL5 Logo"/>  <img src="https://img.shields.io/badge/Language-MQL4%20%26%20MQL5-0078d7?style=flat-square" style="vertical-align: middle;" alt="MQL5 Language"/>&nbsp;&nbsp;<a href="https://marketplace.visualstudio.com/items?itemName=sarfrazfrompk.buraq-mql5-mql4" style="text-decoration: none;"><img src="mql-images/vs-code.png" height="20" style="vertical-align: middle; margin-right: 4px;" alt="VS Code Logo"/><img src="https://img.shields.io/badge/VS%20Code-Marketplace-0078d7?style=flat-square" style="vertical-align: middle;" alt="Visual Studio Marketplace"/></a>&nbsp;&nbsp;<img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-orange?style=flat-square" style="vertical-align: middle;" alt="License"/></p>
+
 
 ---
+
 
 ## 🚀 Features
 
