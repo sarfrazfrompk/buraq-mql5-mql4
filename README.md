@@ -1,165 +1,117 @@
 # Buraq MQL5 & MQL4
 
-![Build](https://img.shields.io/badge/build-passing-brightgreen.svg) ![Version](https://img.shields.io/visual-studio-marketplace/v/sarfrazfrompk.buraq-mql5-mql4) ![License](https://img.shields.io/badge/license-MIT-blue.svg)
+<p align="left">
+  A premium Visual Studio Code extension delivering comprehensive language support, compilation workflows, and developer productivity tools for MetaQuotes Language (MQL4/MQL5) used in MetaTrader platforms.
+</p>
 
-Buraq MQL5 & MQL4 is a Visual Studio Code extension that brings comprehensive language support, compilation, and productivity tooling for MetaQuotes Language (MQL4/MQL5) used in MetaTrader platforms.
+<p align="left">
+  <a href="https://marketplace.visualstudio.com/items?itemName=sarfrazfrompk.buraq-mql5-mql4">
+    <img src="https://img.shields.io/visual-studio-marketplace/v/sarfrazfrompk.buraq-mql5-mql4?style=flat-square&label=Marketplace&color=0078d7" alt="Marketplace Version"/>
+  </a>
+  <a href="https://github.com/sarfrazfrompk/buraq-mql5-mql4">
+    <img src="https://img.shields.io/github/stars/sarfrazfrompk/buraq-mql5-mql4?style=flat-square&color=brightgreen" alt="GitHub Stars"/>
+  </a>
+  <img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-orange?style=flat-square" alt="License"/>
+</p>
 
-## Features
+---
 
-- Syntax highlighting and language grammars for `.mq4`, `.mq5`, and `.mqh`
-- Compile, check, and script actions integrated into VS Code
-- Configurable MetaEditor paths and include directories for MT4/MT5
-- Help access with English language support for MQL4/MQL5
-- Context menu actions for inserting includes, resources, imports, and commentary
-- Keybindings for quick compile/check/help actions
-- Chart view with customizable MQL-Media branding
+## 🚀 Features
 
-### New in v0.8.0
+<p align="center">
+  <img src="mql-images/features.png" alt="Buraq MQL5 & MQL4 Features Overview" width="100%"/>
+</p>
 
-- **Unified Compilation Infrastructure**: Consolidated syntax-checking and compilation workflows under a single compilation core, ensuring identical output formatting and behavior between manual commands and the dashboard builder.
-- **Independent Diagnostics Storage**: Re-architected the database to store diagnostics keyed directly by the actual file path where the error occurred rather than the compiled parent file, preventing diagnostics from include files from polluting other files.
-- **Recursive Include Scanner**: Automatically tracks all recursively included files (`#include`) for any compilation target to ensure include files are updated or cleaned up dynamically.
-- **Robust Path Resolver**: Enhanced the compiler log parser to resolve relative include paths (e.g. `structure\WavePipeline.mqh`) using the compiled file directory, workspace root, and configured Include directories.
-- **Fixed Dashboard Redirection**: Fixed the dashboard automatically focusing and pulling the user back when navigating to other tabs after the first load.
+---
 
-## Installation
+## 📦 Installation
 
 ### From Marketplace
 
-- Search for `Buraq MQL5 & MQL4` in VS Code Extensions, or install via CLI:
+Search for `Buraq MQL5 & MQL4` in the Extensions panel (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd>), or install directly via CLI:
 
 ```bash
 code --install-extension sarfrazfrompk.buraq-mql5-mql4
 ```
 
-- Marketplace link: https://marketplace.visualstudio.com/items?itemName=sarfrazfrompk.buraq-mql5-mql4
+- 🛒 **Marketplace**: https://marketplace.visualstudio.com/items?itemName=sarfrazfrompk.buraq-mql5-mql4
+- 🐙 **GitHub**: https://github.com/sarfrazfrompk/buraq-mql5-mql4
 
-### From VSIX (Local Package)
+### From VSIX (Local Build)
 
 ```bash
-# Install packaging tool if needed
+# Install the VSCE packaging tool
 npm install -g vsce
 
-# From project root, create a VSIX package
+# Build a VSIX package from the project root
 vsce package
 
-# Install the generated VSIX
-code --install-extension ./buraq-mql5-mql4-0.1.0.vsix
+# Install the generated package
+code --install-extension ./buraq-mql5-mql4-0.8.0.vsix
 ```
 
-## Usage
+---
 
-- Open any `.mq4`, `.mq5`, or `.mqh` file. The extension activates automatically.
-- Use the title bar buttons or Command Palette actions:
-  - `MQL: Compile File`
-  - `MQL: Check File`
-  - `MQL: Compile Script`
-  - `MQL: Help`
-  - `MQL: Configurations`
-- Context menu actions for MQL files:
-  - Insert includes/resources/imports/time/icon
-  - Create commentary blocks
-  - Open file directly in MetaEditor
+## 🛠️ Usage
 
-### Keybindings
+1. Open any `.mq4`, `.mq5`, or `.mqh` file — the extension activates automatically.
+2. Use the **Editor Title Bar Buttons** or the **Command Palette** (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>) to trigger compile actions.
+3. Right-click anywhere in an MQL document to access **Context Menu** helpers for inserting headers, resources, and comment blocks.
 
-- `Ctrl+Shift+C` — Compile Script
-- `Ctrl+Shift+X` — Compile File
-- `Ctrl+Shift+Z` — Check File
-- `F1` — Open MQL Help (when enabled)
+### ⌨️ Keybindings
 
+| Action | Shortcut |
+|---|---|
+| 🔨 Compile MQL File | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> |
+| 🔍 Check File Syntax | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> |
+| 🚀 Compile using Script | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd> |
+| 📖 Open MQL Help Reference | <kbd>F1</kbd> |
 
+---
 
-## Configuration
+## ⚙️ Configuration
 
-The extension contributes settings under `Buraq MQL5 & MQL4`.
+Configure the extension under **Settings** (<kbd>Ctrl</kbd> + <kbd>,</kbd>) or in `.vscode/settings.json`.
 
-### Environment Requirements
-
-- Windows with MetaEditor installed for MT4 and/or MT5
-- VS Code `^1.106.0`
-- Extension dependency: `ms-vscode.cpptools`
-
-### Settings Table
+<details>
+<summary>🔧 Click to expand Configuration Settings</summary>
 
 | Setting Key | Type | Default | Description |
 |---|---|---|---|
-| `buraq_mql5_mql4.LogFile.DeleteLog` | boolean | `true` | Automatically delete previous log file on run |
-| `buraq_mql5_mql4.Metaeditor.Metaeditor4Dir` | string | `C:\\MT4_Install\\MetaTrader\\metaeditor.exe` | Path to MetaEditor (MT4) executable |
-| `buraq_mql5_mql4.Metaeditor.Metaeditor5Dir` | string | `C:\\MT5_Install\\MetaTrader\\metaeditor.exe` | Path to MetaEditor (MT5) executable |
-| `buraq_mql5_mql4.Metaeditor.Include4Dir` | string | `` | Additional include directory for MT4 |
-| `buraq_mql5_mql4.Metaeditor.Include5Dir` | string | `` | Additional include directory for MT5 |
-| `buraq_mql5_mql4.LogFile.NameLog` | string | `` | Custom log file name/location |
-| `buraq_mql5_mql4.ShowButton.Compile` | boolean | `true` | Show compile button in editor title bar |
-| `buraq_mql5_mql4.ShowButton.Check` | boolean | `true` | Show check button in editor title bar |
-| `buraq_mql5_mql4.ShowButton.Script` | boolean | `true` | Show script button in editor title bar |
-| `buraq_mql5_mql4.Script.MiniME` | boolean | `true` | Use mini MetaEditor window mode for script |
-| `buraq_mql5_mql4.Script.Timetomini` | number | `500` (min `100`) | Delay before switching to mini mode (ms) |
-| `buraq_mql5_mql4.Script.CloseME` | boolean | `true` | Close MetaEditor after script runs |
-| `buraq_mql5_mql4.Help.HelpON` | boolean | `true` | Enable F1 help integration |
-| `buraq_mql5_mql4.Help.MQL4HelpLanguage` | string | `English` | Help language for MQL4 |
-| `buraq_mql5_mql4.Help.MQL5HelpLanguage` | string | `English` | Help language for MQL5 |
-| `buraq_mql5_mql4.Help.HelpVal` | number | `500` (min `150`) | Help operation timeout/interval (ms) |
-| `buraq_mql5_mql4.context` | boolean | `false` | Enable extra explorer context menu commands |
-| `buraq_mql5_mql4.ShowChart.BrandingEnabled` | boolean | `true` | Enable MQL-Media branding on charts |
-| `buraq_mql5_mql4.ShowChart.BrandingPosition` | string | `top-right` | Position of MQL-Media branding on charts (top-right, top-left, bottom-right, bottom-left) |
+| `buraq_mql5_mql4.Metaeditor.Metaeditor4Dir` | string | `"C:\\MT4_Install\\MetaTrader\\metaeditor.exe"` | Path to MetaEditor (MT4) executable |
+| `buraq_mql5_mql4.Metaeditor.Metaeditor5Dir` | string | `"C:\\MT5_Install\\MetaTrader\\metaeditor.exe"` | Path to MetaEditor (MT5) executable |
+| `buraq_mql5_mql4.Metaeditor.Include4Dir` | string | `""` | Optional additional include directory for MT4 |
+| `buraq_mql5_mql4.Metaeditor.Include5Dir` | string | `""` | Optional additional include directory for MT5 |
+| `buraq_mql5_mql4.LogFile.DeleteLog` | boolean | `true` | Auto-delete temporary compilation logs |
+| `buraq_mql5_mql4.LogFile.NameLog` | string | `""` | Custom log file path (auto-generated if empty) |
+| `buraq_mql5_mql4.ShowButton.Compile` | boolean | `true` | Show Compile button in editor title bar |
+| `buraq_mql5_mql4.ShowButton.Check` | boolean | `true` | Show Check button in editor title bar |
+| `buraq_mql5_mql4.ShowButton.Script` | boolean | `true` | Show Script button in editor title bar |
+| `buraq_mql5_mql4.Script.MiniME` | boolean | `true` | Minimize MetaEditor when compiling via script |
+| `buraq_mql5_mql4.Script.Timetomini` | number | `500` (min `100`) | Delay before minimizing MetaEditor (ms) |
+| `buraq_mql5_mql4.Script.CloseME` | boolean | `true` | Close MetaEditor after script finishes |
+| `buraq_mql5_mql4.Help.HelpON` | boolean | `true` | Enable F1 offline help resolution |
+| `buraq_mql5_mql4.Help.MQL4HelpLanguage` | string | `"English"` | Help language for MQL4 |
+| `buraq_mql5_mql4.Help.MQL5HelpLanguage` | string | `"English"` | Help language for MQL5 |
+| `buraq_mql5_mql4.Help.HelpVal` | number | `500` (min `150`) | Help operation timeout (ms) |
+| `buraq_mql5_mql4.context` | boolean | `false` | Enable extra context menu commands in Explorer |
+| `buraq_mql5_mql4.ShowChart.BrandingEnabled` | boolean | `true` | Enable MQL-Media branding on chart views |
+| `buraq_mql5_mql4.ShowChart.BrandingPosition` | string | `"top-right"` | Branding position (`top-right`, `top-left`, `bottom-right`, `bottom-left`) |
+| `buraq_mql5_mql4.author` | string | `"sarfrazfrompk"` | Author name inserted into new file templates |
+| `buraq_mql5_mql4.link` | string | `"https://sarfrazfrompk.com"` | Author website inserted into new file templates |
+| `buraq_mql5_mql4.codeLens.enabled` | boolean | `true` | Enable Code Lens reference count indicators |
 
-## Customizing Syntax Highlighting
+</details>
 
-You can customize the colors of syntax highlighting for MQL files using VS Code's built-in `editor.tokenColorCustomizations` setting. This allows you to change colors for comments, keywords, functions, and any other code elements.
+---
 
-### How to Customize Colors
+## 🎨 Customizing Syntax Highlighting
 
-1. **Identify the TextMate Scope**:
-   - Open a `.mq4`, `.mq5`, or `.mqh` file
-   - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
-   - Search for and select **"Developer: Inspect Editor Tokens and Scopes"**
-   - Click on the code element you want to customize (e.g., a comment, function name, keyword)
-   - Note the **TextMate scope** shown in the popup (e.g., `comment.line.double-slash.mql`)
+You can customize MQL syntax colors using VS Code's `editor.tokenColorCustomizations` setting.
 
-2. **Add Custom Colors to settings.json**:
-   - Press `Ctrl+Shift+P` and select **"Preferences: Open Settings (JSON)"**
-   - Add or modify the `editor.tokenColorCustomizations` section:
+**Step 1**: Use <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> → **Developer: Inspect Editor Tokens and Scopes** to identify the TextMate scope of any token.
 
-```json
-{
-    "editor.tokenColorCustomizations": {
-    "textMateRules": [
-      {
-        "scope": "comment.line.double-slash.mql",
-        "settings": {
-          "foreground": "#51ff00",
-          "fontStyle": "italic"
-        }
-      },
-      {
-        "scope": "comment.block.mql",
-        "settings": {
-          "foreground": "#51ff00",
-          "fontStyle": "italic"
-        }
-      }
-    ]
-  }
-}
-```
-
-### Common MQL TextMate Scopes
-
-Here are some commonly used scopes for MQL files that you can customize:
-
-- `comment.line.double-slash.mql` — Single-line comments (`//`)
-- `comment.block.mql` — Multi-line comments (`/* */`)
-- `keyword.control.mql` — Control keywords (if, else, for, while, return, etc.)
-- `keyword.control.preprocessor.mql` — Preprocessor directives (#include, #property, etc.)
-- `storage.type.mql` — Data types (int, double, string, bool, etc.)
-- `storage.modifier.mql` — Modifiers (extern, input, static)
-- `entity.name.function.mql` — Function names
-- `string.quoted.double.mql` — String literals
-- `constant.numeric.integer.mql` — Integer numbers
-- `constant.numeric.double.mql` — Floating-point numbers
-
-### Example: Custom Color Scheme for MQL
+**Step 2**: Add your custom colors to `settings.json`:
 
 ```json
 {
@@ -167,143 +119,113 @@ Here are some commonly used scopes for MQL files that you can customize:
     "textMateRules": [
       {
         "scope": "comment.line.double-slash.mql",
-        "settings": {
-          "foreground": "#00FF00",
-          "fontStyle": "italic"
-        }
+        "settings": { "foreground": "#00FF00", "fontStyle": "italic" }
       },
       {
         "scope": "keyword.control.mql",
-        "settings": {
-          "foreground": "#569CD6",
-          "fontStyle": "bold"
-        }
+        "settings": { "foreground": "#569CD6", "fontStyle": "bold" }
       },
       {
         "scope": "entity.name.function.mql",
-        "settings": {
-          "foreground": "#DCDCAA"
-        }
+        "settings": { "foreground": "#DCDCAA" }
       },
       {
         "scope": "storage.type.mql",
-        "settings": {
-          "foreground": "#4EC9B0"
-        }
+        "settings": { "foreground": "#4EC9B0" }
       }
     ]
   }
 }
 ```
 
-For more information on customizing syntax highlighting, see the [VS Code Theme Color Reference](https://code.visualstudio.com/api/references/theme-color).
+<details>
+<summary>📋 Common MQL TextMate Scopes</summary>
 
+| Scope | Applies To |
+|---|---|
+| `comment.line.double-slash.mql` | Single-line comments `//` |
+| `comment.block.mql` | Multi-line comments `/* */` |
+| `keyword.control.mql` | Control statements (`if`, `else`, `for`, `while`) |
+| `keyword.control.preprocessor.mql` | Preprocessor directives (`#include`, `#property`) |
+| `storage.type.mql` | Primitive types (`int`, `double`, `string`, `bool`) |
+| `storage.modifier.mql` | Modifiers (`extern`, `input`, `static`, `sinput`) |
+| `entity.name.function.mql` | Function names |
+| `string.quoted.double.mql` | String literals |
+| `constant.numeric.integer.mql` | Integer constants |
 
-## Commands
+</details>
 
-- `buraq_mql5_mql4.compileScript`
-- `buraq_mql5_mql4.checkFile`
-- `buraq_mql5_mql4.compileFile`
-- `buraq_mql5_mql4.help`
-- `buraq_mql5_mql4.configurations`
-- `buraq_mql5_mql4.Addicon`, `Showfiles`, `InsNameMQH`, `InsMQH`, `InsMQL`, `InsNameMQL`, `InsResource`, `InsImport`, `InsTime`, `InsIcon`, `openInME`, `commentary`
-- `buraq_mql5_mql4.showChartView` - Display chart with MQL-Media branding
+---
 
-## Troubleshooting
+## 📋 Commands Reference
 
-### Common Issues
+<details>
+<summary>📌 Click to expand full Commands list</summary>
 
-#### MetaEditor Not Found
-- **Solution**: Verify `Metaeditor4Dir`/`Metaeditor5Dir` paths in settings and ensure MetaEditor is installed.
-- Check that the path points to the actual `metaeditor.exe` file (e.g., `C:\Program Files\MetaTrader 5\MetaEditor64.exe`)
+| Command ID | Description |
+|---|---|
+| `buraq_mql5_mql4.compileFile` | Compile MQL file using MetaEditor |
+| `buraq_mql5_mql4.checkFile` | Check MQL syntax without compiling |
+| `buraq_mql5_mql4.compileScript` | Compile MQL file using automation script |
+| `buraq_mql5_mql4.help` | Get MQL4/MQL5 help for word at cursor |
+| `buraq_mql5_mql4.configurations` | Apply recommended VS Code settings for MQL |
+| `buraq_mql5_mql4.Showfiles` | Toggle `.ex4`/`.ex5` binary file visibility |
+| `buraq_mql5_mql4.openInME` | Open current file directly in MetaEditor |
+| `buraq_mql5_mql4.commentary` | Insert standardized function block comment |
+| `buraq_mql5_mql4.showChartView` | Show chart view panel with MQL-Media branding |
+| `buraq_mql5_mql4.newExpertAdvisor` | Create a new Expert Advisor from template |
+| `buraq_mql5_mql4.newIndicator` | Create a new Indicator from template |
+| `buraq_mql5_mql4.newScript` | Create a new Script from template |
+| `buraq_mql5_mql4.newLibrary` | Create a new Library from template |
+| `buraq_mql5_mql4.quickFixAll` | Apply all available quick fixes in document |
+| `buraq_mql5_mql4.detectIncludePaths` | Auto-detect MT4/MT5 Include directories |
+| `buraq_mql5_mql4.autoConfigureIncludePaths` | Auto-configure detected Include paths in settings |
+| `buraq_mql5_mql4.showCompiledFileInfo` | Display compiled binary metadata |
+| `buraq_mql5_mql4.compareCompiledFiles` | Compare two compiled MQL binary outputs |
+| `buraq_mql5_mql4.compileAllWorkspace` | Compile all non-ignored MQL files in workspace |
+| `buraq_mql5_mql4.compileMainFile` | Compile the main `.mq5` file in workspace root |
 
-#### Buttons Missing in Editor Title Bar
-- **Solution**: Ensure `ShowButton.*` settings are enabled and file extension is `.mq4`, `.mq5`, or `.mqh`.
-- Reload VS Code window after changing settings (`Ctrl+Shift+P` → "Developer: Reload Window")
+</details>
 
-#### F1 Help Not Working / 404 Errors
-- **Symptoms**: Pressing F1 shows "Failed to load help file. Server response code - 404"
-- **Solutions**:
-  1. Ensure `Help.HelpON` is set to `true` in settings
-  2. Check your internet connection (help files are downloaded on first use)
-  3. Try deleting the help cache folder and triggering F1 again:
-     - Navigate to: `[Extension Install Dir]/mql-files/help/`
-     - Delete all `.chm` files
-     - Press F1 on a keyword to re-download
-  4. If the issue persists, check the Developer Console (`Ctrl+Shift+I`) for detailed error messages
-  5. Verify firewall/antivirus isn't blocking the download
+---
 
-#### Syntax Highlighting Colors
-- **Question**: "Can I customize the syntax highlighting colors?"
-- **Answer**: Yes! See the [Customizing Syntax Highlighting](#customizing-syntax-highlighting) section above for detailed instructions.
-- Use `Ctrl+Shift+P` → "Developer: Inspect Editor Tokens and Scopes" to identify scopes, then customize in `settings.json`
+## ❓ Troubleshooting & FAQ
 
-#### Context Menu Items Absent
-- **Solution**: Set `buraq_mql5_mql4.context` to `true` in settings
+<p align="center">
+  <img src="mql-images/faq.png" alt="Buraq MQL5 & MQL4 Troubleshooting & FAQ" width="100%"/>
+</p>
 
-#### Chart Branding Not Visible
-- **Solution**: Ensure `ShowChart.BrandingEnabled` is true and icon files exist in the extension directory
+---
 
-### FAQ
+## 🤝 Contributing
 
-**Q: The help file downloads are very slow. Can I download them manually?**
-
-A: Yes. Download the help files from the GitHub repository and place them in `[Extension Install Dir]/mql-files/help/`:
-- For MQL4: `mql4.chm`
-- For MQL5: `mql5.chm` (or localized versions like `mql5-russian.chm`)
-
-**Q: Why does the extension use the C++ language mode?**
-
-A: MQL syntax is similar to C++, so the extension maps `.mq4`, `.mq5`, and `.mqh` files to the `cpp` language ID for better IDE integration. This allows features like IntelliSense from the C++ tools extension.
-
-**Q: How do I disable F1 help if it conflicts with VS Code's default help?**
-
-A: Set `"buraq_mql5_mql4.Help.HelpON": false` in your settings.json.
-
-
-## Contributing
-
-1. Fork the repository and create a feature branch
+1. Fork the repository and create a feature branch.
 2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+3. Run lint:
+   ```bash
+   pnpm run lint
+   ```
+4. Follow conventional commits and open a Pull Request with a clear description.
 
-```bash
-npm install
-```
+---
 
-3. Lint and test locally:
+## 🔗 Links
 
-```bash
-npm run lint
-npm test
-```
+<p align="left">
+  <a href="https://sarfrazfrompk.com"><img src="https://img.shields.io/badge/Website-sarfrazfrompk.com-0078d7?style=flat-square&logo=google-chrome&logoColor=white" alt="Website"/></a>
+  <a href="https://github.com/sarfrazfrompk/buraq-mql5-mql4"><img src="https://img.shields.io/badge/GitHub-Repository-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"/></a>
+  </p>
+  <p align="left">
+  <a href="https://www.linkedin.com/in/sarfrazfrompk/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white"alt="LinkedIn"/></a>
+  <a href="https://sarfrazfrompk.com/contact"><img src="https://img.shields.io/badge/Contact-FF6B6B?style=flat-square&logo=mail.ru&logoColor=white" alt="Contact"/></a>
+  <a href="https://www.facebook.com/groups/mql5programmers"><img src="https://img.shields.io/badge/Facebook%20Community-1877F2?style=flat-square&logo=facebook&logoColor=white" alt="Facebook"/></a>
+</p>
 
-4. Follow conventional commits for messages
-5. Open a Pull Request with a clear description and screenshots where relevant
+---
 
-### Code of Conduct
+## 📄 License
 
-This project adheres to the Contributor Covenant, version 2.1. See https://www.contributor-covenant.org/version/2/1/code_of_conduct/ for details.
-
-## Known Issues
-
-- Primarily tested on Windows due to MetaEditor integration paths
-- VS Code language id maps to `cpp` for grammar scope; other C++ tooling may interact
-
-## Acknowledgments
-
-- MetaQuotes Language (MQL4/MQL5) and documentation by MetaQuotes
-- VS Code Extension API and samples
-
-## Related Links
-
-- MQL4 Reference: https://docs.mql4.com/
-- MQL5 Reference: https://www.mql5.com/en/docs
-- VS Code Extension API: https://code.visualstudio.com/api
-- Publisher site: http://sarfrazfrompk.com
-- [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/sarfrazfrompk/)
-- [![Contact](https://img.shields.io/badge/Contact-FF6B6B?style=flat&logo=mail&logoColor=white)](https://sarfrazfrompk.com/contact)
-- [![Facebook Community](https://img.shields.io/badge/Facebook%20Community-1877F2?style=flat&logo=facebook&logoColor=white)](https://www.facebook.com/groups/mql5programmers)
-
-## License
-
-Released under the MIT License. See `LICENSE.md`.
+Released under the **PolyForm Noncommercial License 1.0.0**. See [LICENSE.md](LICENSE.md) for details.

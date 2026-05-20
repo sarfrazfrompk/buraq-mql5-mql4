@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.0] — 2026-05-20
+
+### ✨ Added
+- **Better README**: Redesigned the main page with a professional look and new badges.
+- **Detailed Help**: Updated the `docs.md` file with clear instructions for all commands.
+- **New Images**: Added new images for the FAQ and features sections.
+
+---
+
 ## [0.8.0] — 2026-05-19
 
 ### ✨ Added

@@ -635,8 +635,8 @@ function registerTemplateCommands(context) {
 
                 // Replace placeholders
                 const year = new Date().getFullYear();
-                const author = vscode.workspace.getConfiguration('buraq_mql5_mql4').get('author', 'Your Name');
-                const link = vscode.workspace.getConfiguration('buraq_mql5_mql4').get('link', 'https://www.example.com');
+                const author = vscode.workspace.getConfiguration('buraq_mql5_mql4').get('author', 'sarfrazfrompk');
+                const link = vscode.workspace.getConfiguration('buraq_mql5_mql4').get('link', 'https://sarfrazfrompk.com');
 
                 templateContent = templateContent
                     .replace(/\$\{FILE_NAME\}/g, fileName + ext)

@@ -49,27 +49,49 @@ You can configure the extension settings in `.vscode/settings.json` or via the V
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `buraq_mql5_mql4.Metaeditor.Metaeditor4Dir` | `C:\MT4_Install\MetaTrader\metaeditor.exe` | Path to MT4 MetaEditor executable. |
-| `buraq_mql5_mql4.Metaeditor.Metaeditor5Dir` | `C:\MT5_Install\MetaTrader\metaeditor.exe` | Path to MT5 MetaEditor executable. |
-| `buraq_mql5_mql4.Metaeditor.Include4Dir` | `""` | Path to MT4 Include folder (optional, auto-detectable). |
-| `buraq_mql5_mql4.Metaeditor.Include5Dir` | `""` | Path to MT5 Include folder (optional, auto-detectable). |
-| `buraq_mql5_mql4.LogFile.DeleteLog` | `true` | Delete temporary compilation log files after reading. |
-| `buraq_mql5_mql4.ShowButton.Compile` | `true` | Show Compile button in editor title bar. |
-| `buraq_mql5_mql4.ShowButton.Check` | `true` | Show Check button in editor title bar. |
-| `buraq_mql5_mql4.author` | `"Your Name"` | Author name used in file templates. |
-| `buraq_mql5_mql4.link` | `"https://www.example.com"` | Author link used in file templates. |
+| `buraq_mql5_mql4.Metaeditor.Metaeditor4Dir` | `"C:\MT4_Install\MetaTrader\metaeditor.exe"` | Path to "metaeditor.exe" for MQL4. |
+| `buraq_mql5_mql4.Metaeditor.Metaeditor5Dir` | `"C:\MT5_Install\MetaTrader\metaeditor.exe"` | Path to "metaeditor.exe" for MQL5. |
+| `buraq_mql5_mql4.Metaeditor.Include4Dir` | `""` | Path to the "Include" folder for MQL4 (optional). |
+| `buraq_mql5_mql4.Metaeditor.Include5Dir` | `""` | Path to the "Include" folder for MQL5 (optional). |
+| `buraq_mql5_mql4.LogFile.DeleteLog` | `true` | Delete temporary compilation log files after checking/compilation. |
+| `buraq_mql5_mql4.LogFile.NameLog` | `""` | Custom log file name/location. If empty, it is generated automatically. |
+| `buraq_mql5_mql4.ShowButton.Compile` | `true` | Show Compile button in the editor title bar. |
+| `buraq_mql5_mql4.ShowButton.Check` | `true` | Show Check button in the editor title bar. |
+| `buraq_mql5_mql4.ShowButton.Script` | `true` | Show Compile using Script button in the editor title bar. |
+| `buraq_mql5_mql4.Script.MiniME` | `true` | Minimize MetaEditor after launch (when compiling via script). |
+| `buraq_mql5_mql4.Script.Timetomini` | `500` | Delay before minimizing MetaEditor (in milliseconds, minimum `100`). |
+| `buraq_mql5_mql4.Script.CloseME` | `true` | Close MetaEditor after compilation finishes. |
+| `buraq_mql5_mql4.Help.HelpON` | `true` | Enable F1 offline help integration. |
+| `buraq_mql5_mql4.Help.MQL4HelpLanguage` | `"English"` | Help language for MQL4. |
+| `buraq_mql5_mql4.Help.MQL5HelpLanguage` | `"English"` | Help language for MQL5. |
+| `buraq_mql5_mql4.Help.HelpVal` | `500` | Help operation timeout/interval (in milliseconds, minimum `150`). |
+| `buraq_mql5_mql4.context` | `false` | Enable extra Explorer context menu commands (do not disable). |
+| `buraq_mql5_mql4.ShowChart.BrandingEnabled` | `true` | Enable MQL-Media branding on charts. |
+| `buraq_mql5_mql4.ShowChart.BrandingPosition` | `"top-right"` | Position of MQL-Media branding on charts (`top-right`, `top-left`, `bottom-right`, `bottom-left`). |
+| `buraq_mql5_mql4.author` | `"sarfrazfrompk"` | Author name used in file templates. |
+| `buraq_mql5_mql4.link` | `"https://sarfrazfrompk.com"` | Author link/website used in file templates. |
+| `buraq_mql5_mql4.codeLens.enabled` | `true` | Enable Code Lens showing reference counts. |
 
 ---
 
 ## Commands
 Access these commands via the **Command Palette** (`Ctrl+Shift+P`):
 
-- **MQL: Compile File**: Compiles the current file.
-- **MQL: Configurations**: Applies recommended settings (file associations, exclusions, syntax highlighting colours) for MQL development. This now merges with your existing settings instead of overwriting them.
-- **MQL: Auto-Configure Include Paths**: Automatically sets the best detected include paths in settings.
-- **MQL: New Expert Advisor/Indicator/Script**: Creates a new file from a template.
-- **MQL: Show Compiled File Info**: Displays information about the compiled binary.
-- **MQL: Compare Compiled Files**: Compares the current compiled binary with another version.
+- **MQL: Compile File**: Compiles the current `.mq4`, `.mq5`, or `.mqh` file using MetaEditor.
+- **MQL: Check MQL Syntax**: Performs a syntax check without generating an executable.
+- **MQL: Compile MQL file using script**: Compiles the file utilizing MetaEditor scripting.
+- **MQL: Get the MQL4/MQL5 help**: Opens the offline help file (`.chm`) targeting the keyword at the cursor.
+- **MQL: Create configuration**: Merges recommended workspace settings (file associations, exclusions, syntax token colors) for MQL development.
+- **MQL: Detect Include Paths**: Automatically scans the system to locate MetaTrader data folders and Include directories.
+- **MQL: Auto-Configure Include Paths**: Automatically detects and writes include directory configuration settings.
+- **MQL: New Expert Advisor / Indicator / Script / Library**: Prompts for details and builds a new file from templates.
+- **MQL: Show Compiled File Info**: Displays metadata and size of the compiled binary (`.ex4` or `.ex5`).
+- **MQL: Compare Compiled Files**: Compares the currently active compiled binary against another file.
+- **MQL: Compile All MQL Files**: Scans the workspace and compiles all non-ignored MQL files sequentially.
+- **MQL: Compile Main MQL File**: Automatically compiles the main `.mq5` file located in the workspace root.
+- **MQL: Quick Fix All**: Analyzes the current document and applies syntax corrections automatically.
+- **MQL: Show Chart with MQL-Media Branding**: Displays the chart view with customizable branding.
+- **MQL: Show/hide ex4/ex5 files**: Toggles the visibility of compiled binary files in the VS Code explorer.
 
 ---
 
@@ -85,42 +107,36 @@ Default keybindings (active in MQL files):
 This section documents the internal code structure for developers contributing to the extension.
 
 ### File Structure (`out/`)
-The extension logic is primarily located in the `out/` directory (compiled JS or direct JS source).
+The extension logic is structured into the following components inside the `out/` directory:
 
 #### Core Components
-- **`extension.js`**: The main entry point.
-  - Activates the extension.
-  - Registers commands.
-  - Manages the **Buraq Terminal** (`initializeBuraqTerminal`, `writeToTerminal`).
-  - Handles the compilation process (`Compile` function):
-    1. Saves all files.
-    2.Determines the compiler path based on file extension.
-    3. Executes `metaeditor.exe` with `/compile` and `/log` arguments.
-    4. Reads the generated log file (UTF-16LE).
-    5. Parses the log (`replaceLog`) to extract errors/warnings.
-    6. Updates the VS Code Diagnostic Collection (Problems panel).
-    7. Outputs colorized results to the terminal.
+- **`extension.js`**: The main entry point. Activates the extension, registers commands, initializes providers, and coordinates background files/workspace scans.
+- **`MQLDashboardProvider.js`**: Webview provider for the "MQL Dashboard" sidebar UI. Renders compilation progress, queue details, and file statuses.
+- **`buraq-compiler/`**: The core compilation system containing:
+  - `index.js`: Exports compiler interfaces.
+  - `compilerCore.js`: The unified compiler core that runs `metaeditor.exe`, reads UTF-16LE compiler log files, parses errors/warnings via regex, and returns structured compilation results.
+  - `DiagnosticsManager.js`: Re-architected diagnostic manager storing compilation diagnostics keyed by the exact files where they occurred to prevent diagnostics pollution.
+  - `CompilationQueue.js`: Sequential compilation queue preventing race conditions and file locking during compilation runs.
+  - `WorkspaceScanner.js`: Scans the workspace folder to find all compilation targets while respecting `.buraqignore`.
+  - `BuraqIgnoreParser.js`: Parses ignore files and applies glob rules.
+  - `LogFileManager.js`: Manages generated compilation logs.
 
-#### Language Features
-- **`provider.js`**: Implements Language Server Protocol features.
-  - `Hover_log`: Hover support for usage logs.
-  - `DefinitionProvider`: Go to Definition support.
-  - `Hover_MQL`: Hover documentation for MQL functions.
-  - `ItemProvider`: Code completion (IntelliSense).
-  - `HelpProvider`: Signature help for functions.
-  - `ColorProvider`: VS Code color picker support for MQL colors.
-- **`symbolProvider.js`**: Handles Document Symbols (Outline) and Workspace Symbols.
-- **`codeLensProvider.js`**: Implements CodeLens (e.g., showing reference counts).
-- **`foldingProvider.js`**: Logic for code folding ranges.
+#### Language & Editor Features
+- **`provider.js`**: Implements Language Server Protocol features including Hover documentation for MQL functions/logs, Definition Provider for includes, signature help, and custom Color Picker support.
+- **`symbolProvider.js`**: Provides Document Symbols (outline view), Workspace Symbols, and rename actions.
+- **`codeLensProvider.js`**: Implements reference count Code Lens indicators for MQL code symbols.
+- **`foldingProvider.js`**: Provides code folding ranges based on MQL brackets and regions.
+- **`documentLinkProvider.js`**: Implements Document Links on `#include` statements for fast navigation.
+- **`codeActionProvider.js`**: Provides editor Quick Fixes and Refactoring commands (e.g., Extract to function, Add include guards).
+- **`quickFixAnalyzer.js`**: Statically analyzes files to detect issues like missing/duplicate semicolons.
 
-#### Utilities
-- **`includePathDetector.js`**:
-  - `findAppDataTerminals()`: Scans `%APPDATA%\MetaQuotes\Terminal` for MT4/5 data folders.
-  - `findCommonInstallations()`: Scans common "Program Files" paths.
-  - `autoConfigureIncludePaths()`: Updates user settings with the best found paths.
-- **`compiledFileDiff.js`**: Logic for comparing binary or text outputs.
-- **`errorCodeDatabase.js`**: Database of MQL error codes for enhanced hover/error info.
-- **`chartView.js`**: Manages webview-based chart interactions or branding.
+#### Utilities & UI Helper Components
+- **`includePathDetector.js`**: Automatically scans Program Files and AppData folders to auto-configure MT4/MT5 include directories.
+- **`compiledFileDiff.js`**: Compares different versions of compiled MQL binaries.
+- **`errorCodeDatabase.js`**: Offline MQL error code database that provides descriptive explanations during hovers.
+- **`chartView.js`**: Integrates webview chart displays with customizable branding.
+- **`help.js`**: Handles downloading and launching MQL `.chm` help files via `BuraqKeys.exe`.
+- **`createProperties.js`**: Configures global/workspace setting values (file associations, token colors, folder exclusions).
 
 ### Compilation Flow
 1. User triggers **Compile File**.
@@ -129,3 +145,9 @@ The extension logic is primarily located in the `out/` directory (compiled JS or
 4. Shell execution spawns `metaeditor.exe`.
 5. Log file parsing uses Regex to match `File(Line,Col) : Error Code: Message`.
 6. `vscode.Diagnostic` objects are created and pushed to `diagnosticCollection`.
+
+---
+
+## Related Links
+- **GitHub Repository**: https://github.com/sarfrazfrompk/buraq-mql5-mql4
+- **Publisher Website**: https://sarfrazfrompk.com
